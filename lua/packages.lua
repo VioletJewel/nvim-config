@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 12 January 2023
+-- Last Change: 02 April 2023
 
 -- init {{{1
 
@@ -103,13 +103,13 @@ local optional_packages = { -- {{{1
 }
 
 local opts = { -- {{{1
-  root = vim.fn.stdpath('config')..'/lazy'
+  -- root = vim.fn.stdpath('config')..'/lazy'
 }
 
 -- setup {{{1
 
 -- add optional_packages into packages
-for ind, name in ipairs(optional_packages) do
+for _,name in ipairs(optional_packages) do
   local pkg
   if type(name) == 'table' then
     pkg = name
@@ -122,7 +122,7 @@ for ind, name in ipairs(optional_packages) do
 end
 
 -- iterate over packages and remove /^n?vim[-.]/ and /[-.]n\?vim$/
-for ind, name in ipairs(packages) do
+for ind,name in ipairs(packages) do
   local pkg
   if type(name) == 'table' then
     pkg = name

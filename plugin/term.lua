@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 12 January 2023
+-- Last Change: 18 January 2023
 
 local map = require'utils'.map
 local au = require'utils'.buildaugroup('VioletTerm')
@@ -11,7 +11,7 @@ local cmd = vim.api.nvim_create_user_command
 --       ... unless you want neovim to lock up in tmux
 
 -- treat term <c-w> like vim: allow <c-w>:, window navigation, etc
-map{ 't <c-w>', function()
+map{ '<c-w>', function()
   local wid = vim.api.nvim_get_current_win()
   local count = {}
   local ch = vim.fn.getcharstr()
@@ -37,7 +37,7 @@ map{ 't <c-w>', function()
   else
     vim.api.nvim_buf_set_var(vim.api.nvim_win_get_buf(wid), '_term_ins_', true)
   end
-end }
+end, modes='t' }
 
 -- re-enter insert mode when coming back to a terminal when it was left with <c-w> map above
 au{ 'BufWinEnter,WinEnter,CmdlineLeave', function()

@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 12 January 2023
+-- Last Change: 20 April 2023
 
 -- setup {{{1
 
@@ -13,7 +13,7 @@ local desc
 
 
 map{ '<L>',
-  'minimize mapleader side effects: <leader> => <nop>' }
+  desc='minimize mapleader side effects: <leader> => <nop>' }
 
 
 map{ '<m-w>', '<cmd>sil up<cr>', modes='nix',
@@ -78,6 +78,14 @@ map{ '<m-j>', 'zczjzo', silent=true,
 map{ '<m-k>', 'zczkzo', silent=true,
   'move to prev fold' }
 
+map{ '<c-r><c-u>', function()
+    local inp = vim.fn.input':Repeat/'
+    local sepPos = inp:find'/'
+    local amt = inp:sub(1, sepPos-1)
+    local str = inp:sub(sepPos+1)
+    return ('<c-r>=repeat(%s,%s)<cr>'):format(vim.fn.string(str), amt)
+  end, modes='i', expr=true, silent=true,
+  'repeat string in insert mode'}
 
 -- search {{{1
 

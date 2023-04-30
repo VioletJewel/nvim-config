@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 12 January 2023
+-- Last Change: 12 April 2023
 
 -- set up lsp via lspconfig
 
@@ -57,40 +57,13 @@ setup'ccls'
 
 -- lua {{{1
 
-local runtime_path = vim.split(package.path, ';')
-table.insert(runtime_path, "lua/?.lua")
-table.insert(runtime_path, "lua/?/init.lua")
-
-setup('sumneko_lua', {
-  on_new_config = function(cfg, root)
-    if root == os.getenv'HOME'..'/.config/awesome' then
-      cfg.settings.Lua.diagnostics.globals = {'awesome', 'tag', 'client', 'screen'}
-    elseif root == os.getenv'HOME'..'/.config/nvim' then
-      cfg.settings.Lua.diagnostics.globals = {'vim'}
-    end
-  end,
-  cmd = { os.getenv'HOME'..'/git/lua-language-server/bin/lua-language-server' },
+setup('lua_ls', {
   settings = {
     Lua = {
-      runtime = {
-        -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-        version = 'LuaJIT',
-        -- Setup your lua path
-        path = runtime_path,
-      },
-      diagnostics = {
-        -- globals = {'vim', 'awesome', 'tag'},
-        disable = {'lowercase-global'}
-      },
-      workspace = {
-        -- Make the server aware of Neovim runtime files
-        library = vim.api.nvim_get_runtime_file("", true),
-        checkThirdParty = false,
-      },
-      -- Do not send telemetry data containing a randomized but unique identifier
-      telemetry = {
-        enable = false,
-      },
+      runtime = { version = 'LuaJIT', },
+      diagnostics = { globals = {'vim'}, disable = { 'lowercase-global' } },
+      workspace = { library = vim.api.nvim_get_runtime_file("", true), checkThirdParty = false },
+      telemetry = { enable = false, },
     },
   },
 })
@@ -111,6 +84,10 @@ setup('vimls', {
   },
   vimruntime = ""
 })
+
+-- python {{{1
+
+setup'pyright'
 
 -- }}}1
 

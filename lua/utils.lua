@@ -1,14 +1,7 @@
 -- Author: Violet
--- Last Change: 13 January 2023
+-- Last Change: 02 April 2023
 
 local utils = {}
-
-function utils.try(fun, ...)
-  _, ret = xpcall(fun, function(err)
-    print("Error", err)
-  end, ...)
-  return ret
-end
 
 local function pop(tab, key)
   local ret = tab[key]
@@ -17,7 +10,7 @@ local function pop(tab, key)
 end
 
 function utils.map(opts)
-  local lhs = (pop(opts, 1) or pop(opts, lhs)):gsub('<[lL]>', '<leader>'):gsub('<[lL][lL]>', '<localleader>')
+  local lhs = (pop(opts, 1) or pop(opts, 'lhs')):gsub('<[lL]>', '<leader>'):gsub('<[lL][lL]>', '<localleader>')
   local rhs = pop(opts, 2) or pop(opts, 'rhs') or ''
   local desc = pop(opts, 3)
   local modes = pop(opts, 'modes') or 'n'
@@ -44,7 +37,6 @@ function utils.buildaugroup(aug, skipcreate)
     local cmd = pop(opts, 2) or pop(opts, 'command')
     local desc = pop(opts, 3)
     opts.group = auid
-    local ex, cb -- ex command, lua callback
     if type(cmd) == 'function' then
       opts.callback = cmd
       opts.command = nil

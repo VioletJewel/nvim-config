@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 12 January 2023
+-- Last Change: 30 April 2023
 
 -- helpers {{{1
 
@@ -53,15 +53,16 @@ vim.o.hidden         = true
 vim.o.ignorecase     = true
 vim.o.inccommand     = 'nosplit'
 vim.o.joinspaces     = false
-vim.o.laststatus     = 1
+vim.o.laststatus     = 0
 vim.o.lazyredraw     = true
 vim.o.list           = false
 vim.o.listchars      = 'trail:·,tab:›·,nbsp:○'
+vim.o.mouse          = nil
 vim.o.pumheight      = 10
 vim.o.ruler          = false
 vim.o.shiftround     = true
 vim.o.shiftwidth     = 0
-vim.o.shortmess      = 'filnmrwxtToOFcWAc'
+vim.o.shortmess      = 'filnmrwxtToOFcWAcS'
 vim.o.showbreak      = '↪'
 vim.o.showcmd        = false
 vim.o.showmode       = false

@@ -1,12 +1,25 @@
 -- Author: Violet
--- Last Change: 13 January 2023
+-- Last Change: 02 April 2023
 
-local try = require'utils'.try
+local load = function(pkg)
+  pcall(require, pkg)
+end
 
-vim.cmd.colorscheme 'nokto-init'  -- load immediately in case fatal error
-try(require, 'opts')              -- load lua/opts.lua early next
-try(require, 'packages')          -- load lua/packages.lua next
-try(vim.cmd.colorscheme, 'nokto') -- load colorscheme
+local colorok = false
+local color = function(col)
+  -- print(vim.o.rtp)
+  if not colorok then
+    colorok = pcall(vim.cmd.colorscheme, col)
+  end
+end
 
--- now all plugin/*.{vim,lua} then after/plugin/*.{vim,lua} are loaded in no
--- particular order (although they are loaded alphabetically)
+-- load things in specific order
+
+color'nokto'   -- try to load colorscheme (can't load earlier (easily))
+load'opts'     -- load lua/opts.lua early next
+load'packages' -- load lua/packages.lua next
+color'nokto'   -- try to load colorscheme (can't load earlier (easily))
+load'lsp'      -- load lua/lsp.lua
+
+-- during init, plugin/*.{vim,lua} then after/plugin/*.{vim,lua} are loaded in
+-- no particular order (although they are loaded alphabetically)

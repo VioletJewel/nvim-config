@@ -1,5 +1,5 @@
 " Author: Violet
-" Last Change: 10 March 2022
+" Last Change: 30 April 2023
 
-setlocal foldmethod=syntax foldlevel=0 colorcolumn=50
+setl fdm=syntax fdl=0 tw=72 cc=50,+0 fo=tlncr
 
