@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 02 April 2023
+-- Last Change: 20 June 2023
 
 -- init {{{1
 
@@ -36,8 +36,11 @@ local packages = {
   'novasenco/vimix',
   'novasenco/nokto',
   'novasenco/vulpo',
+  'owickstrom/vim-colors-paramount',
   'lifepillar/gruvbox8',
-  { 'preservim/vim-markdown', ft='markdown' },
+  'preservim/vim-markdown',
+  'lervag/vimtex',
+  'elixir-editors/vim-elixir',
 
   'dylnmc/ctrlg.vim',
 
@@ -99,7 +102,6 @@ local optional_packages = { -- {{{1
   },
 
   -- { 'glacambre/firenvim', build=function() vim.fn['firenvim#install'](0) end },
-  -- { 'lervag/vimtex', ft={'tex'}, tag='v1.6' },
 }
 
 local opts = { -- {{{1

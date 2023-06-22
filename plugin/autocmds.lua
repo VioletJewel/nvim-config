@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 13 January 2023
+-- Last Change: 22 June 2023
 
 local au = require'utils'.buildaugroup('VioletAutocmds')
 
@@ -30,5 +30,6 @@ au{'VimEnter,BufNew', [[  if expand('<afile>:p') =~ '^/tmp'
 au{'CmdlineChanged', 'silent! foldopen', pattern='[/?]',
   'open folds when searching with incsearch (^g, ^t)'}
 
--- au{'ColorScheme', 'highlight Normal ctermbg=NONE guibg=NONE', pattern='nokto'}
+-- set ft=eelixir for *.{heex,sface}
+vim.filetype.add{extension={heex = 'eelixir', sface = 'eelixir'}}
 

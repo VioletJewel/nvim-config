@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 20 April 2023
+-- Last Change: 15 June 2023
 
 -- setup {{{1
 
@@ -21,6 +21,12 @@ map{ '<m-w>', '<cmd>sil up<cr>', modes='nix',
 
 map{ '<m-W>', '<cmd>sil noa up<cr>', modes='nix',
   'quietly update without autocmds' }
+
+map{ '<m-e>', '<cmd>sil wa<cr>', modes='nix',
+  'quietly update all unchanged buffers' }
+
+map{ '<m-e>', '<cmd>sil noa wa<cr>', modes='nix',
+  'quietly update all unchanged buffers w/o autocmds' }
 
 
 map{ '<LL>q', '<cmd>qa<cr>',
