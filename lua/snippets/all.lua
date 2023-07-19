@@ -7,4 +7,5 @@ local part = lsx.partial
 
 return {
   snippet('date', part(os.date, '%d %B %Y')),
+  snippet('datet', part(os.date, '%Y-%m-%d')),
 }
