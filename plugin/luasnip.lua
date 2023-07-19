@@ -1,7 +1,7 @@
 -- Author: Violet
--- Last Change: 12 January 2023
+-- Last Change: 19 July 2023
 
-local au = require'utils'.buildaugroup('VioletLuasnip')
+local au = require'utils'.augroup'VioletLuasnip'
 
 local ok, loader = pcall(require, 'luasnip.loaders.from_lua')
 if not ok then
@@ -25,6 +25,16 @@ require'luasnip'.config.set_config({
 })
 
 -- auto-read skeleton in for new snippet file
-au{ 'BufNewFile', [[call setline(1, readfile(stdpath('config')..'/lua/snippets/.skel'))]], pattern=vim.fn.stdpath('config')..'/lua/snippets/*.lua' }
-au{ 'BufNewFile', [[echo 'New snippet buffer created; read snippet skeleton (lua/snippets/.skel)']], pattern=vim.fn.stdpath('config')..'/lua/snippets/*.lua' }
+au( 'BufNewFile', {
+  pattern  = vim.fn.stdpath('config')..'/lua/snippets/*.lua',
+  callback = function(a)
+    print('BufNewFile lua/snippets/*.lua', a.file)
+    -- call setline(1, readfile(stdpath('config')..'/lua/snippets/.skel'))
+  end,
+})
+
+au( 'BufNewFile', {
+  pattern = vim.fn.stdpath('config')..'/lua/snippets/*.lua',
+  command = "echo 'New snippet buffer created; read snippet skeleton (lua/snippets/.skel)'",
+})
 

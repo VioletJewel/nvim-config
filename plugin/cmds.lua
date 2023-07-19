@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 30 July 2022
+-- Last Change: 12 July 2023
 
 local cmd = vim.api.nvim_create_user_command
 local opts
@@ -75,5 +75,6 @@ cmd('Ssnip', function(c)
     mods = c.smods,
   }, {})
 end, {nargs='?'})
--- C('Snip', "execute 'edit' fnameescape(stdpath('config')..'/lua/snippets/'..(empty(<q-args>) ? &filetype : <q-args>)..'.lua')", {nargs='?'})
--- C('Ssnip', "execute <q-mods> 'sp' fnameescape(stdpath('config')..'/lua/snippets/'..(empty(<q-args>) ? &filetype : <q-args>)..'.lua')", {nargs='?'})
+-- cmd('Snip', "execute 'edit' fnameescape(stdpath('config')..'/lua/snippets/'..(empty(<q-args>) ? &filetype : <q-args>)..'.lua')", {nargs='?'})
+-- cmd('Ssnip', "execute <q-mods> 'sp' fnameescape(stdpath('config')..'/lua/snippets/'..(empty(<q-args>) ? &filetype : <q-args>)..'.lua')", {nargs='?'})
+

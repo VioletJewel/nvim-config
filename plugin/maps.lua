@@ -1,11 +1,11 @@
 -- Author: Violet
--- Last Change: 15 June 2023
+-- Last Change: 19 July 2023
 
 -- setup {{{1
 
 
 local map = require'utils'.map
-local au = require'utils'.buildaugroup('VioletMaps')
+local au = require'utils'.augroup('VioletMaps')
 local desc
 
 
@@ -43,7 +43,11 @@ map{ '<L><c-l>', '<cmd>syn sync fromstart<cr>',
 map{ '<c-p>', "{last->stridx(':/?',last) is -1?':':last}(get(g:,'_cmdtype_last_',':'))..'<c-p>'", expr=true,
   'opens last command or search' }
 
-au{ 'CmdlineEnter', function() vim.g._cmdtype_last_=vim.v.event.cmdtype end }
+au( 'CmdlineEnter', {
+  callback = function()
+    vim.g._cmdtype_last_ = vim.v.event.cmdtype
+  end
+})
 
 map{ '<c-p>', ":<c-u>'<,'><up>", modes='x',
   "open last command operating on visual selection" }
@@ -137,8 +141,7 @@ map{ '<L>*', ':<c-u>let v:hlsearch=maps#visSearch()+1<cr>gv', modes='x',
   'search forward for literal visual selection' }
 
 
-map{ 'n', function()
-      modes='nxo'
+map{ 'n', modes='nxo', function()
       vim.v.searchforward = 1
       vim.api.nvim_feedkeys('n', 'ntx', false)
       if vim.fn.foldclosed('.') >= 0 then
@@ -147,8 +150,7 @@ map{ 'n', function()
     end,
   'always search forwards' }
 
-map{ 'N', function()
-      modes='nxo'
+map{ 'N', modes='nxo', function()
       vim.v.searchforward = 1
       vim.api.nvim_feedkeys('N', 'ntx', false)
       if vim.fn.foldclosed('.') >= 0 then

@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 16 June 2023
+-- Last Change: 19 July 2023
 
 -- Overview: basically remove barriers for speedier terminal use.
 -- tl;dr:
@@ -18,7 +18,7 @@
 --  nicer buffer name for :term &statusline
 
 local map = require'utils'.map
-local au = require'utils'.buildaugroup('VioletTerm')
+local au = require'utils'.augroup('VioletTerm')
 local cmd = vim.api.nvim_create_user_command
 
 -- Note: do not change/switch startinsert w nvim_feedkeys() or vice versa,
@@ -62,14 +62,16 @@ map{ '<c-w>', function()
 end, modes='t' }
 
 -- re-enter insert mode when coming back to a terminal when it was left with <c-w> map above
-au{ 'BufWinEnter,WinEnter,CmdlineLeave', function()
+au( 'BufWinEnter,WinEnter,CmdlineLeave', {
+  callback = function()
     if vim.o.buftype == 'terminal' and vim.w._term_ins_ then
       if vim.fn.mode(1) == 'nt' then
         vim.cmd'startinsert'
         vim.w._term_ins_ = false
       end
     end
-  end }
+  end
+})
 
 cmd('Sterminal', '<mods> split | terminal <args>', { nargs='*' })
 cmd('STerminal', '<mods> split | terminal <args>', { nargs='*' })
@@ -78,7 +80,8 @@ vim.cmd[[ cabbrev <expr> term getcmdtype() is ':' && getcmdline() =~# '^term' &&
 vim.cmd[[ cabbrev <expr> vterm getcmdtype() is ':' && getcmdline() =~# '^vterm' && getcmdpos() is 6 ? 'vert Sterm' : 'vterm' ]]
 
 -- prettify statusline; auto-start insert
-au{ 'TermOpen', function()
+au( 'TermOpen', {
+  callback = function()
     if vim.bo.buflisted then
       local shortname = vim.api.nvim_buf_get_name(0):gsub('%S*:', '')
       if shortname == vim.o.shell then
@@ -90,12 +93,15 @@ au{ 'TermOpen', function()
         vim.cmd'startinsert'
       end
     end
-  end }
+  end
+})
 
-au{ 'TermClose', function()
+au( 'TermClose', {
+  callback = function()
     if vim.o.shell == vim.api.nvim_buf_get_name(0):gsub('%S*:','')
       and vim.v.event.status == 0 then
       vim.fn.feedkeys(' ', 'nt')
     end
-  end }
+  end
+})
 
