@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 30 April 2023
+-- Last Change: 11 August 2023
 
 -- helpers {{{1
 
@@ -36,8 +36,7 @@ end
 vim.o.backup         = true
 vim.o.backupdir      = nvim_dir'BACKUP'..'//'
 vim.o.backupext      = '.bak'
-vim.o.breakindent    = false
-vim.o.breakindentopt = 'min:80,sbr'
+vim.o.breakindent    = true
 vim.o.colorcolumn    = '+0'
 vim.o.completeopt    = 'menu,menuone'
 vim.o.cpoptions      = default'cpo'..'y'
@@ -63,7 +62,7 @@ vim.o.ruler          = false
 vim.o.shiftround     = true
 vim.o.shiftwidth     = 0
 vim.o.shortmess      = 'filnmrwxtToOFcWAcS'
-vim.o.showbreak      = '↪'
+vim.o.showbreak      = ' ↪ '
 vim.o.showcmd        = false
 vim.o.showmode       = false
 vim.o.signcolumn     = 'auto:1'
@@ -88,7 +87,7 @@ vim.o.virtualedit    = 'insert,block'
 vim.o.wildignorecase = true
 vim.o.winminheight   = 0
 vim.o.winminwidth    = 0
-vim.o.wrap           = false
+vim.o.wrap           = true
 
 vim.g.mapleader = ' '
 vim.g.maplocalleader = '\\'

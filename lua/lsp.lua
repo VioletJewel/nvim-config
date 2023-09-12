@@ -1,22 +1,47 @@
 -- Author: Violet
--- Last Change: 12 April 2023
+-- Last Change: 10 September 2023
 
 -- set up lsp via lspconfig
 
 local lsploaded, lspconfig = pcall(require, 'lspconfig')
 if not lsploaded then return false end
 
-local map = require'utils'.map
+local mapall = require'utils'.mapall
 
 -- global keymaps {{{1
 
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
-map{ '<leader>d', '<cmd>lua vim.diagnostic.open_float()<cr>', silent=true }
-map{ '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>', silent=true }
-map{ ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>', silent=true }
-map{ '<leader>D', '<cmd>lua vim.diagnostic.setloclist()<cr>', silent=true }
+mapall{
+  '<sil> <l>d <cmd>lua vim.diagnostic.open_float()<cr>',
+  '<sil> [d   <cmd>lua vim.diagnostic.goto_prev()<cr>',
+  '<sil> ]d   <cmd>lua vim.diagnostic.goto_next()<cr>',
+  '<sil> <l>D <cmd>lua vim.diagnostic.setloclist()<cr>',
+}
 
 -- lsp setup {{{1
+
+local function lspfmt(a)
+  local k, n = a:match'^(%S+)%s+(.*)'
+  return { k, vim.lsp.buf[n], buffer=true, silent=true, desc='lsp.'..n }
+end
+
+local bufmaps = {
+  lspfmt'gD    declaration',
+  lspfmt'gd    definition',
+  lspfmt'K     hover',
+  lspfmt'<L>i  implementation',
+  lspfmt'<c-k> signature_help',
+  lspfmt'<L>wa add_workspace_folder',
+  lspfmt'<L>wr remove_workspace_folder',
+  lspfmt'<L>ws workspace_symbol',
+  { '<buf> <L>wl', function() vim.print(vim.lsp.buf.list_workspace_folders()) end, buffer=true, silent=true },
+  lspfmt'td    type_definition',
+  lspfmt'<L>r  rename',
+  lspfmt'<L>ca code_action',
+  lspfmt'<L>gr references',
+  lspfmt'<L>gf format',
+  '<sil,buf> <L>K K',
+}
 
 local function on_attach(_, bnr)
   -- Use an on_attach function to only map the following keys
@@ -24,23 +49,8 @@ local function on_attach(_, bnr)
 
   vim.api.nvim_buf_set_option(bnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-  -- TODO
+  mapall(bufmaps)
 
-  local function m(l, c) map{ l, '<cmd>lua '..c..'<cr>', silent=true, buffer=bnr } end
-  m( 'gD',     'vim.lsp.buf.declaration()' )
-  m( 'gd',     'vim.lsp.buf.definition()' )
-  m( 'K',      'vim.lsp.buf.hover()' )
-  m( '<L>i',   'vim.lsp.buf.implementation()' )
-  m( '<c-k>',  'vim.lsp.buf.signature_help()' )
-  m( '<L>wa',  'vim.lsp.buf.add_workspace_folder()' )
-  m( '<L>wr',  'vim.lsp.buf.remove_workspace_folder()' )
-  m( '<L>wl',  'print(vim.inspect(vim.lsp.buf.list_workspace_folders()))' )
-  m( '<L>td',  'vim.lsp.buf.type_definition()' )
-  m( '<L>r',   'vim.lsp.buf.rename()' )
-  m( '<L>a',   'vim.lsp.buf.code_action()' )
-  m( '<LL>gr', 'vim.lsp.buf.references()' )
-  m( '<LL>gf', 'vim.lsp.buf.formatting()' )
-  map{ '<L>K', 'K' }
 end
 
 local function setup(name, cfg)

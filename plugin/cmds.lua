@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 12 July 2023
+-- Last Change: 11 September 2023
 
 local cmd = vim.api.nvim_create_user_command
 local opts
@@ -56,25 +56,41 @@ cmd('DiffOrig', table.concat({
   'diffthis',
   'wincmd p',
   'diffthis',
-  }, '|'), {})
+}, '|'), {})
 
 -- clear quickfix
 cmd('Cclear', 'call setqflist([], "r")', { nargs=0 })
 
-cmd('Snip', function(c)
-  local f = vim.fn.stdpath('config')..'/lua/snippets/'..(c.args == '' and vim.o.filetype or c.args)..'.lua'
-  vim.cmd('edit '..f)
-end, {nargs='?'})
+local snipdir = vim.fn.stdpath'config'..'/lua/snippets/'
 
-cmd('Ssnip', function(c)
-  local f = vim.fn.stdpath('config')..'/lua/snippets/'..(c.args == '' and vim.o.filetype or c.args)..'.lua'
-  print(vim.inspect( c ))
-  vim.api.nvim_cmd({
-    cmd = 'split',
+local snipCompl = function(lead,_,_)--, cmdline, curpos)
+  local fd = vim.uv.fs_opendir(snipdir, nil, 10)
+  local fs = vim.uv.fs_readdir(fd)
+  local snipfiles = {}
+  local m = lead..'.*%.lua$'
+  while fs do
+    for _,f in ipairs(fs) do
+      if f.type == 'file' and f.name:match(m) then
+        snipfiles[#snipfiles+1] = f.name
+      end
+    end
+    fs = vim.uv.fs_readdir(fd)
+  end
+  vim.uv.fs_closedir(fd)
+  return snipfiles
+end
+
+cmd('Snipedit', function(c)
+  local f = snipdir..(c.args == '' and vim.o.filetype or c.args)..'.lua'
+  vim.cmd.edit(f)
+end, { nargs='?', complete=snipCompl })
+
+cmd('Snip', function(c)
+  local f = snipdir..(c.args == '' and vim.o.filetype or c.args)..'.lua'
+  vim.cmd{
+    cmd = 'new',
     args = { f },
     mods = c.smods,
-  }, {})
-end, {nargs='?'})
--- cmd('Snip', "execute 'edit' fnameescape(stdpath('config')..'/lua/snippets/'..(empty(<q-args>) ? &filetype : <q-args>)..'.lua')", {nargs='?'})
--- cmd('Ssnip', "execute <q-mods> 'sp' fnameescape(stdpath('config')..'/lua/snippets/'..(empty(<q-args>) ? &filetype : <q-args>)..'.lua')", {nargs='?'})
+  }
+end, { nargs='?', complete=snipCompl })
 

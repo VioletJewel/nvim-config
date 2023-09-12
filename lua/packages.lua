@@ -1,10 +1,10 @@
 -- Author: Violet
--- Last Change: 20 June 2023
+-- Last Change: 12 September 2023
 
 -- init {{{1
 
 local lazypath = vim.fn.stdpath('config')..'/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
     'git',
     'clone',
@@ -16,7 +16,7 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- packags -- {{{1
+-- packages -- {{{1
 
 local packages = {
   'rstacruz/vim-closer',
@@ -38,7 +38,6 @@ local packages = {
   'novasenco/vulpo',
   'owickstrom/vim-colors-paramount',
   'lifepillar/gruvbox8',
-  'preservim/vim-markdown',
   'lervag/vimtex',
   'elixir-editors/vim-elixir',
 
@@ -51,7 +50,16 @@ local packages = {
 
   -- TODO: https://github.com/windwp/nvim-autopairs
 
+  { 'preservim/vim-markdown',
+    init = function()
+      vim.g.vim_markdown_override_foldtext = 0
+      vim.g.vim_markdown_no_default_key_mappings = 1
+      vim.g.vim_markdown_folding_disabled = 1
+    end
+  },
+
   -- { 'tpope/vim-markdown', ft='markdown' },
+
   { 'nvim-treesitter/nvim-treesitter',
     build = function() -- {{{2
       local ts_update = require'nvim-treesitter.install'.update{with_sync=true}
@@ -62,9 +70,12 @@ local packages = {
       local ok, treecfg = pcall(require, 'nvim-treesitter.configs')
       if not ok then return end
       treecfg.setup {
+        modules = {},
+        ignore_install = {},
+        auto_install = true,
         -- "all", "maintained", or a list of languages
         ensure_installed = { 'c', 'cpp', 'make', 'bash', 'vim', 'lua',
-        'json', 'yaml', 'toml' },
+        'json', 'yaml', 'toml', 'query' },
         -- ensure_installed = { 'c', 'cpp', 'make', 'bash', 'html', 'css',
         --   'typescript', 'regex', 'json', 'json5', 'bibtex', 'haskell',
         --   'ocaml', 'vim', 'commonlisp', 'rasi', 'yaml', 'toml' },
@@ -87,9 +98,33 @@ local optional_packages = { -- {{{1
   'tpope/vim-abolish',
   'junegunn/goyo.vim',
   'tweekmonster/helpful.vim',
-  'nvim-treesitter/playground',
   'puremourning/vimspector',
   'novasenco/ptppt.vim',
+
+  { 'nvim-treesitter/playground',
+    config = function()
+      require'nvim-treesitter.configs'.setup{
+        playground = {
+          enable = true,
+          disable = {},
+          updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
+          persist_queries = false, -- Whether the query persists across vim sessions
+          keybindings = {
+            toggle_query_editor = 'o',
+            toggle_hl_groups = 'i',
+            toggle_injected_languages = 't',
+            toggle_anonymous_nodes = 'a',
+            toggle_language_display = 'I',
+            focus_language = 'f',
+            unfocus_language = 'F',
+            update = 'R',
+            goto_node = '<cr>',
+            show_help = '?',
+          },
+        }
+      }
+    end
+  },
 
   { 'dhruvasagar/vim-table-mode', ft='tex' },
   { 'KeitaNakamura/tex-conceal.vim', ft='tex' },

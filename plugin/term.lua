@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 19 July 2023
+-- Last Change: 12 September 2023
 
 -- Overview: basically remove barriers for speedier terminal use.
 -- tl;dr:
@@ -30,7 +30,7 @@ local cmd = vim.api.nvim_create_user_command
 local N = vim.api.nvim_replace_termcodes('<c-bslash><c-n>', true, true, true)
 
 -- treat term <c-w> like vim
-map{ '<c-w>', function()
+map{ ':t: <c-w>', function()
   local wid = vim.api.nvim_get_current_win()
   local tcount = {}
   local ch = vim.fn.getcharstr()
@@ -59,10 +59,10 @@ map{ '<c-w>', function()
   vim.api.nvim_win_set_var(wid, '_term_ins_', true)
   keys = vim.api.nvim_replace_termcodes('<c-bslash><c-n>'..count..'<c-w>'..ch, true, true, true)
   vim.api.nvim_feedkeys(keys, '', false)
-end, modes='t' }
+end }
 
 -- re-enter insert mode when coming back to a terminal when it was left with <c-w> map above
-au( 'BufWinEnter,WinEnter,CmdlineLeave', {
+au{ 'BufWinEnter,WinEnter,CmdlineLeave',
   callback = function()
     if vim.o.buftype == 'terminal' and vim.w._term_ins_ then
       if vim.fn.mode(1) == 'nt' then
@@ -71,7 +71,7 @@ au( 'BufWinEnter,WinEnter,CmdlineLeave', {
       end
     end
   end
-})
+}
 
 cmd('Sterminal', '<mods> split | terminal <args>', { nargs='*' })
 cmd('STerminal', '<mods> split | terminal <args>', { nargs='*' })
@@ -80,7 +80,7 @@ vim.cmd[[ cabbrev <expr> term getcmdtype() is ':' && getcmdline() =~# '^term' &&
 vim.cmd[[ cabbrev <expr> vterm getcmdtype() is ':' && getcmdline() =~# '^vterm' && getcmdpos() is 6 ? 'vert Sterm' : 'vterm' ]]
 
 -- prettify statusline; auto-start insert
-au( 'TermOpen', {
+au{ 'TermOpen',
   callback = function()
     if vim.bo.buflisted then
       local shortname = vim.api.nvim_buf_get_name(0):gsub('%S*:', '')
@@ -94,14 +94,14 @@ au( 'TermOpen', {
       end
     end
   end
-})
+}
 
-au( 'TermClose', {
+au{ 'TermClose',
   callback = function()
     if vim.o.shell == vim.api.nvim_buf_get_name(0):gsub('%S*:','')
       and vim.v.event.status == 0 then
       vim.fn.feedkeys(' ', 'nt')
     end
   end
-})
+}
 

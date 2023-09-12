@@ -1,7 +1,14 @@
 -- Author: Violet
--- Last Change: 19 July 2023
+-- Last Change: 06 September 2023
 
 local utils = {}
+
+local lastcolor = nil
+function utils.color(color)
+  if lastcolor ~= color then
+    lastcolor = pcall(vim.cmd.colorscheme, color) and color or nil
+  end
+end
 
 local function pop(tab, key)
   local ret = tab[key]
@@ -9,30 +16,116 @@ local function pop(tab, key)
   return ret
 end
 
-function utils.map(opts)
-  local lhs = (pop(opts, 1) or pop(opts, 'lhs')):gsub('<[lL]>', '<leader>'):gsub('<[lL][lL]>', '<localleader>')
-  local rhs = pop(opts, 2) or pop(opts, 'rhs') or ''
-  local desc = pop(opts, 3) or pop(opts, 'desc')
-  local modes = pop(opts, 'modes') or 'n'
-  if type(modes) == 'string' then
-    if #modes > 1 then
-      mode = {}
-      for i = 1, #modes do
-        mode[#mode+1] = modes:sub(i, i)
-      end
-    elseif #modes == 0 then
-      mode = 'n'
-    else
-      mode = modes
+local mapargs = {
+  buffer  = 'buffer',  buf  = 'buffer',
+  nowait  = 'nowait',  nw   = 'nowait',
+  silent  = 'silent',  sil  = 'silent',
+  noremap = 'noremap', nore = 'noremap',
+  remap   = 'remap',   re   = 'remap',
+  script  = 'script',
+  expr    = 'expr',
+  unique  = 'unique',
+  replace_keycodes = true,
+  desc = true,
+  callback = true,
+}
+
+-- Example:
+--  > mapall{
+--  >   { '<leader>x', '"leader x"', mode={'n','x'}, silent=true, expr=true },
+--  >   ':nx:<sil,expr><l>y "leader y"', -- same as above
+--  > }
+function utils.mapall(maps)
+  for _,map in ipairs(maps) do
+    if type(map) == 'table' or type(map) == 'string' and not map:find'^%s*$' then
+      utils.map(type(map) == 'string' and {map} or map)
     end
   end
-  if desc then opts.desc = desc end
-  vim.keymap.set(mode, lhs, rhs, opts)
+end
+
+-- Examples:
+--  > map{ '<l>' }
+--  > map{ '<leader> <nop>', desc='make leader noop' }
+--
+--  > map{ '<l>h', "<cmd>unsil echo 'hi'<cr>", sil=true, mode='ni' }
+--  > map{ ':ni:<sil><l>h <cmd>unsil echo 'hi'<cr>" }
+--  > map{ ':ni:<silent,expr> <l>h', function() print'hi' return '' end }
+function utils.map(opts)
+  local lhs, rhs, pos, mode, args
+  args = {}
+  if type(opts) ~= 'table' then opts = {opts} end
+  lhs = table.remove(opts, 1)
+  if lhs:find'^:%S*:' then
+    mode, lhs = lhs:match'^:(%S*):(.*)'
+  else
+    mode = pop(opts, 'mode')
+  end
+	pos = lhs:find'%S'
+	for pre,arg,after in lhs:gmatch"()(%b<>)%s*()" do
+    if lhs:sub(pos,pre):match('%S') ~= '<' then break end
+    arg = arg:sub(2, -2)
+    if arg:match',' then
+      local targs = {}
+      local mfail = false
+      for a in arg:gmatch'([^,]+)' do
+        if mapargs[a] == nil or type(mapargs[a]) == 'bool' then
+          mfail = true
+          break
+        end
+        targs[#targs+1] = a
+      end
+      if mfail then break end
+      for _,a in ipairs(targs) do
+        args[mapargs[a]] = true
+      end
+      pos = after
+    else
+      if mapargs[arg] == nil or type(mapargs[arg]) == 'bool' then break end
+      args[mapargs[arg]] = true
+      pos = after
+    end
+	end
+  lhs = lhs:sub(pos)
+  lhs, rhs = lhs:match'^(%S+)%s*(.*)'
+  if #rhs == 0 then rhs = table.remove(opts, 1) or '' end
+  lhs = lhs:gsub('<([lL])>', '<%1eader>'):gsub('<([lL])([lL])>', '<%1ocal%2eader>')
+  if type(mode) == 'string' then
+    if #mode > 1 and not (#mode == 2 and (mode == 'ia' or mode == 'ca' or mode == '!a')) then
+      local smode = mode
+      mode = {}
+      local mp = nil
+      for i = 1, #smode do
+        local m = smode:sub(i, i)
+        if m == 'a' and (mp == 'o' or mp == 'c' or mp == '!') then
+          mode[#mode] = mode[#mode] .. m
+        elseif m == ' ' then
+        else
+          mode[#mode+1] = m
+        end
+        mp = m
+      end
+    end
+  elseif not mode then
+    mode = 'n'
+  end
+  for k,v in pairs(opts) do
+    if type(k) == 'string' and mapargs[k] then
+      args[type(mapargs[k]) == 'boolean' and k or mapargs[k]] = v
+    end
+  end
+
+  if not pcall(vim.keymap.set, mode, lhs, rhs, args) then
+    print("ERROR")
+    vim.print(mode)
+    print(mode, lhs, rhs)
+    vim.print(args)
+  end
 end
 
 function utils.augroup(aug, skipcreate)
   local group = vim.api.nvim_create_augroup(aug, { clear = not skipcreate })
-  return function(evt, opts)
+  return function(opts)
+    local evt = table.remove(opts, 1)
     if type(evt) == 'string' and evt:match',' then
       -- split event if str w commas: 'Foo,Bar' => {'Foo','Bar'}
       local evts = evt

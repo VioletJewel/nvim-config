@@ -1,13 +1,15 @@
 -- Author: Violet
--- Last Change: 19 July 2023
+-- Last Change: 05 September 2023
 
-local au = require'utils'.augroup'VioletLuasnip'
+local cfg = vim.fn.stdpath'config'
 
 local ok, loader = pcall(require, 'luasnip.loaders.from_lua')
 if not ok then
   return
 end
-loader.lazy_load{paths=vim.fn.stdpath'config'..'/lua/snippets'}
+loader.lazy_load{paths=cfg..'/lua/snippets'}
+
+local au = require'utils'.augroup'VioletLuasnip'
 
 require'luasnip'.config.set_config({
   history = true,
@@ -24,17 +26,23 @@ require'luasnip'.config.set_config({
   store_selection_keys = '<m-j>',
 })
 
--- auto-read skeleton in for new snippet file
-au( 'BufNewFile', {
-  pattern  = vim.fn.stdpath('config')..'/lua/snippets/*.lua',
-  callback = function(a)
-    print('BufNewFile lua/snippets/*.lua', a.file)
-    -- call setline(1, readfile(stdpath('config')..'/lua/snippets/.skel'))
-  end,
-})
+local function readfile(name)
+  local f = io.open(name, 'r')
+  if not f then return {} end
+  local lines = {}
+  for line in f:lines() do
+    lines[#lines+1] = line
+  end
+  return lines
+end
 
-au( 'BufNewFile', {
-  pattern = vim.fn.stdpath('config')..'/lua/snippets/*.lua',
-  command = "echo 'New snippet buffer created; read snippet skeleton (lua/snippets/.skel)'",
-})
+-- auto-read skeleton in for new snippet file
+au{ 'BufNewFile',
+  pattern  = cfg..'/lua/snippets/*.lua',
+  callback = function()
+    local skel = cfg..'/lua/snippets/.skel'
+    vim.fn.setline(1, readfile(skel))
+    print('New snippet buffer created from '..string.format('%q', skel))
+  end,
+}
 

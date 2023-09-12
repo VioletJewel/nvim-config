@@ -1,5 +1,5 @@
 " Author: Violet
-" Last Change: 18 March 2022
+" Last Change: 12 September 2023
 
 let s:urlRegex = '\v%(https?://)[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}>%([-a-zA-Z0-9()@:%_\+.~#?&//=*]*)'
 
