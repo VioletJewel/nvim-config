@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 11 September 2023
+-- Last Change: 19 September 2023
 
 -- setup {{{1
 
@@ -13,11 +13,11 @@ mapall{
 
   '<l>', -- leader = <nop> (fix side effects)
 
-  ':nix: <m-w> <cmd>sil up<cr>',     -- quietly update file
-  ':nix: <m-W> <cmd>sil noa up<cr>', -- quietly update without autocmds
+  '<#nix> <m-w> <cmd>sil up<cr>',     -- quietly update file
+  '<#nix> <m-W> <cmd>sil noa up<cr>', -- quietly update without autocmds
 
-  ':nix: <m-e> <cmd>sil wa<cr>',     -- quietly update all unchanged buffers
-  ':nix: <m-E> <cmd>sil noa wa<cr>', -- quietly update all unchanged buffers w/o autocmds
+  '<#nix> <m-e> <cmd>sil wa<cr>',     -- quietly update all unchanged buffers
+  '<#nix> <m-E> <cmd>sil noa wa<cr>', -- quietly update all unchanged buffers w/o autocmds
 
   '<ll>q <cmd>qa<cr>', -- quit unless unsaved changes
 
@@ -29,7 +29,7 @@ mapall{
   au{ 'CmdlineEnter', callback = function() vim.g._cmdtype_last_ = vim.v.event.cmdtype end },
 
   "<expr> <c-p> {last->stridx(':/?',last) is -1?':':last}(get(g:,'_cmdtype_last_',':'))..'<c-p>'", -- opens last command or search
-  ":x: <c-p> :<c-u>'<,'><up>",                                                                    -- open last command operating on visual selection
+  "<#x> <c-p> :<c-u>'<,'><up>",                                                                    -- open last command operating on visual selection
 
   "<expr> zO foldclosed('.') is -1 ? 'zczO' : 'zO'", -- same as zO but if fold already open, close first
 
@@ -39,13 +39,13 @@ mapall{
   '<m-L> <cmd>sil Lmake<cr>', -- quick :Lmake
 
   '           <l>p <cmd>call synstack#echo()<cr>', -- print highlight groups
-  ':x: <expr> <l>p synstack#vExprPrint()', -- "print stats visual selection (similar to 'showcmd')"
+  '<#x,expr> <l>p synstack#vExprPrint()', -- "print stats visual selection (similar to 'showcmd')"
 
-  ':o: w <cmd>call maps#o_word(0)<cr>', -- fix cw/dw inconsistency
-  ':o: W <cmd>call maps#o_word(1)<cr>', -- fix cW/dW inconsistency
+  '<#o> w <cmd>call maps#o_word(0)<cr>', -- fix cw/dw inconsistency
+  '<#o> W <cmd>call maps#o_word(1)<cr>', -- fix cW/dW inconsistency
 
   {
-    ':i:<c-r><c-u>', function()
+    '<#i> <c-r><c-u>', function()
       local inp = vim.fn.input':Repeat/'
       local sepPos = inp:find'/'
       local amt = inp:sub(1, sepPos-1)
@@ -63,78 +63,81 @@ mapall{
   [[# <cmd>let v:hlsearch=setreg('/', '\<'..expand('<cword>')..'\>\C')+1<bar>call search('', 'bc')<cr>]], -- "# but respect capitalization; move cursor to beg of word"
   [[g* <cmd>let v:hlsearch=setreg('/', expand('<cword>')..'\C')+1<cr>]], -- "g* without \\< and \\>"
   [[g# <cmd>let v:hlsearch=setreg('/', expand('<cword>')..'\C')+1<bar>call search('', 'bc')<cr>]], -- "g# without \\< and \\>"
-  ':x: * <esc>*gv', -- use * in visual mode
-  ':x: # <esc>#gv', -- use # in visual mode
-  ':x: g* <esc>g*gv', -- use g* in visual mode
-  ':x: g# <esc>g#gv', -- use g# in visual mode
+  '<#x> * <esc>*gv', -- use * in visual mode
+  '<#x> # <esc>#gv', -- use # in visual mode
+  '<#x> g* <esc>g*gv', -- use g* in visual mode
+  '<#x> g# <esc>g#gv', -- use g# in visual mode
   --    eg: c*Replacement<esc>.. to replace <cword> with 'Replacement' and repeat twice
-  ':o: <sil,expr> *  maps#stargn(1)', -- "faster *N{op}gn"
-  ':o: <sil,expr> #  maps#stargn(1)', -- "faster #N{op}gn"
-  ':o: <sil,expr> g* maps#stargn(0)',  -- "faster g*N{op}gn"
-  ':o: <sil,expr> g# maps#stargn(0)',  -- "faster g#N{op}gn"
-  ':x: <l># :<c-u>let v:hlsearch=maps#visSearch()+1<cr>gvo', -- search backward for literal visual selection
-  ':x:<l>* :<c-u>let v:hlsearch=maps#visSearch()+1<cr>gv', -- search forward for literal visual selection
-  {
-    ':nxo:n', function() -- always search forwards
-      vim.v.searchforward = 1
-      vim.api.nvim_feedkeys('n', 'ntx', false)
-      if vim.fn.foldclosed('.') >= 0 then
-        vim.cmd'silent! foldopen!'
-      end
-    end
-  },
-  {
-    ':nxo:N', function() -- always search backwards
-      vim.v.searchforward = 1
-      vim.api.nvim_feedkeys('N', 'ntx', false)
-      if vim.fn.foldclosed('.') >= 0 then
-        vim.cmd'silent! foldopen!'
-      end
-    end
-  },
-  ":c:<c-t> <c-t><c-r>=execute('sil! foldo!')[-1]<cr>",
-  ":c:<c-g> <c-g><c-r>=execute('sil! foldo!')[-1]<cr>",
+  '<#o,sil,expr> *  maps#stargn(1)', -- "faster *N{op}gn"
+  '<#o,sil,expr> #  maps#stargn(1)', -- "faster #N{op}gn"
+  '<#o,sil,expr> g* maps#stargn(0)',  -- "faster g*N{op}gn"
+  '<#o,sil,expr> g# maps#stargn(0)',  -- "faster g#N{op}gn"
+  '<#x> <l># :<c-u>let v:hlsearch=maps#visSearch()+1<cr>gvo', -- search backward for literal visual selection
+  '<#x> <l>* :<c-u>let v:hlsearch=maps#visSearch()+1<cr>gv', -- search forward for literal visual selection
+  { '<#nxo> <expr> n', function() return vim.v.searchforward ~= 0 and 'n' or 'N' end },
+  { '<#nxo> <expr> N', function() return vim.v.searchforward ~= 0 and 'N' or 'n' end },
+  -- {
+  --   '<#nxo> n', function() -- always search forwards
+  --     vim.v.searchforward = 1
+  --     vim.api.nvim_feedkeys('n', 'ntx', false)
+  --     if vim.fn.foldclosed('.') >= 0 then
+  --       vim.cmd'silent! foldopen!'
+  --     end
+  --   end
+  -- },
+  -- {
+  --   '<#nxo> N', function() -- always search backwards
+  --     vim.v.searchforward = 1
+  --     vim
+  --     vim.api.nvim_feedkeys('N', 'ntx', false)
+  --     if vim.fn.foldclosed('.') >= 0 then
+  --       vim.cmd'silent! foldopen!'
+  --     end
+  --   end
+  -- },
+  "<#c> <c-t> <c-t><c-r>=execute('sil! foldo!')[-1]<cr>",
+  "<#c> <c-g> <c-g><c-r>=execute('sil! foldo!')[-1]<cr>",
 
   -- quick {{{1
 
-  "<sil>[b :<c-u>execute v:count.'bprevious'<cr>", -- [count] bprevious
-  "<sil>[B :bfirst<cr>", -- bfirst
-  "<sil>]b :<c-u>execute v:count.'bnext'<cr>", -- [count] bnext
-  "<sil>]B :blast<cr>", -- blast
+  "<sil> [b :<c-u>execute v:count.'bprevious'<cr>", -- [count] bprevious
+  "<sil> [B :bfirst<cr>", -- bfirst
+  "<sil> ]b :<c-u>execute v:count.'bnext'<cr>", -- [count] bnext
+  "<sil> ]B :blast<cr>", -- blast
 
-  "<sil>[a :<c-u>execute v:count.'previous'<cr>", -- [count] previous
-  "<sil>[A :first<cr>", -- first
-  "<sil>]a :<c-u>execute v:count.'next'<cr>", -- [count] next
-  "<sil>]A :last<cr>", -- last
+  "<sil> [a :<c-u>execute v:count.'previous'<cr>", -- [count] previous
+  "<sil> [A :first<cr>", -- first
+  "<sil> ]a :<c-u>execute v:count.'next'<cr>", -- [count] next
+  "<sil> ]A :last<cr>", -- last
 
-  '<sil><l>ww <cmd>call maps#locToggle()<cr>', -- toggle local list
-  '<sil><l>wo :lopen<cr>', -- open local list
-  '<sil><l>wc :lclose<cr>', -- close local list
-  "<sil>[w :<c-u>execute v:count.'lprevious'<cr>", -- [count] lprevious
-  '<sil>[W :lfirst<cr>', -- lfirst
-  "<sil>]w :<c-u>execute v:count.'lnext'<cr>", -- [count] lnext
-  "<sil>]W :llast<cr>", -- llast
+  '<sil> <l>ww <cmd>call maps#locToggle()<cr>', -- toggle local list
+  '<sil> <l>wo :lopen<cr>', -- open local list
+  '<sil> <l>wc :lclose<cr>', -- close local list
+  "<sil> [w :<c-u>execute v:count.'lprevious'<cr>", -- [count] lprevious
+  '<sil> [W :lfirst<cr>', -- lfirst
+  "<sil> ]w :<c-u>execute v:count.'lnext'<cr>", -- [count] lnext
+  "<sil> ]W :llast<cr>", -- llast
 
-  '<sil><l>qq <cmd>call maps#qfToggle()<cr>', -- toggle quickfix list
-  '<sil><l>qo :belowright copen<cr>', -- open quickfix list
-  '<sil><l>qc :cclose<cr>', -- close quickfix list
-  "<sil>[q :<c-u>execute v:count.'cprevious'<cr>", -- [count] cprevious
-  '<sil>[Q :cfirst<cr>', -- cfirst
-  "<sil>]q :<c-u>execute v:count.'cnext'<cr>", -- [count] cnext
-  '<sil>]Q :clast<cr>', -- clast
+  '<sil> <l>qq <cmd>call maps#qfToggle()<cr>', -- toggle quickfix list
+  '<sil> <l>qo :belowright copen<cr>', -- open quickfix list
+  '<sil> <l>qc :cclose<cr>', -- close quickfix list
+  "<sil> [q :<c-u>execute v:count.'cprevious'<cr>", -- [count] cprevious
+  '<sil> [Q :cfirst<cr>', -- cfirst
+  "<sil> ]q :<c-u>execute v:count.'cnext'<cr>", -- [count] cnext
+  '<sil> ]Q :clast<cr>', -- clast
 
-  '<sil>[e :<c-u>call maps#moveLine(0, v:count, 0)<cr>', -- move line up
-  ':x:<sil>[e :<c-u>call maps#moveLine(0, v:count, 1)<cr>', -- 'move selection up' }
+  '   <sil> [e :<c-u>call maps#moveLine(0, v:count, 0)<cr>', -- move line up
+  '<#x,sil> [e :<c-u>call maps#moveLine(0, v:count, 1)<cr>', -- 'move selection up' }
 
-  '<sil>]e :<c-u>call maps#moveLine(1, v:count, 0)<cr>', -- move line down
-  ':x:<sil>]e :<c-u>call maps#moveLine(1, v:count, 1)<cr>', -- move selection down
+  '   <sil> ]e :<c-u>call maps#moveLine(1, v:count, 0)<cr>', -- move line down
+  '<#x,sil> ]e :<c-u>call maps#moveLine(1, v:count, 1)<cr>', -- move selection down
 
-  "<sil>[g call search('^\\%(<<<<<<<\\|=======\\|>>>>>>>\\)', 'wb)<cr>", -- jump to next git marker'
-  "<sil>]g :call search('^\\%(<<<<<<<\\|=======\\|>>>>>>>\\)', 'w')<cr>", -- jump to previous git marker
+  "<sil> [g call search('^\\%(<<<<<<<\\|=======\\|>>>>>>>\\)', 'wb)<cr>", -- jump to next git marker'
+  "<sil> ]g :call search('^\\%(<<<<<<<\\|=======\\|>>>>>>>\\)', 'w')<cr>", -- jump to previous git marker
 
 
-  '<sil>]f :call maps#nextFile(1)<cr>', -- edit next file in directory
-  '<sil>[f :call maps#nextFile(0)<cr>', -- edit previous file in directory
+  '<sil> ]f :call maps#nextFile(1)<cr>', -- edit next file in directory
+  '<sil> [f :call maps#nextFile(0)<cr>', -- edit previous file in directory
 
   { '<l>f', function() require'fzf-lua'.files() end }, -- browse ./**
   '<l>F <cmd>History<cr>', -- browse oldfiles
@@ -205,7 +208,7 @@ mapall{
   -- Quickly fix spelling errors (don't forget to :setl spell)
   -- Note: CTRL-S may conflict with "flow control" in some terminals
 
-  ':i:   <c-s> <esc>[s1z=gi', -- quickly fix prev spell error in insert mode
+  '<#i>   <c-s> <esc>[s1z=gi', -- quickly fix prev spell error in insert mode
   '<sil> <c-s>h [s1z=``:sil! call repeat#set("\\<c-s>h")<cr>', -- fix prev spell error (repeatable)
   '<sil> <c-s>l ]s1z=``:sil! call repeat#set("\\<c-s>l")<cr>', -- fix next spell error (repeatable)
 
@@ -216,22 +219,22 @@ mapall{
   [[<c-s>Gl ]SzG``:sil! call repeat#set("\<c-s>Gl")<cr>]],
 
   -- cmdline {{{1
-  ':c: <m-b> <s-left>',  -- better than <s-left>
-  ':c: <m-f> <s-right>', -- better than <s-right>
-  ':c: <m-h> <left>',    -- better than left
-  ':c: <m-l> <right>',   -- better than right
-  ':c: <m-k> <up>',      -- better than up
-  ':c: <m-j> <down>',    -- better than down
-  ':c: <m-a> <c-b>',     -- mirror <c-b>
-  ':c: <m-e> <c-e>',     -- mirror <c-e>
+  '<#c> <m-b> <s-left>',  -- better than <s-left>
+  '<#c> <m-f> <s-right>', -- better than <s-right>
+  '<#c> <m-h> <left>',    -- better than left
+  '<#c> <m-l> <right>',   -- better than right
+  '<#c> <m-k> <up>',      -- better than up
+  '<#c> <m-j> <down>',    -- better than down
+  '<#c> <m-a> <c-b>',     -- mirror <c-b>
+  '<#c> <m-e> <c-e>',     -- mirror <c-e>
 
   -- snap {{{1
-  ':i: <m-p> <plug>(snapSimple)',         -- insert placeholder
-  ':i: <m-P> <plug>(snapText)',           -- insert reminder
-  ':inxso: <m-o> <plug>(snapNext)',       -- snap to next placeholder
-  ':inxs:  <m-O> <plug>(snapRepeatNext)', -- repeat last snap on next placeholder
-  ':inxso: <m-i> <plug>(snapPrev)',       -- snap to previous placeholder
-  ':inxs:  <m-I> <plug>(snapRepeatPrev)', -- repeat last snap on previous placeholder
+  '<#i> <m-p> <plug>(snapSimple)',         -- insert placeholder
+  '<#i> <m-P> <plug>(snapText)',           -- insert reminder
+  '<#inxso> <m-o> <plug>(snapNext)',       -- snap to next placeholder
+  '<#inxs>  <m-O> <plug>(snapRepeatNext)', -- repeat last snap on next placeholder
+  '<#inxso> <m-i> <plug>(snapPrev)',       -- snap to previous placeholder
+  '<#inxs>  <m-I> <plug>(snapRepeatPrev)', -- repeat last snap on previous placeholder
 }
 
 -- luasnip {{{1
@@ -240,10 +243,10 @@ local ok, ls = pcall(require, 'luasnip')
 if ok then
   local e_,e,j_,j,ca_,cc = ls.expandable, ls.expand, ls.jumpable, ls.jump, ls.choice_active, ls.change_choice
   mapall{
-    { ':is:  <m-space>', function() if e_() then e() end end }, -- 'expand luasnippet'
-    { ':isn: <m-h>', function() if j_(-1) then j(-1) end end }, -- 'jump to previous luasnip node'
-    { ':isn: <m-l>', function() if j_(1) then j(1) end end }, -- 'jump to next luasnip node' }
-    { ':is: <m-j>', function() if ca_() then cc(1) end end }, -- 'cycle forward though luasnip node choices'
-    { ':is: <m-k>', function() if ca_() then cc(-1) end end }, -- 'cycle backward though luasnip node choices'
+    { '<#is>  <m-space>', function() if e_() then e() end end }, -- 'expand luasnippet'
+    { '<#isn> <m-h>', function() if j_(-1) then j(-1) end end }, -- 'jump to previous luasnip node'
+    { '<#isn> <m-l>', function() if j_(1) then j(1) end end }, -- 'jump to next luasnip node' }
+    { '<#is> <m-j>', function() if ca_() then cc(1) end end }, -- 'cycle forward though luasnip node choices'
+    { '<#is> <m-k>', function() if ca_() then cc(-1) end end }, -- 'cycle backward though luasnip node choices'
   }
 end

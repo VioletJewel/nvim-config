@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 12 September 2023
+-- Last Change: 19 September 2023
 
 -- Overview: basically remove barriers for speedier terminal use.
 -- tl;dr:
@@ -30,7 +30,7 @@ local cmd = vim.api.nvim_create_user_command
 local N = vim.api.nvim_replace_termcodes('<c-bslash><c-n>', true, true, true)
 
 -- treat term <c-w> like vim
-map{ ':t: <c-w>', function()
+map{ '<#t> <c-w>', function()
   local wid = vim.api.nvim_get_current_win()
   local tcount = {}
   local ch = vim.fn.getcharstr()

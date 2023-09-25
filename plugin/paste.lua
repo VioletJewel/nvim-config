@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 05 September 2023
+-- Last Change: 19 September 2023
 
 -- Usage:
 --   <leader>BB ------------------ paste current line to {paste-site}
@@ -51,9 +51,9 @@ local map = require'utils'.map
 local cmd = vim.api.nvim_create_user_command
 local opts
 
-map{ '<L>B', ':<c-u>set opfunc=paste#bin<cr>g@', silent=true }
-map{ '<L>B', ':<c-u>call paste#bin(visualmode())<cr>', mode='x', silent=true}
-map{ '<L>BB', 'V<space>B', silent=true, remap=true }
+map'<sil>       <L>B :<c-u>set opfunc=paste#bin<cr>g@'
+map'<#x,sil>    <L>B :<c-u>call paste#bin(visualmode())<cr>'
+map'<sil,remap> <L>BB V<space>B'
 
 opts = { bang=false, complete='customlist,paste#complete', range='%', nargs='?', bar=true }
 cmd('Pastebin', "call paste#bin('command', <line1>, <line2>, <q-args>)", opts)

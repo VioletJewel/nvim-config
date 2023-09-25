@@ -1,5 +1,5 @@
 -- Author: Violet
--- Last Change: 06 September 2023
+-- Last Change: 19 September 2023
 
 local utils = {}
 
@@ -32,9 +32,9 @@ local mapargs = {
 
 -- Example:
 --  > mapall{
---  >   { '<leader>x', '"leader x"', mode={'n','x'}, silent=true, expr=true },
---  >   ':nx:<sil,expr><l>y "leader y"', -- same as above
---  > }
+--  ..  { '<leader>x', '"leader x"', mode={'i','s'}, silent=true, expr=true },
+--  ..  '<#is,sil,expr> <l>y "leader y"',
+--  ..}
 function utils.mapall(maps)
   for _,map in ipairs(maps) do
     if type(map) == 'table' or type(map) == 'string' and not map:find'^%s*$' then
@@ -48,47 +48,44 @@ end
 --  > map{ '<leader> <nop>', desc='make leader noop' }
 --
 --  > map{ '<l>h', "<cmd>unsil echo 'hi'<cr>", sil=true, mode='ni' }
---  > map{ ':ni:<sil><l>h <cmd>unsil echo 'hi'<cr>" }
---  > map{ ':ni:<silent,expr> <l>h', function() print'hi' return '' end }
+--  > map{ '<#ni,sil> <l>h <cmd>unsil echo 'hi'<cr>" }
 function utils.map(opts)
   local lhs, rhs, pos, mode, args
   args = {}
+
   if type(opts) ~= 'table' then opts = {opts} end
   lhs = table.remove(opts, 1)
-  if lhs:find'^:%S*:' then
-    mode, lhs = lhs:match'^:(%S*):(.*)'
-  else
-    mode = pop(opts, 'mode')
-  end
+
 	pos = lhs:find'%S'
 	for pre,arg,after in lhs:gmatch"()(%b<>)%s*()" do
+    local targs = {}
+    local mfail = false
     if lhs:sub(pos,pre):match('%S') ~= '<' then break end
     arg = arg:sub(2, -2)
-    if arg:match',' then
-      local targs = {}
-      local mfail = false
-      for a in arg:gmatch'([^,]+)' do
+    for a in arg:gmatch'([^,]+)' do
+      if a:find'^#' then
+        mode = a:sub(2)
+      else
         if mapargs[a] == nil or type(mapargs[a]) == 'bool' then
           mfail = true
           break
         end
         targs[#targs+1] = a
       end
-      if mfail then break end
-      for _,a in ipairs(targs) do
-        args[mapargs[a]] = true
-      end
-      pos = after
-    else
-      if mapargs[arg] == nil or type(mapargs[arg]) == 'bool' then break end
-      args[mapargs[arg]] = true
-      pos = after
     end
+    if mfail then break end
+    for _,a in ipairs(targs) do
+      args[mapargs[a]] = true
+    end
+    pos = after
 	end
   lhs = lhs:sub(pos)
+
   lhs, rhs = lhs:match'^(%S+)%s*(.*)'
   if #rhs == 0 then rhs = table.remove(opts, 1) or '' end
   lhs = lhs:gsub('<([lL])>', '<%1eader>'):gsub('<([lL])([lL])>', '<%1ocal%2eader>')
+
+  if mode == nil then mode = pop(opts, 'mode') end
   if type(mode) == 'string' then
     if #mode > 1 and not (#mode == 2 and (mode == 'ia' or mode == 'ca' or mode == '!a')) then
       local smode = mode
@@ -108,18 +105,14 @@ function utils.map(opts)
   elseif not mode then
     mode = 'n'
   end
+
   for k,v in pairs(opts) do
     if type(k) == 'string' and mapargs[k] then
       args[type(mapargs[k]) == 'boolean' and k or mapargs[k]] = v
     end
   end
 
-  if not pcall(vim.keymap.set, mode, lhs, rhs, args) then
-    print("ERROR")
-    vim.print(mode)
-    print(mode, lhs, rhs)
-    vim.print(args)
-  end
+  vim.keymap.set(mode, lhs, rhs, args)
 end
 
 function utils.augroup(aug, skipcreate)
