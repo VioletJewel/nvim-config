@@ -10,7 +10,7 @@ local pdf_t = {}
 local default_template = 'eisvogel' -- ~/.pandoc/templates/eisvogel.latex
 local default_pdf_viewer = {'zathura', '--fork', '{}'}
 
-au{ 'BufWritePost',
+au('BufWritePost', {
   desc     = 'auto `!Pandoc %` on :write for *.md',
   pattern  = '*.md',
   callback = function()
@@ -18,9 +18,9 @@ au{ 'BufWritePost',
       vim.cmd.Pandoc()
     end
   end,
-}
+})
 
-au{ 'Filetype',
+au('Filetype', {
   pattern = 'markdown',
   callback = function()
 
@@ -32,7 +32,7 @@ au{ 'Filetype',
         local outf = vim.fn.expand('%:r')..'.pdf'
         local templ = vim.b.pandoc_template or vim.g.pandoc_template or default_template
         local ecmd
-        flags = vim.b.pandoc_flags or vim.g.pandoc_flags or nil
+        local flags = vim.b.pandoc_flags or vim.g.pandoc_flags or nil
 
         local function pandoc_exit(s)
           if s.code ~= 0 then
@@ -161,5 +161,5 @@ au{ 'Filetype',
 
   end
 
-}
+})
 

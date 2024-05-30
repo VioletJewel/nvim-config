@@ -1,252 +1,198 @@
--- Author: Violet
--- Last Change: 19 September 2023
 
--- setup {{{1
+--- Mappings for neovim.
+-- @module plugin/maps
 
-
-local mapall = require'utils'.mapall
-local au = require'utils'.augroup('VioletMaps')
-
-mapall{
-
-  -- main {{{1
-
-  '<l>', -- leader = <nop> (fix side effects)
-
-  '<#nix> <m-w> <cmd>sil up<cr>',     -- quietly update file
-  '<#nix> <m-W> <cmd>sil noa up<cr>', -- quietly update without autocmds
-
-  '<#nix> <m-e> <cmd>sil wa<cr>',     -- quietly update all unchanged buffers
-  '<#nix> <m-E> <cmd>sil noa wa<cr>', -- quietly update all unchanged buffers w/o autocmds
-
-  '<ll>q <cmd>qa<cr>', -- quit unless unsaved changes
-
-  '<remap> <ll>R <c-w>p<c-l><c-p><cr><c-w>p', -- re-run previous command in other (terminal?) window
-
-  "<c-l> <cmd>noh|dif|redr!|echon''<cr>", -- :nohlsearch, :diffupdate, :redraw! all in one
-  '<l><c-l> <cmd>syn sync fromstart<cr>', -- sync syntax from beginning of file
-
-  au{ 'CmdlineEnter', callback = function() vim.g._cmdtype_last_ = vim.v.event.cmdtype end },
-
-  "<expr> <c-p> {last->stridx(':/?',last) is -1?':':last}(get(g:,'_cmdtype_last_',':'))..'<c-p>'", -- opens last command or search
-  "<#x> <c-p> :<c-u>'<,'><up>",                                                                    -- open last command operating on visual selection
-
-  "<expr> zO foldclosed('.') is -1 ? 'zczO' : 'zO'", -- same as zO but if fold already open, close first
-
-  "<sil,expr> <l>; (getline('.')=~#';\\s*$'?'g_x':'g_a;<esc>').virtcol('.').'|'", -- toggle ";" at end of line
-
-  '<m-M> <cmd>sil Make<cr>',  -- quick :Make
-  '<m-L> <cmd>sil Lmake<cr>', -- quick :Lmake
-
-  '           <l>p <cmd>call synstack#echo()<cr>', -- print highlight groups
-  '<#x,expr> <l>p synstack#vExprPrint()', -- "print stats visual selection (similar to 'showcmd')"
-
-  '<#o> w <cmd>call maps#o_word(0)<cr>', -- fix cw/dw inconsistency
-  '<#o> W <cmd>call maps#o_word(1)<cr>', -- fix cW/dW inconsistency
-
-  {
-    '<#i> <c-r><c-u>', function()
-      local inp = vim.fn.input':Repeat/'
-      local sepPos = inp:find'/'
-      local amt = inp:sub(1, sepPos-1)
-      local str = inp:sub(sepPos+1)
-      return ('<c-r>=repeat(%s,%s)<cr>'):format(vim.fn.string(str), amt)
-    end,
-    silent = true,
+-- cabbrev hack for v{cmd} -> vert {cmd} at beginning of line only
+local function vca(ab)
+  return {
+    string.format("ca v%s getcmdline() == 'v%s' && getcmdtype() == ':' && getcmdpos() is %d ? 'vert %s' : '%s'", ab, ab, #ab+2, ab, ab),
     expr = true,
-    desc = 'repeat string in insert mode'
-  },
+    desc = 'vert '..ab
+  }
+end
 
-  -- search {{{1
+require'utils'.mapall{
 
-  [[* <cmd>let v:hlsearch=setreg('/', '\<'..expand('<cword>')..'\>\C')+1<cr>]], -- "* but respect capitalization; don't move cursor"
-  [[# <cmd>let v:hlsearch=setreg('/', '\<'..expand('<cword>')..'\>\C')+1<bar>call search('', 'bc')<cr>]], -- "# but respect capitalization; move cursor to beg of word"
-  [[g* <cmd>let v:hlsearch=setreg('/', expand('<cword>')..'\C')+1<cr>]], -- "g* without \\< and \\>"
-  [[g# <cmd>let v:hlsearch=setreg('/', expand('<cword>')..'\C')+1<bar>call search('', 'bc')<cr>]], -- "g# without \\< and \\>"
-  '<#x> * <esc>*gv', -- use * in visual mode
-  '<#x> # <esc>#gv', -- use # in visual mode
-  '<#x> g* <esc>g*gv', -- use g* in visual mode
-  '<#x> g# <esc>g#gv', -- use g# in visual mode
-  --    eg: c*Replacement<esc>.. to replace <cword> with 'Replacement' and repeat twice
-  '<#o,sil,expr> *  maps#stargn(1)', -- "faster *N{op}gn"
-  '<#o,sil,expr> #  maps#stargn(1)', -- "faster #N{op}gn"
-  '<#o,sil,expr> g* maps#stargn(0)',  -- "faster g*N{op}gn"
-  '<#o,sil,expr> g# maps#stargn(0)',  -- "faster g#N{op}gn"
-  '<#x> <l># :<c-u>let v:hlsearch=maps#visSearch()+1<cr>gvo', -- search backward for literal visual selection
-  '<#x> <l>* :<c-u>let v:hlsearch=maps#visSearch()+1<cr>gv', -- search forward for literal visual selection
-  { '<#nxo> <expr> n', function() return vim.v.searchforward ~= 0 and 'n' or 'N' end },
-  { '<#nxo> <expr> N', function() return vim.v.searchforward ~= 0 and 'N' or 'n' end },
-  -- {
-  --   '<#nxo> n', function() -- always search forwards
-  --     vim.v.searchforward = 1
-  --     vim.api.nvim_feedkeys('n', 'ntx', false)
-  --     if vim.fn.foldclosed('.') >= 0 then
-  --       vim.cmd'silent! foldopen!'
-  --     end
-  --   end
-  -- },
-  -- {
-  --   '<#nxo> N', function() -- always search backwards
-  --     vim.v.searchforward = 1
-  --     vim
-  --     vim.api.nvim_feedkeys('N', 'ntx', false)
-  --     if vim.fn.foldclosed('.') >= 0 then
-  --       vim.cmd'silent! foldopen!'
-  --     end
-  --   end
-  -- },
-  "<#c> <c-t> <c-t><c-r>=execute('sil! foldo!')[-1]<cr>",
-  "<#c> <c-g> <c-g><c-r>=execute('sil! foldo!')[-1]<cr>",
-
-  -- quick {{{1
-
-  "<sil> [b :<c-u>execute v:count.'bprevious'<cr>", -- [count] bprevious
-  "<sil> [B :bfirst<cr>", -- bfirst
-  "<sil> ]b :<c-u>execute v:count.'bnext'<cr>", -- [count] bnext
-  "<sil> ]B :blast<cr>", -- blast
-
-  "<sil> [a :<c-u>execute v:count.'previous'<cr>", -- [count] previous
-  "<sil> [A :first<cr>", -- first
-  "<sil> ]a :<c-u>execute v:count.'next'<cr>", -- [count] next
-  "<sil> ]A :last<cr>", -- last
-
-  '<sil> <l>ww <cmd>call maps#locToggle()<cr>', -- toggle local list
-  '<sil> <l>wo :lopen<cr>', -- open local list
-  '<sil> <l>wc :lclose<cr>', -- close local list
-  "<sil> [w :<c-u>execute v:count.'lprevious'<cr>", -- [count] lprevious
-  '<sil> [W :lfirst<cr>', -- lfirst
-  "<sil> ]w :<c-u>execute v:count.'lnext'<cr>", -- [count] lnext
-  "<sil> ]W :llast<cr>", -- llast
-
-  '<sil> <l>qq <cmd>call maps#qfToggle()<cr>', -- toggle quickfix list
-  '<sil> <l>qo :belowright copen<cr>', -- open quickfix list
-  '<sil> <l>qc :cclose<cr>', -- close quickfix list
-  "<sil> [q :<c-u>execute v:count.'cprevious'<cr>", -- [count] cprevious
-  '<sil> [Q :cfirst<cr>', -- cfirst
-  "<sil> ]q :<c-u>execute v:count.'cnext'<cr>", -- [count] cnext
-  '<sil> ]Q :clast<cr>', -- clast
-
-  '   <sil> [e :<c-u>call maps#moveLine(0, v:count, 0)<cr>', -- move line up
-  '<#x,sil> [e :<c-u>call maps#moveLine(0, v:count, 1)<cr>', -- 'move selection up' }
-
-  '   <sil> ]e :<c-u>call maps#moveLine(1, v:count, 0)<cr>', -- move line down
-  '<#x,sil> ]e :<c-u>call maps#moveLine(1, v:count, 1)<cr>', -- move selection down
-
-  "<sil> [g call search('^\\%(<<<<<<<\\|=======\\|>>>>>>>\\)', 'wb)<cr>", -- jump to next git marker'
-  "<sil> ]g :call search('^\\%(<<<<<<<\\|=======\\|>>>>>>>\\)', 'w')<cr>", -- jump to previous git marker
+  vca'sb',  vca'sb#',
+  vca'h',   vca'h#',
+  vca'sn',  vca'sn#',
+  vca'spr', vca'spr#',
+  vca'sbn', vca'sbn#',
+  vca'sbp', vca'sbp#',
 
 
-  '<sil> ]f :call maps#nextFile(1)<cr>', -- edit next file in directory
-  '<sil> [f :call maps#nextFile(0)<cr>', -- edit previous file in directory
+  { 'nx <L>', desc='fix leader side effects' },
 
-  { '<l>f', function() require'fzf-lua'.files() end }, -- browse ./**
-  '<l>F <cmd>History<cr>', -- browse oldfiles
-  { '<ll>f', function() require'fzf-lua'.files() end }, -- browse %:p:h/**
-  '<ll>F :Files %:p:h<c-z>', -- browse %:p:h/** but wait for user
-  '<l>b <cmd>Buffers<cr>', -- switch buffers
-  -- <l>sb :BLines<cr>', desc = 'find pattern in current buffer
-  -- <l>sB :Lines<cr>', desc = 'find pattern in buffers
-  -- <l>S :Rg ', desc = 'find pattern in files
-  -- <l>: <cmd>History :<cr>
-  -- <l>/ <cmd>History /<cr>
-  '<l>cd :cd %:p:h<c-z>', -- cd %:p:h; wait
-  '<l>g :Git ',
+  -- quick
 
-  -- config {{{1
+  { 'nxic <M-w> <Cmd>sil up<CR>', desc='update file quickly', silent=true },
+  { 'nxic <M-W> <Cmd>sil noa up<CR>', desc='update file quickly (noautocmd)', silent=true },
 
-  -- 'edit files in config'
-  {
-    '<ll>c', function()
-      require'telescope.builtin'.find_files{
-        cwd = vim.fn.stdpath'config'
-      }
-    end
-  },
+  { 'nxic <M-e> <Cmd>sil wa<CR>', desc='write file quickly', silent=true },
+  { 'nxic <M-E> <Cmd>sil noa wa<CR>', desc='write file quickly (noautocmd)', silent=true },
 
-  -- 'edit files in config'
-  {
-    '<ll><ll>c', function()
-      require'fzf-lua'.files{
-        cwd = vim.fn.stdpath'config'
-      }
-    end
-  },
+  { 'n <LL>q <Cmd>qa<CR>', desc='quit quickly', silent=true },
+  { 'n <LL>s <Cmd>sil up|so%<CR>', desc='update and source current file', silent=true },
 
+  { "n <C-l> <cmd>noh|dif|redr!|echon''<cr>", desc='overload <C-l>', silent=true },
 
-  -- 'reload config'
-  {
-    '<ll>C', function()
-      local dn = vim.fn.stdpath'config'..'/plugin/'
-      local fd  = vim.uv.fs_opendir(dn, nil, 10)
-      local fs = vim.uv.fs_readdir(fd)
-      local files = {}
-      while fs do
-        for _,f in ipairs(fs) do
-          if f.type == 'file' then
-            local cmd = nil
-            if f.name:match'.lua$' then -- lua script
-              cmd = 'luafile'
-            elseif f.name:match'.vim$' then -- vim script
-              cmd = 'source'
-            end
-            if cmd then
-              files[#files+1] = f.name
-              vim.api.nvim_cmd({ cmd=cmd, args={dn..f.name} }, {})
-            end
-          end
-        end
-        fs = vim.uv.fs_readdir(fd)
-      end
-      vim.uv.fs_closedir(fd)
-      print(vim.inspect( files ))
-      print(string.format('Reloaded plugin/{%s}', table.concat(files, ',')))
-    end
-  },
+  { 'n <C-p> :<C-p>', desc='get to previous command quickly', silent=true },
+  { 'x <C-p> :<Up>',  desc='get to previous "visual" command quickly', silent=true },
 
-  -- spell {{{1
+  { "n zO foldclosed('.') is -1 ? 'zczO' : 'zO'", expr = true,
+    desc = 'same as zO but if fold already open, close first', silent=true },
 
-  -- Quickly fix spelling errors (don't forget to :setl spell)
-  -- Note: CTRL-S may conflict with "flow control" in some terminals
+  -- jumping
 
-  '<#i>   <c-s> <esc>[s1z=gi', -- quickly fix prev spell error in insert mode
-  '<sil> <c-s>h [s1z=``:sil! call repeat#set("\\<c-s>h")<cr>', -- fix prev spell error (repeatable)
-  '<sil> <c-s>l ]s1z=``:sil! call repeat#set("\\<c-s>l")<cr>', -- fix next spell error (repeatable)
+  { "n [b :<c-u>execute v:count.'bprevious'<cr>", desc='[count] bprevious', silent=true },
+  { "n [B :bfirst<cr>", desc='bfirst', silent=true },
+  { "n ]b :<c-u>execute v:count.'bnext'<cr>", desc='[count] bnext', silent=true },
+  { "n ]B :blast<cr>", desc='blast', silent=true },
+
+  { "n [a :<c-u>execute v:count.'previous'<cr>", desc='[count] previous', silent=true },
+  { "n [A :first<cr>", desc='first', silent=true },
+  { "n ]a :<c-u>execute v:count.'next'<cr>", desc='[count] next', silent=true },
+  { "n ]A :last<cr>", desc='last', silent=true },
+
+  { 'n <l>ww <cmd>call maps#locToggle()<cr>', desc='toggle local list', silent=true },
+  { 'n <l>wo :lopen<cr>', desc='open local list', silent=true },
+  { 'n <l>wc :lclose<cr>', desc='close local list', silent=true },
+  { "n [w :<c-u>execute v:count.'lprevious'<cr>", desc='[count] lprevious', silent=true },
+  { 'n [W :lfirst<cr>', desc='lfirst', silent=true },
+  { "n ]w :<c-u>execute v:count.'lnext'<cr>", desc='[count] lnext', silent=true },
+  { "n ]W :llast<cr>", desc='llast', silent=true },
+
+  { 'n <l>qq <cmd>call maps#qfToggle()<cr>', desc='toggle quickfix list', silent=true },
+  { 'n <l>qo :belowright copen<cr>', desc='open quickfix list', silent=true },
+  { 'n <l>qc :cclose<cr>', desc='close quickfix list', silent=true },
+  { "n [q :<c-u>execute v:count.'cprevious'<cr>", desc='[count] cprevious', silent=true },
+  { 'n [Q :cfirst<cr>', desc='cfirst', silent=true },
+  { "n ]q :<c-u>execute v:count.'cnext'<cr>", desc='[count] cnext', silent=true },
+  { 'n ]Q :clast<cr>', desc='clast', silent=true },
+
+  { 'n [e :<c-u>call maps#moveLine(0, v:count, 0)<cr>', desc='move line up', silent=true },
+  { 'x [e :<c-u>call maps#moveLine(0, v:count, 1)<cr>', desc='move selection up', silent=true },
+
+  { 'n ]e :<c-u>call maps#moveLine(1, v:count, 0)<cr>', desc='move line down', silent=true },
+  { 'x ]e :<c-u>call maps#moveLine(1, v:count, 1)<cr>', desc='move selection down', silent=true },
+
+  { "n [g call search('^\\%(<<<<<<<\\|=======\\|>>>>>>>\\)', 'wb)<cr>", desc='jump to next git marker', silent=true },
+  { "n ]g :call search('^\\%(<<<<<<<\\|=======\\|>>>>>>>\\)', 'w')<cr>", desc='jump to previous git marker', silent=true },
+
+  { 'n ]f :call maps#nextFile(1)<cr>', desc='edit next file in directory', silent=true },
+  { 'n [f :call maps#nextFile(0)<cr>', desc='edit previous file in directory', silent=true },
+
+  -- fzf
+
+  { 'n <l>f', function() require'fzf-lua'.files() end, desc='browse ./**' },
+  -- { 'n <l>F <cmd>History<cr>', desc='browse oldfiles' },
+  { 'n <ll>f', function() require'fzf-lua'.files() end, desc='browse %:p:h/**', },
+  -- { 'n <ll>F :Files %:p:h<c-z>', desc='browse %:p:h/** but wait for user', },
+  { 'n <l>b <cmd>Buffers<cr>', desc='switch buffers', },
+
+  { 'n <ll>c', function() require'fzf-lua'.files{ cwd = vim.fn.stdpath'config' } end,
+    desc='edit files in config' },
+
+  -- spell
+
+  { 'i   <c-s> <esc>[s1z=gi', desc='quickly fix prev spell error in insert mode', silent=true },
+  { 'n <c-s>h [s1z=``:sil! call repeat#set("\\<c-s>h")<cr>', desc='fix prev spell error (repeatable)', silent=true },
+  { 'n <c-s>l ]s1z=``:sil! call repeat#set("\\<c-s>l")<cr>', desc='fix next spell error (repeatable)', silent=true },
 
   -- spell gooding (repeatable)
-  [[<c-s>gh [Szg``:sil! call repeat#set("\<c-s>gh")<cr>]],
-  [[<c-s>gl ]Szg``:sil! call repeat#set("\<c-s>gl")<cr>]],
-  [[<c-s>Gh [SzG``:sil! call repeat#set("\<c-s>Gh")<cr>]],
-  [[<c-s>Gl ]SzG``:sil! call repeat#set("\<c-s>Gl")<cr>]],
+  { [[n <c-s>gh [Szg``:sil! call repeat#set("\<c-s>gh")<cr>]] },
+  { [[n <c-s>gl ]Szg``:sil! call repeat#set("\<c-s>gl")<cr>]] },
+  { [[n <c-s>Gh [SzG``:sil! call repeat#set("\<c-s>Gh")<cr>]] },
+  { [[n <c-s>Gl ]SzG``:sil! call repeat#set("\<c-s>Gl")<cr>]] },
 
-  -- cmdline {{{1
-  '<#c> <m-b> <s-left>',  -- better than <s-left>
-  '<#c> <m-f> <s-right>', -- better than <s-right>
-  '<#c> <m-h> <left>',    -- better than left
-  '<#c> <m-l> <right>',   -- better than right
-  '<#c> <m-k> <up>',      -- better than up
-  '<#c> <m-j> <down>',    -- better than down
-  '<#c> <m-a> <c-b>',     -- mirror <c-b>
-  '<#c> <m-e> <c-e>',     -- mirror <c-e>
+  -- searching
 
-  -- snap {{{1
-  '<#i> <m-p> <plug>(snapSimple)',         -- insert placeholder
-  '<#i> <m-P> <plug>(snapText)',           -- insert reminder
-  '<#inxso> <m-o> <plug>(snapNext)',       -- snap to next placeholder
-  '<#inxs>  <m-O> <plug>(snapRepeatNext)', -- repeat last snap on next placeholder
-  '<#inxso> <m-i> <plug>(snapPrev)',       -- snap to previous placeholder
-  '<#inxs>  <m-I> <plug>(snapRepeatPrev)', -- repeat last snap on previous placeholder
+  { [[n * <cmd>let v:hlsearch=setreg('/', '\<'..expand('<cword>')..'\>\C')+1<cr>]],
+    desc=[["* but respect capitalization; don't move cursor"]] },
+  { [[n # <cmd>let v:hlsearch=setreg('/', '\<'..expand('<cword>')..'\>\C')+1<bar>call search('', 'bc')<cr>]],
+    desc=[["# but respect capitalization; move cursor to beg of word"]] },
+  { [[n g* <cmd>let v:hlsearch=setreg('/', expand('<cword>')..'\C')+1<cr>]],
+    desc=[["g* without \< and \>"]] },
+  { [[n g# <cmd>let v:hlsearch=setreg('/', expand('<cword>')..'\C')+1<bar>call search('', 'bc')<cr>]],
+    desc=[["g# without \< and \>"]] },
+
+  { 'o *  maps#stargn(1)', desc='"faster *N{op}gn"', silent=true, expr=true },
+  { 'o #  maps#stargn(1)', desc='"faster #N{op}gn"', silent=true, expr=true },
+  { 'o g* maps#stargn(0)', desc='"faster g*N{op}gn"', silent=true, expr=true  },
+  { 'o g# maps#stargn(0)', desc='"faster g#N{op}gn"', silent=true, expr=true  },
+
+  { 'nxo n', function() return vim.v.searchforward ~= 0 and 'n' or 'N' end, expr=true },
+  { 'nxo N', function() return vim.v.searchforward ~= 0 and 'N' or 'n' end, expr=true },
+
+  -- command line
+
+  { 'c <M-h> <left>',  desc='go left in cmdline' },
+  { 'c <M-l> <right>', desc='go right in cmdline' },
+
+  { 'c <M-k> <up>',   desc='go up in cmdline' },
+  { 'c <M-j> <down>', desc='go down in cmdline' },
+
+  { 'c <M-b> <c-left>',  desc='go a word left in cmdline' },
+  { 'c <M-f> <c-right>', desc='go a word right in cmdline' },
+
+  { 'c <M-a> <c-b>', desc='go to beginning of cmdline' },
+  { 'c <M-e> <c-e>', desc='go to end of cmdline' },
+
+  -- text objects
+
+  { 'x il <Esc>g_v^', desc='in-line text object' },
+  { 'o il <Cmd>norm!g_v^<Cr>', desc='in-line text object' },
+
+  { 'x al <Esc>$v0', desc='around-line text object' },
+  { 'o al <Cmd>norm!$v0<Cr>', desc='around-line text object' },
+
+  { 'x id <Esc>G$Vgg0', desc='in-document text object' },
+  { 'o id <Cmd>norm!G$Vgg0<Cr>', desc='in-document text object' },
+
+  { 'x  go <cmd>call maps#visualGoOther(0)<cr>' },
+  { 'x  gO <cmd>call maps#visualGoOther(1)<cr>' },
+
+  { 'x  gl <cmd>call maps#visualGoLine(0)<cr>' },
+  { 'x  gL <cmd>call maps#visualGoLine(1)<cr>' },
+
+  { 'xo in <cmd>call maps#inNumber()<cr>' },
+  { 'xo an <cmd>call maps#aroundNumber()<cr>' },
+
+  { 'xo ii <cmd>call maps#inIndentation()<cr>' },
+  { 'xo ai <cmd>call maps#aroundIndentation()<cr>' },
+
+  -- visual go commands
+
+  {
+    'x go', function()
+      vim.cmd.normal{
+        vim.api.nvim_replace_termcodes('<c-bslash><c-n>', true, false, true),
+        bang=true,
+      }
+      vim.cmd.normal{'gvo', bang=true,}
+      vim.cmd.normal{'o'..vim.fn.col'.'..'|', bang=true,}
+    end,
+    desc = 'Goto Other [Corner]',
+  },
+
+  {
+    'x gO', function()
+      vim.cmd.normal{'o'..vim.fn.col'.'..'|o', bang=true,}
+    end,
+    desc = 'Grab Other [Corner]',
+  },
+
 }
-
--- luasnip {{{1
 
 local ok, ls = pcall(require, 'luasnip')
 if ok then
   local e_,e,j_,j,ca_,cc = ls.expandable, ls.expand, ls.jumpable, ls.jump, ls.choice_active, ls.change_choice
-  mapall{
-    { '<#is>  <m-space>', function() if e_() then e() end end }, -- 'expand luasnippet'
-    { '<#isn> <m-h>', function() if j_(-1) then j(-1) end end }, -- 'jump to previous luasnip node'
-    { '<#isn> <m-l>', function() if j_(1) then j(1) end end }, -- 'jump to next luasnip node' }
-    { '<#is> <m-j>', function() if ca_() then cc(1) end end }, -- 'cycle forward though luasnip node choices'
-    { '<#is> <m-k>', function() if ca_() then cc(-1) end end }, -- 'cycle backward though luasnip node choices'
+  require'utils'.mapall{
+    { 'is  <m-space>', function() if e_() then e() end end }, -- 'expand luasnippet'
+    { 'isn <m-h>', function() if j_(-1) then j(-1) end end }, -- 'jump to previous luasnip node'
+    { 'isn <m-l>', function() if j_(1) then j(1) end end }, -- 'jump to next luasnip node' }
+    { 'is <m-j>', function() if ca_() then cc(1) end end }, -- 'cycle forward though luasnip node choices'
+    { 'is <m-k>', function() if ca_() then cc(-1) end end }, -- 'cycle backward though luasnip node choices'
   }
 end
+
