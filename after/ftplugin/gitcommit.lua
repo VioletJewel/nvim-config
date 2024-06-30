@@ -1,7 +1,7 @@
+local l = vim.opt_local
 
-vim.wo.foldmethod = 'syntax'
-vim.wo.foldlevel = 0
-vim.bo.textwidth = 72
-vim.wo.colorcolumn = '50,+0'
-vim.bo.formatoptions = 'tlncr'
-
+l.foldmethod = 'syntax'
+l.foldlevel = 0
+l.textwidth = 72
+l.colorcolumn = '50,+0'
+l.formatoptions = 'tlncr'

@@ -1,2 +1,1 @@
-
-vim.wo.concealcursor = ''
+vim.opt_local.concealcursor = ''

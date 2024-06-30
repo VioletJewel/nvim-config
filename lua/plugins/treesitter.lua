@@ -1,13 +1,12 @@
-
 return {
 
   {
     'nvim-treesitter/nvim-treesitter',
     build = function()
-      require'nvim-treesitter.install'.update{ with_sync = true }()
+      require 'nvim-treesitter.install'.update { with_sync = true } ()
     end,
     config = function()
-      require'nvim-treesitter.configs'.setup{
+      require 'nvim-treesitter.configs'.setup {
         ensure_installed = {
           'markdown', -- required
           'c', 'cpp', 'make',
@@ -44,11 +43,11 @@ return {
     optional = true,
     dependencies = { 'nvim-treesitter/nvim-treesitter' },
     config = function()
-      require'nvim-treesitter.configs'.setup{
+      require 'nvim-treesitter.configs'.setup {
         playground = {
           enable = true,
           disable = {},
-          updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
+          updatetime = 25,         -- Debounced time for highlighting nodes in the playground from source code
           persist_queries = false, -- Whether the query persists across vim sessions
           keybindings = {
             toggle_query_editor = 'o',

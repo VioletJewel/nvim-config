@@ -1,6 +1,6 @@
-local ls = require'luasnip'
-local lsf = require'luasnip.extras.fmt'
-local lsx = require'luasnip.extras'
+local ls = require 'luasnip'
+local lsf = require 'luasnip.extras.fmt'
+local lsx = require 'luasnip.extras'
 
 local snippet = ls.snippet
 local text = ls.text_node
@@ -21,8 +21,8 @@ return {
     part(os.date, '%Y-%m-%d'),
     ins(3, 'comma-sep keywords'),
   })),
-  snippet('cc', text'- [ ] '),
-  snippet('cm', text'- [x] '),
+  snippet('cc', text '- [ ] '),
+  snippet('cm', text '- [x] '),
   snippet('si', fmt('`{}`', { ins(1, '') })),
   snippet('ss', fmt('```\n{}\n```', { ins(1, '') })),
 }

@@ -1,11 +1,12 @@
+local l = vim.opt_local
 
-vim.wo.concealcursor = ''
+l.concealcursor = ''
 
-vim.opt.formatoptions:append'2'
-vim.opt.formatoptions:append'n'
+l.formatoptions:append '2'
+l.formatoptions:append 'n'
 
-vim.wo.foldlevel = 0
+l.foldlevel = 0
 
-vim.bo.softtabstop = 2
-vim.bo.tabstop = 2
-vim.bo.shiftwidth = 2
+l.softtabstop = 2
+l.tabstop = 2
+l.shiftwidth = 2

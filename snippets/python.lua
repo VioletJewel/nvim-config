@@ -1,6 +1,6 @@
 local ls = require("luasnip")
 local s = ls.snippet
--- local sn = ls.snippet_node
+local sn = ls.snippet_node
 -- local isn = ls.indent_snippet_node
 local t = ls.text_node
 local i = ls.insert_node
@@ -45,7 +45,7 @@ return {
       t'',
       t'int',
       t'str',
-      s(nil, {
+      sn(nil, {
         i(1, 'tuple'),
         t'[',
         i(2, 'int'),
@@ -63,12 +63,12 @@ return {
         for m in (aline..','):gmatch('(.-)%s*,') do
           if not m:match('^%s*$') then
             local typ = nil -- param type
-            local def = nil -- param default value
+            local dyn = nil -- param default value
             local i1, i2
             m = m:gsub('^%s+','',1)
             i1, i2 = m:find('%s*=%s*')
             if i1 then
-              def = m:sub(i2+1)
+              dyn = m:sub(i2+1)
               m = m:sub(1, i1-1)
             end
             i1, i2 = m:find('%s*:%s*')
@@ -81,16 +81,16 @@ return {
           end
             lines[#lines+1] = t('\t\t'..m)
             if typ then
-              lines[#lines+1] = t(' ('..t..(def and ' optional' or '')..')')
-            elseif def then
+              lines[#lines+1] = t(' ('..typ..(dyn and ' optional' or '')..')')
+            elseif dyn then
               lines[#lines+1] = t' (optional)'
             end
             lines[#lines+1] = t': '
             lines[#lines+1] = i(loopnum, 'param description')
             loopnum = loopnum + 1
-            if def then
+            if dyn then
               lines[#lines+1] = t'. Defaults to '
-              lines[#lines+1] = i(loopnum, def)
+              lines[#lines+1] = i(loopnum, dyn)
               loopnum = loopnum + 1
             end
           end
@@ -99,13 +99,13 @@ return {
       if #lines > 0 then
         table.insert(lines, 1, t{'', '', '\tArgs:', ''})
       end
-      return s(nil, lines)
+      return sn(nil, lines)
     end, 2),
     d(6, function(args)
       if not args[1][1] or args[1][1]:match'^%s*$' then
-        return s(nil, {})
+        return sn(nil, {})
       end
-      return s(nil, {
+      return sn(nil, {
         t{'','','\tReturns:','\t\t'},
         i(1, args[1][1]), --:gsub('^%s*(.-)%s*$', '%1')),
         t': ',

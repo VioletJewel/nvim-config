@@ -24,7 +24,7 @@ return {
     ins(2, ''),
     text')',
     func(function(args)
-      return not args[1][1]:match('^%s*$') and {' -> '} or {}
+      return not args[1][1]:match'^%s*$' and {' -> '} or {}
     end, 3),
     choice(3, {
       text'',
@@ -45,18 +45,18 @@ return {
       for _,aline in ipairs(args[1]) do
         aline = aline:gsub('%s*,%s*$', '')
         aline = aline:gsub('^%s+', '')
-        for m in (aline..','):gmatch('(.-)%s*,') do
-          if not m:match('^%s*$') then
+        for m in (aline..','):gmatch'(.-)%s*,' do
+          if not m:match'^%s*$' then
             local t = nil -- param type
             local d = nil -- param default value
             local i1, i2
             m = m:gsub('^%s+','',1)
-            i1, i2 = m:find('%s*=%s*')
+            i1, i2 = m:find'%s*=%s*'
             if i1 then
               d = m:sub(i2+1)
               m = m:sub(1, i1-1)
             end
-            i1, i2 = m:find('%s*:%s*')
+            i1, i2 = m:find'%s*:%s*'
             if i1 then
               t = m:sub(i2+1)
               m = m:sub(1, i1-1)
