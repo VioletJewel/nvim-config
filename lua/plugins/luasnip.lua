@@ -1,5 +1,4 @@
 local s = function(modes) return vim.split(modes, '') end
-local map = vim.keymap.set
 
 return {
   {
@@ -16,34 +15,34 @@ return {
 
       -- maps
 
-      map(s'nis', '<M-space>', function()
+      vim.keymap.set(s'nis', '<M-space>', function()
         if ls.expandable() then ls.expand() end
       end, {
-          desc = 'expand luasnippet'
+          desc = 'expand luasnip snippet if possible'
         }
       )
 
-      map(s'nis', '<M-h>', function()
+      vim.keymap.set(s'nis', '<M-h>', function()
         if ls.jumpable(-1) then ls.jump(-1) end
       end, {
           desc = 'jump to previous luasnip node'
         }
       )
 
-      map(s'nis', '<M-l>', function()
+      vim.keymap.set(s'nis', '<M-l>', function()
         if ls.jumpable(1) then ls.jump(1) end
       end, {
           desc = 'jump to next luasnip node'
         })
 
-      map(s'nis', '<M-j>', function()
+      vim.keymap.set(s'nis', '<M-j>', function()
         if ls.choice_active() then ls.change_choice(1) end
       end, {
-          desc = 'cycle forward through luasnip node choices'
+          desc = 'cycle forwards through luasnip node choices'
         }
       )
 
-      map(s'nis', '<M-k>', function()
+      vim.keymap.set(s'nis', '<M-k>', function()
         if ls.choice_active() then ls.change_choice(-1) end
       end, {
           desc = 'cycle backwards through luasnip node choices',

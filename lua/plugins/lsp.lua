@@ -1,8 +1,9 @@
 local au = require 'utils'.augroup'LspAttach'
-local map = vim.keymap.set
 
 local lsps = vim.iter{
   clangd = {},
+
+  zls = {},
 
   lua_ls = {
     on_init = function(client)
@@ -21,39 +22,40 @@ local lsps = vim.iter{
     settings = { Lua = {} }
   },
 
-  rls = {
+  rust_analyzer = {
     settings = {
-      rust = {
-        unstable_features = true,
-        build_on_save = false,
-        all_features = true,
-      },
-    },
+      ['rust-analyzer'] = {
+        diagnostics = {
+          enable = false,
+        },
+      }
+    }
   },
+
 }
 
 -- global keymaps
 
-map('n', '<Leader>e', function()
+vim.keymap.set('n', '<Leader>e', function()
   vim.diagnostic.open_float()
 end, {
-  desc = 'diagnostic open_float'
+  desc = 'open diagnostic float'
 })
 
-map('n', '[d', function()
+vim.keymap.set('n', '[d', function()
   vim.diagnostic.jump{ count = -1 }
 end, {
-  desc = 'diagnostic goto_prev'
+  desc = 'goto prev diagnostic'
 })
 
-map('n', ']d', function()
+vim.keymap.set('n', ']d', function()
   vim.diagnostic.jump{ count = 1 }
 end, {
-  desc = 'diagnostic goto_next'
+  desc = 'goto next diagnostic'
 })
 
-map('n', '<Leader>q', function() vim.diagnostic.setloclist() end, {
-  desc = 'diagnostic setloclist'
+vim.keymap.set('n', '<Leader>q', function() vim.diagnostic.setloclist() end, {
+  desc = 'set diagnostic loclist'
 })
 
 local function lspCallback(evt)
@@ -61,71 +63,71 @@ local function lspCallback(evt)
 
   -- buffer keymaps
 
-  map('n', 'gD', vim.lsp.buf.declaration, {
+  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, {
     buffer = evt.buf,
-    desc = 'lsp declaration'
+    desc = 'goto lsp declaration'
   })
 
-  map('n', 'gd', vim.lsp.buf.definition, {
+  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {
     buffer = evt.buf,
-    desc = 'lsp definition'
+    desc = 'goto lsp definition'
   })
 
-  map('n', 'K', vim.lsp.buf.hover, {
+  vim.keymap.set('n', 'K', vim.lsp.buf.hover, {
     buffer = evt.buf,
-    desc = 'lsp hover'
+    desc = 'show lsp hover'
   })
 
-  map('n', 'gi', vim.lsp.buf.implementation, {
+  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, {
     buffer = evt.buf,
-    desc = 'lsp implementation'
+    desc = 'goto lsp implementation'
   })
 
-  map('n', '<C-k>', vim.lsp.buf.signature_help, {
+  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, {
     buffer = evt.buf,
-    desc = 'lsp signature_help'
+    desc = 'show lsp signature help'
   })
 
-  map('n', '<Leader>wa', vim.lsp.buf.add_workspace_folder, {
+  vim.keymap.set('n', '<Leader>wa', vim.lsp.buf.add_workspace_folder, {
     buffer = evt.buf,
-    desc = 'lsp add_workspace_folder'
+    desc = 'add lsp workspace folder'
   })
 
-  map('n', '<Leader>wr', vim.lsp.buf.remove_workspace_folder, {
+  vim.keymap.set('n', '<Leader>wr', vim.lsp.buf.remove_workspace_folder, {
     buffer = evt.buf,
-    desc = 'lsp remove_workspace_folder'
+    desc = 'remove lsp workspace folder'
   })
 
-  map('n', '<Leader>wl', function()
+  vim.keymap.set('n', '<Leader>wl', function()
     vim.print(vim.lsp.buf.list_workspace_folders())
   end, {
     buffer = evt.buf,
-    desc = 'lsp list_workspace_folders'
+    desc = 'list lsp workspace folders'
   })
 
-  map('n', '<Leader>D', vim.lsp.buf.type_definition, {
+  vim.keymap.set('n', '<Leader>D', vim.lsp.buf.type_definition, {
     buffer = evt.buf,
-    desc = 'lsp type_definition'
+    desc = 'goto lsp type definition'
   })
 
-  map('n', '<Leader>r', vim.lsp.buf.rename, {
+  vim.keymap.set('n', '<Leader>r', vim.lsp.buf.rename, {
     buffer = evt.buf,
-    desc = 'lsp rename'
+    desc = 'rename lsp symbol'
   })
 
-  map({ 'n', 'x' }, '<Leader>ca', vim.lsp.buf.code_action, {
+  vim.keymap.set({ 'n', 'x' }, '<Leader>ca', vim.lsp.buf.code_action, {
     buffer = evt.buf,
-    desc = 'lsp code_action'
+    desc = 'list lsp code action'
   })
 
-  map('n', '<Leader>R', vim.lsp.buf.references, {
+  vim.keymap.set('n', '<Leader>R', vim.lsp.buf.references, {
     buffer = evt.buf,
-    desc = 'lsp references'
+    desc = 'list lsp references'
   })
 
-  map({ 'n', 'x' }, '<Leader>F', function() vim.lsp.buf.format { async = true } end, {
+  vim.keymap.set({ 'n', 'x' }, '<Leader>F', function() vim.lsp.buf.format { async = true } end, {
     buffer = evt.buf,
-    desc = 'lsp format'
+    desc = 'format file|range using lsp'
   })
 end
 

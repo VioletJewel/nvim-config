@@ -1,5 +1,3 @@
-local map = vim.keymap.set
-
 return {
 
   {
@@ -9,10 +7,10 @@ return {
     dependencies = { 'nvim-lua/plenary.nvim' },
     config = function()
       local builtin = require 'telescope.builtin'
-      map('n', '<Leader>ff', builtin.find_files, {})
-      map('n', '<Leader>fg', builtin.live_grep, {})
-      map('n', '<Leader>fb', builtin.buffers, {})
-      map('n', '<Leader>fh', builtin.help_tags, {})
+      vim.keymap.set('n', '<LocalLeader>ff', builtin.find_files, { desc = 'find files with telescope' })
+      vim.keymap.set('n', '<LocalLeader>fg', builtin.live_grep,  { desc = 'grep files with telescope' })
+      vim.keymap.set('n', '<LocalLeader>fb', builtin.buffers,    { desc = 'find buffers with telescope' })
+      vim.keymap.set('n', '<LocalLeader>fh', builtin.help_tags,  { desc = 'find help tags with telescope' })
     end,
   }
 

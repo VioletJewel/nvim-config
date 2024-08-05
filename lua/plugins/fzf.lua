@@ -1,5 +1,9 @@
 return {
 
-  'ibhagwan/fzf-lua',
+  {
+    'ibhagwan/fzf-lua',
+    config = 'max-perf',
+    lazy = true,
+  },
 
 }
