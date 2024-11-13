@@ -1,5 +1,3 @@
 return {
-
-  { 'puremourning/vimspector', lazy = true },
-
+  'puremourning/vimspector',
 }

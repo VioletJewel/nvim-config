@@ -1,18 +1,51 @@
+local function toggle(desc, action)
+  return function()
+    print(desc .. ' ' .. (require'gitsigns'[action]() and 'on' or 'off'))
+  end
+end
+
 return {
 
   {
     'tpope/vim-fugitive',
-    lazy = true,
+    name = 'fugitive',
+    cmd = { 'G', 'Git', 'Ggrep', 'Glgrep', 'Gclog', 'Gcd', 'Glcd', 'Gedit', 'Gdiffsplit' },
+    keys = {
+      {
+        '<Leader>g', function()
+          local buf = vim.api.nvim_get_current_buf()
+          vim.cmd.Git()
+          if #vim.api.nvim_tabpage_list_wins(0) == 2 and vim.bo[buf].buftype == '' and #vim.fn.undotree(buf).entries == 0 then
+            vim.cmd.wincmd 'o'
+          end
+          vim.api.nvim_win_set_cursor(0, { 1, 0 })
+        end,
+      }
+    },
   },
+
   {
     'junegunn/gv.vim',
-    lazy = true,
+    dependencies = { 'tpope/vim-fugitive' },
+    name = 'gv',
+    cmd = { 'GV' }
   },
 
   {
     'NeogitOrg/neogit',
     opts = {
+      integrations = { fzf_lua = true, diffview = true, },
     },
+    cmd = { 'Neogit', 'NeogitResetState', },
+    -- keys = {
+    --   { '<leader>g',
+    --     function()
+    --       local cdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+    --       local gdir = vim.fs.find('.git/', { path = cdir, upward = true })
+    --       require 'neogit'.open{ cwd = #gdir and vim.fs.dirname(gdir[1]) or nil }
+    --     end,
+    --     desc = 'open neogit' },
+    -- },
     dependencies = {
       'nvim-lua/plenary.nvim',
       'sindrets/diffview.nvim',      -- optional
@@ -24,6 +57,7 @@ return {
 
   {
     'lewis6991/gitsigns.nvim',
+    name = 'gitsigns',
     opts = {
       signcolumn = false, -- Toggle w :Gitsigns toggle_signs
       -- numhl      = false, -- Toggle w :Gitsigns toggle_numhl
@@ -35,7 +69,7 @@ return {
         -- Navigation
         vim.keymap.set('n', ']c', function()
           if vim.wo.diff then
-            vim.cmd.normal({ ']c', bang = true })
+            vim.api.nvim_feedkeys(']c', 'nt', false)
           else
             gitsigns.nav_hunk 'next'
           end
@@ -58,115 +92,89 @@ return {
         -- Actions
 
         vim.keymap.set('n',
-          '<Leader>hs', gitsigns.stage_hunk, {
+          '<LocalLeader>hs', gitsigns.stage_hunk, {
+            buffer = bufnr,
+            desc = 'stage gitsigns hunk'
+          })
+
+        vim.keymap.set('x', '<LocalLeader>hs', function()
+          gitsigns.stage_hunk {
+            vim.fn.line('.'), vim.fn.line('v')
+          }
+        end, {
           buffer = bufnr,
           desc = 'stage gitsigns hunk'
         })
 
         vim.keymap.set('n',
-          '<Leader>hr', gitsigns.reset_hunk, {
+          '<LocalLeader>hr', gitsigns.reset_hunk, {
+            buffer = bufnr,
+            desc = 'reset gitsigns hunk'
+          })
+
+        vim.keymap.set('x', '<LocalLeader>hr', function()
+          gitsigns.reset_hunk {
+            vim.fn.line('.'), vim.fn.line('v') }
+        end, {
           buffer = bufnr,
           desc = 'stage gitsigns hunk'
         })
 
-        vim.keymap.set('x', '<Leader>hs', function() gitsigns.stage_hunk {
-          vim.fn.line('.'), vim.fn.line('v') } end, {
+        vim.keymap.set('n', '<LocalLeader>hS', gitsigns.stage_buffer, {
           buffer = bufnr,
           desc = 'stage gitsigns hunk'
         })
 
-        vim.keymap.set('x', '<Leader>hr', function() gitsigns.reset_hunk {
-          vim.fn.line('.'), vim.fn.line('v') } end, {
+        vim.keymap.set('n', '<LocalLeader>hu', gitsigns.undo_stage_hunk, {
           buffer = bufnr,
           desc = 'stage gitsigns hunk'
         })
 
-        vim.keymap.set('n', '<Leader>hS', gitsigns.stage_buffer, {
+        vim.keymap.set('n', '<LocalLeader>hR', gitsigns.reset_buffer, {
           buffer = bufnr,
           desc = 'stage gitsigns hunk'
         })
 
-        vim.keymap.set('n', '<Leader>hu', gitsigns.undo_stage_hunk, {
+        vim.keymap.set('n', '<LocalLeader>hp', gitsigns.preview_hunk, {
           buffer = bufnr,
           desc = 'stage gitsigns hunk'
         })
 
-        vim.keymap.set('n', '<Leader>hR', gitsigns.reset_buffer, {
-          buffer = bufnr,
-          desc = 'stage gitsigns hunk'
-        })
-
-        vim.keymap.set('n', '<Leader>hp', gitsigns.preview_hunk, {
-          buffer = bufnr,
-          desc = 'stage gitsigns hunk'
-        })
-
-        vim.keymap.set('n', '<Leader>hb', function()
+        vim.keymap.set('n', '<LocalLeader>hb', function()
           gitsigns.blame_line { full = true }
         end, {
           buffer = bufnr,
           desc = 'stage gitsigns hunk'
         })
 
-        vim.keymap.set('n', '<Leader>tb', gitsigns.toggle_current_line_blame, {
+        vim.keymap.set('n', '<LocalLeader>tb', gitsigns.toggle_current_line_blame, {
           buffer = bufnr,
           desc = 'stage gitsigns hunk'
         })
 
-        vim.keymap.set('n', '<Leader>hd', gitsigns.diffthis, {
+        vim.keymap.set('n', '<LocalLeader>hd', gitsigns.diffthis, {
           buffer = bufnr,
           desc = 'stage gitsigns hunk'
         })
 
-        vim.keymap.set('n', '<Leader>hD', function() gitsigns.diffthis('~') end, {
+        vim.keymap.set('n', '<LocalLeader>hD', function() gitsigns.diffthis('~') end, {
           buffer = bufnr,
           desc = 'stage gitsigns hunk'
         })
 
-        vim.keymap.set('n', '<Leader>td', gitsigns.toggle_deleted, {
+        vim.keymap.set('n', '<LocalLeader>td', gitsigns.toggle_deleted, {
           buffer = bufnr,
           desc = 'stage gitsigns hunk'
-        })
-
-        -- toggle signs
-
-        local function toggle(desc, func)
-          return function() print(desc..' '..(func() and 'on' or 'off')) end
-        end
-
-        vim.keymap.set('n', '<Leader>gss', toggle('sign-column signs', gitsigns.toggle_signs), {
-          buffer = bufnr,
-          desc = 'toggle gitsigns sign-column signs'
-        })
-
-        vim.keymap.set('n', '<Leader>gsn', toggle('linenr highlight', gitsigns.toggle_numhl), {
-          buffer = bufnr,
-          desc = 'toggle gitsigns linenr highlight'
-        })
-
-        vim.keymap.set('n', '<Leader>gsl', toggle('inline highlight', gitsigns.toggle_linehl), {
-          buffer = bufnr,
-          desc = 'toggle gitsigns inline highlight'
-        })
-
-        vim.keymap.set('n', '<Leader>gsw', toggle('word diff', gitsigns.toggle_word_diff), {
-          buffer = bufnr,
-          desc = 'toggle gitsigns word diff'
-        })
-
-        vim.keymap.set('n', '<Leader>gsb', toggle('auto git blame', gitsigns.toggle_current_line_blame), {
-          buffer = bufnr,
-          desc = 'toggle gitsigns auto git blame'
         })
 
         -- git blame
 
-        vim.keymap.set('n', '<Leader>gb', gitsigns.blame_line, {
+        vim.keymap.set('n', '<LocalLeader>gb', gitsigns.blame_line, {
           buffer = bufnr,
           desc = 'show git blame on current line'
         })
 
-        vim.keymap.set('n', '<Leader>gB', gitsigns.blame, {
+        vim.keymap.set('n', '<LocalLeader>gB', gitsigns.blame, {
           buffer = bufnr,
           desc = 'toggle git blame split'
         })
@@ -176,7 +184,37 @@ return {
           buffer = bufnr
         })
       end
-    }
-  },
+    },
+    cmd = 'Gitsigns',
+    keys = {
+      {
+        '<LocalLeader>gss',
+        toggle('sign-column signs', 'toggle_signs'),
+        desc = 'toggle gitsigns sign-column signs'
+      },
+      {
+        '<LocalLeader>gsn',
+        toggle('linenr highlight', 'toggle_numhl'),
+        desc = 'toggle gitsigns linenr highlight'
+      },
 
+      {
+        '<LocalLeader>gsl',
+        toggle('inline highlight', 'toggle_linehl'),
+        desc = 'toggle gitsigns inline highlight'
+      },
+
+      {
+        '<LocalLeader>gsw',
+        toggle('word diff', 'toggle_word_diff'),
+        desc = 'toggle gitsigns word diff'
+      },
+
+      {
+        '<LocalLeader>gsb',
+        toggle('auto git blame', 'toggle_current_line_blame'),
+        desc = 'toggle gitsigns auto git blame'
+      },
+    },
+  },
 }

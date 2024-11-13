@@ -85,9 +85,73 @@ local function hlLink(group)
   vim.api.nvim_set_hl(0, from, { link = to })
 end
 
-au { 'ColorScheme',
-  pattern = 'dracula',
-  callback = function()
+local function gethl(name)
+  local hl = vim.api.nvim_get_hl(0, { name = name })
+  while hl.link do
+    hl = vim.api.nvim_get_hl(0, { name = hl.link })
+  end
+  return hl
+end
+
+local eobsav
+
+local function ColorSchemePost()
+  -- if synIDattr(hlID('@variable'), 'fg') == 'NvimLightGrey2'
+  if vim.deep_equal(gethl '@variable', { fg = 14738154 }) then
+    -- hi clear @variable
+    vim.api.nvim_set_hl(0, '@variable', {})
+  end
+
+  -- if synIDattr(hlID('Operator'), 'fg') == 'NvimLightGrey2'
+  if vim.deep_equal(gethl 'Operator', { fg = 14738154 }) then
+    -- hi! link Operator Special
+    vim.api.nvim_set_hl(0, 'Operator', { link = 'Special' })
+  end
+
+  -- if synIDattr(hlID('Delimiter'), 'fg') == 'NvimLightGrey2'
+  if vim.deep_equal(gethl 'Delimiter', { fg = 14738154 }) then
+    -- hi! link Delimiter Special
+    vim.api.nvim_set_hl(0, 'Delimiter', { link = 'Special' })
+  end
+
+  -- if { h -> synIDattr(h, 'fg') == 'NvimDarkGrey1' && synIDattr(h, 'bg') == 'NvimLightYellow' }(hlID('CurSearch'))
+  if vim.deep_equal(gethl 'CurSearch', { bg = 16572564, ctermbg = 11, fg = 460813, ctermfg = 0 }) then
+    -- hi! link CurSearch IncSearch
+    vim.api.nvim_set_hl(0, 'CurSearch', { link = 'IncSearch' })
+  end
+
+  -- if synIDattr(hlID('NormalFloat'), 'bg') == 'NvimDarkGrey1'
+  if vim.deep_equal(gethl 'NormalFloat', { bg = 1842204 }) then
+    -- hi! link NormalFloat Normal
+    vim.api.nvim_set_hl(0, 'NormalFloat', { link = 'Normal' })
+  end
+
+  -- if { h -> synIDattr(h, 'fg') == 'NvimLightGrey4' &&  synIDattr(h, 'bg') == 'NvimDarkGrey1' && synIDattr(h, 'bold') == 1 }(hlID('WinBar'))
+  if vim.deep_equal(gethl 'WinBar', { fg = 10198692, bg = 460813, bold = true, cterm = { bold = true } }) then
+    -- hi! link WinBar StatusLine
+    vim.api.nvim_set_hl(0, 'WinBar', { link = 'StatusLine' })
+  end
+
+  -- if { h -> synIDattr(h, 'fg') == 'NvimLightGrey4' &&  synIDattr(h, 'bg') == 'NvimDarkGrey1' && synIDattr(h, 'bold', 'cterm') == 1 }(hlID('WinBarNC'))
+  if vim.deep_equal(gethl 'WinBarNC', { bg = 460813, fg = 10198692, cterm = { bold = true } }) then
+    -- hi! link WinBarNC StatusLineNC
+    vim.api.nvim_set_hl(0, 'WinBarNC', { link = 'StatusLineNC' })
+  end
+
+  if eobsav == nil then
+    eobsav = vim.opt.fillchars:get().eob
+  end
+  if gethl 'EndOfBuffer'.fg == gethl 'Normal'.bg then
+    vim.opt.fillchars:append 'eob: '
+  else
+    vim.opt.fillchars:append('eob:' .. eobsav)
+  end
+end
+
+--- @type table<string, fun()|table>
+local colorschemeFixes = {
+
+  dracula = function()
     hlLink 'SpecialKey DraculaPink'
     hlLink 'LazyNormal Normal'
     hlLink 'FloatBorder NonText'
@@ -95,5 +159,44 @@ au { 'ColorScheme',
     hlLink '@lsp.type.keyword DraculaPurpleBold'
     hlLink '@lsp.type.event.lua DraculaPurple'
   end,
-  desc = 'modify dracula to be cuter :3 and better :D',
+
+  tokyonight = function()
+    -- vim.api.nvim_set_hl(0, 'NonText', { fg = '#4e505e', ctermfg = 239, })
+    hlLink 'EndOfBuffer NonText'
+  end,
+
+  nokto = function()
+    hlLink 'EndOfBuffer Comment'
+  end,
+
 }
+
+local function nullop() end
+
+for theme, opts in pairs(colorschemeFixes) do
+  local desc = 'modify ' .. theme .. ' to be cuter :3 and better :)'
+  if type(opts) == 'function' then
+    opts = { callback = opts }
+  elseif not opts.callback then
+    opts.callback = nullop
+  end
+  au {
+    'ColorScheme',
+    pattern = theme,
+    callback = function()
+      opts.callback()
+      ColorSchemePost()
+    end,
+    desc = opts.desc or desc,
+  }
+end
+
+au { 'ColorScheme',
+  callback = function(opts)
+    if not vim.list_contains(vim.tbl_keys(colorschemeFixes), opts.match) then
+      ColorSchemePost()
+    end
+  end,
+  desc = 'fix older colorschemes'
+}
+

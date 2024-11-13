@@ -2,7 +2,8 @@ return {
 
   {
     'tpope/vim-abolish',
-    lazy = true,
+    cmd = { 'Abolish', 'Subvert', 'S', },
+    keys = 'cr',
   }
 
 }

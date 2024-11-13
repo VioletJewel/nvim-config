@@ -1,15 +1,17 @@
-local au = require 'utils'.augroup'LspAttach'
+local au = require 'utils'.augroup 'LspAttach'
 
-local lsps = vim.iter{
+local lsps = {
   clangd = {},
 
   zls = {},
 
   lua_ls = {
     on_init = function(client)
-      local path = client.workspace_folders[1].name
-      if vim.loop.fs_stat(path .. '/.luarc.json') or vim.loop.fs_stat(path .. '/.luarc.jsonc') then
-        return
+      if client.workspace_folders then
+        local path = client.workspace_folders[1].name
+        if vim.uv.fs_stat(path..'/.luarc.json') or vim.uv.fs_stat(path..'/.luarc.jsonc') then
+          return
+        end
       end
       client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
         runtime = { version = 'LuaJIT' },
@@ -34,30 +36,6 @@ local lsps = vim.iter{
 
 }
 
--- global keymaps
-
-vim.keymap.set('n', '<Leader>e', function()
-  vim.diagnostic.open_float()
-end, {
-  desc = 'open diagnostic float'
-})
-
-vim.keymap.set('n', '[d', function()
-  vim.diagnostic.jump{ count = -1 }
-end, {
-  desc = 'goto prev diagnostic'
-})
-
-vim.keymap.set('n', ']d', function()
-  vim.diagnostic.jump{ count = 1 }
-end, {
-  desc = 'goto next diagnostic'
-})
-
-vim.keymap.set('n', '<Leader>q', function() vim.diagnostic.setloclist() end, {
-  desc = 'set diagnostic loclist'
-})
-
 local function lspCallback(evt)
   vim.bo[evt.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
@@ -78,12 +56,27 @@ local function lspCallback(evt)
     desc = 'show lsp hover'
   })
 
+  vim.keymap.set('n', '<Space>K', 'K', {
+    buffer = evt.buf,
+    desc = 'preserve default K'
+  })
+
   vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, {
     buffer = evt.buf,
     desc = 'goto lsp implementation'
   })
 
-  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, {
+  vim.keymap.set({ 'n', 'i', 'x' }, '<M-Tab>', function()
+    local basewid = vim.api.nvim_get_current_win()
+    for _, wid in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+      if wid ~= basewid and vim.api.nvim_win_get_config(wid).win == basewid then
+        vim.print(wid)
+        vim.api.nvim_win_close(wid, false)
+        return
+      end
+    end
+    vim.lsp.buf.signature_help()
+  end, {
     buffer = evt.buf,
     desc = 'show lsp signature help'
   })
@@ -135,15 +128,47 @@ return {
 
   {
     'neovim/nvim-lspconfig',
+    name = 'lspconfig',
+
+    event = { 'BufReadPost', 'BufNewFile' },
+    cmd = { "LspInfo", "LspInstall", "LspUninstall" },
+
     config = function()
       local lc = require 'lspconfig'
 
-      lsps:each(function(lsp, cfg)
+      vim.iter(pairs(lsps)):each(function(lsp, cfg)
         lc[lsp].setup(cfg)
       end)
 
       au { 'LspAttach', callback = lspCallback }
-    end
+    end,
+
+    keys = {
+      {
+        '<Leader>e',
+        vim.diagnostic.open_float,
+        desc = 'open diagnostic float'
+      },
+
+      {
+        '[d',
+        function() vim.diagnostic.jump { count = -1 } end,
+        desc = 'goto prev diagnostic'
+      },
+
+      {
+        ']d',
+        function() vim.diagnostic.jump { count = 1 } end,
+        desc = 'goto next diagnostic'
+      },
+
+      {
+        '<Leader>q',
+        vim.diagnostic.setloclist,
+        desc = 'set diagnostic loclist'
+      },
+    },
+
   },
 
 }

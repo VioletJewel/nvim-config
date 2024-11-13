@@ -1,5 +1,11 @@
 return {
 
-  'tpope/vim-commentary',
+  {
+    'tpope/vim-commentary',
+    keys = {
+      { 'gc', mode = { 'n', 'x' } },
+    },
+    cmd = 'Commentary',
+  }
 
 }

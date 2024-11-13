@@ -1,5 +1,5 @@
 return {
-
-  { 'tweekmonster/helpful.vim', lazy=true },
-
+  'tweekmonster/helpful.vim',
+  name = 'helpful',
+  cmd = 'HelpfulVersion'
 }

@@ -1,5 +1,8 @@
 return {
 
-  'elixir-editors/vim-elixir',
+  {
+    'elixir-editors/vim-elixir',
+    ft = 'elixir',
+  },
 
 }

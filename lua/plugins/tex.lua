@@ -1,11 +1,12 @@
 return {
-
-  { 'lervag/vimtex',
+  {
+    'lervag/vimtex',
+    ft = 'tex',
     config = function()
       vim.g.vimtex_view_general_viewer = 'zathura'
       vim.g.vimtex_compiler_latexmk = {
-        aux_dir = function() return './.'..vim.fn.expand'%:t:r'..'.out' end,
-        out_dir = function() return './.'..vim.fn.expand'%:t:r'..'.out' end,
+        aux_dir = function() return './.' .. vim.fn.expand '%:t:r' .. '.out' end,
+        out_dir = function() return './.' .. vim.fn.expand '%:t:r' .. '.out' end,
         options = {
           '-shell-escape',
           '-verbose',
@@ -18,8 +19,8 @@ return {
     end
   },
 
-  { 'KeitaNakamura/tex-conceal.vim',
-    lazy = true,
+  {
+    'KeitaNakamura/tex-conceal.vim',
     ft = 'tex',
   },
 }

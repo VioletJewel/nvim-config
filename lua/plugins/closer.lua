@@ -1,5 +1,10 @@
 return {
 
-  'rstacruz/vim-closer',
+  {
+    'rstacruz/vim-closer',
+    keys = {
+      { '<CR>', mode = 'i' },
+    }
+  }
 
 }

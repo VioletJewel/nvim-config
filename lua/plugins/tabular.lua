@@ -1,5 +1,6 @@
 return {
-
-  'godlygeek/tabular',
-
+  {
+    'godlygeek/tabular',
+    cmd = 'Tabularize',
+  },
 }

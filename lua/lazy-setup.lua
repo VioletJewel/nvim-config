@@ -2,7 +2,7 @@ local d = vim.fn.stdpath 'data' ---@cast d string
 
 local lazypath = vim.fs.joinpath(d, 'lazy', 'lazy.nvim')
 
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system {
     "git",
     "clone",
@@ -17,9 +17,9 @@ vim.opt.rtp:prepend(lazypath)
 require 'lazy'.setup('plugins', {
   install = {
     missing = true,
-    colorscheme = { 'dracula' }
+    colorscheme = { 'habamax' }
   },
-  defaults = { lazy = false },
+  defaults = { lazy = true },
   ui = {
     border = 'rounded',
     backgroup = 60,
@@ -27,5 +27,17 @@ require 'lazy'.setup('plugins', {
   checker = { enabled = true, notify = false },
   lockfile = vim.fs.joinpath(d, 'lazy-lock.json'),
   change_detection = { notify = false, },
+  performance = { rtp = { disabled_plugins = {
+    'gzip',
+    'matchit',
+    'matchparen',
+    'netrwPlugin',
+    'tarPlugin',
+    'tohtml',
+    'tutor',
+    'zipPlugin',
+    'rplugin',
+    'osc52',
+  } } },
   debug = false,
 })

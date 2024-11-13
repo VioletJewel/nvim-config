@@ -6,7 +6,7 @@ vim.keymap.set('n', '<Leader>', '', {
 
 -- save
 
-vim.keymap.set({ 'n', 'x', 'i', 'c' }, '<M-w>', '<Cmd>silent update<CR>', {
+vim.keymap.set({ 'n', 'x', 'i', 'c' }, '<M-w>', '<Cmd>silent update<Bar>redrawstatus!<CR>', {
   desc = 'update current file quickly'
 })
 
@@ -214,20 +214,6 @@ vim.keymap.set('n', '[f', ':call maps#nextFile(0)<CR>', {
   desc = 'edit previous file in current file\'s dir'
 })
 
--- fzf
-
-vim.keymap.set('n', '<Leader>f', function()
-  require 'fzf-lua'.files()
-end, {
-  desc = 'browse all files in cwd in fzf-lua'
-})
-
-vim.keymap.set('n', '<LocalLeader>c', function()
-  require 'fzf-lua'.files { cwd = vim.fn.stdpath 'config' }
-end, {
-  desc = 'browse files in config in fzf-lua'
-})
-
 -- spell
 
 vim.keymap.set('n', '<M-s>', '[s1z=``:sil! call repeat#set("\\<M-s>")<CR>', {
@@ -283,12 +269,12 @@ vim.keymap.set('n', 'g#', [[<Cmd>let v:hlsearch=setreg('/', expand('<cword>')..'
   desc = "# without \\< and \\>"
 })
 
-vim.keymap.set('n', '<Leader>*', '*', { desc = 'original forwards search backup' })
-vim.keymap.set('n', '<Leader>#', '#', { desc = 'original backwards search backup' })
-vim.keymap.set('n', '<Leader>g*', 'g*', { desc = 'original forwards no-bounds search backup' })
-vim.keymap.set('n', '<Leader>g#', 'g#', { desc = 'original backwards no-bounds search backup' })
-vim.keymap.set('n', '<Leader>n', 'n', { desc = 'original forwards search' })
-vim.keymap.set('n', '<Leader>N', 'N', { desc = 'original backwards search' })
+vim.keymap.set('n', '<LocalLeader>*', '*', { desc = 'original forwards search backup' })
+vim.keymap.set('n', '<LocalLeader>#', '#', { desc = 'original backwards search backup' })
+vim.keymap.set('n', '<LocalLeader>g*', 'g*', { desc = 'original forwards no-bounds search backup' })
+vim.keymap.set('n', '<LocalLeader>g#', 'g#', { desc = 'original backwards no-bounds search backup' })
+vim.keymap.set('n', '<LocalLeader>n', 'n', { desc = 'original forwards search' })
+vim.keymap.set('n', '<LocalLeader>N', 'N', { desc = 'original backwards search' })
 
 
 -- faster *N{operator}gn{replacementText} using */#/g*/g# as pending operators
@@ -546,25 +532,32 @@ end, {
   desc = 'Around Indentation text object'
 })
 
--- cmdline abbreviations (egs, :vhelp => :vert help, :vsbn => :vert sbn)
+-- cmdline abbreviations (egs, :vhelp => :vert help, :tsbn => :tab sbn)
 
-local function vca(ab)
-  vim.keymap.set('ca', 'v' .. ab,
-    string.format("getcmdline() == 'v%s' && getcmdtype() == ':' && getcmdpos() is %d ? 'vert %s' : 'v%s'", ab, #ab + 2,
-      ab, ab), {
+local function vtca(ab)
+  local l = ab:lower()
+  vim.keymap.set('ca', 'v' .. l,
+    string.format("getcmdline() == 'v%s' && getcmdtype() == ':' && getcmdpos() is %d ? 'vert %s' : 'v%s'", l, #ab + 2,
+      ab, l), {
       expr = true,
       desc = ':vert ' .. ab .. ' abbrev hack (beg. of line only)'
+    })
+  vim.keymap.set('ca', 't' .. l,
+    string.format("getcmdline() == 't%s' && getcmdtype() == ':' && getcmdpos() is %d ? 'tab %s' : 't%s'", ab, #ab + 2,
+      ab, l), {
+      expr = true,
+      desc = ':tab ' .. ab .. ' abbrev hack (beg. of line only)'
     })
 end
 
 vim.iter(vim.gsplit(
-  'al:l ba:ll diffs:plit dsp:lit h:elp isp:lit sN:ext sa:rgument sal:l sbN:ext sb:uffer sba:ll sbf:irst sbl:ast sbm:odified sbn:ext sbp:revious sbr:ewind sf:ind sfi sfi:rst sla:st sn:xt splitfind spr:evious sre:wind sta:g stj:ump sts:elect sv:iew',
+  'al:l ba:ll diffs:plit dsp:lit h:elp isp:lit sN:ext sa:rgument sal:l sbN:ext sb:uffer sba:ll sbf:irst sbl:ast sbm:odified sbn:ext sbp:revious sbr:ewind sf:ind sfi sfi:rst sla:st sn:xt splitfind spr:evious sre:wind sta:g stj:ump sts:elect sv:iew Man',
   '%s'))
     :each(function(w)
       local ab, r = w:match '^(%S+):(%S-)$'
       if ab == nil then ab = w end
-      vca(ab)
-      if r ~= nil then vca(ab .. r) end
+      vtca(ab)
+      if r ~= nil then vtca(ab .. r) end
     end)
 
 -- abbreviations for typos
