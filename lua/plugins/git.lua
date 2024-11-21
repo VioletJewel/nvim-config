@@ -12,14 +12,16 @@ return {
     cmd = { 'G', 'Git', 'Ggrep', 'Glgrep', 'Gclog', 'Gcd', 'Glcd', 'Gedit', 'Gdiffsplit' },
     keys = {
       {
-        '<Leader>g', function()
+        '<Leader>gg', function()
           local buf = vim.api.nvim_get_current_buf()
-          vim.cmd.Git()
+          vim.cmd.Git { mods = { vertical = true, split = "topleft" } }
           if #vim.api.nvim_tabpage_list_wins(0) == 2 and vim.bo[buf].buftype == '' and #vim.fn.undotree(buf).entries == 0 then
             vim.cmd.wincmd 'o'
           end
           vim.api.nvim_win_set_cursor(0, { 1, 0 })
         end,
+        silent = true,
+        desc = 'open :Git|only (if no active windows) or :top vert Git (otherwise)'
       }
     },
   },
