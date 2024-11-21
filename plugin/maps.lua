@@ -46,9 +46,11 @@ vim.api.nvim_set_keymap('n', "<C-l>", "<Cmd>nohlsearch | diffupdate | redraw! | 
 
 -- previous command
 
-vim.keymap.set({ 'n', 'x' }, '<C-p>', function()
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(':<Up>', true, true, true), 'tx!', false)
-end, {
+vim.api.nvim_set_keymap('', '<C-p>', '', {
+  noremap = true,
+  callback = function()
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(':<Up>', true, true, true), 'tx!', false)
+  end,
   desc = 'open command-line and go <Up> to last command' -- this works in visual mode, too
 })
 
@@ -139,11 +141,13 @@ vim.api.nvim_set_keymap('x', ']e', ':<C-u>call maps#moveLine(1, v:count, 1)<CR>'
 
 local gitMarkReg = [[^\%(<<<<<<<\|=======\|>>>>>>>\)]]
 
-vim.keymap.set({ 'n', 'x' }, '[g', function()
-  for _ = 1, vim.v.count1 do
-    vim.fn.search(gitMarkReg, 'wb')
-  end
-end, {
+vim.api.nvim_set_keymap('', '[g', '', {
+  noremap = true,
+  callback = function()
+    for _ = 1, vim.v.count1 do
+      vim.fn.search(gitMarkReg, 'wb')
+    end
+  end,
   desc = 'goto previous [count]th git marker',
 })
 
@@ -152,11 +156,13 @@ vim.api.nvim_set_keymap('o', '[g', ":<C-u>exe 'norm V'..v:count..'[g'<CR>", {
   desc = 'goto previous [count]th git marker (textobject)'
 })
 
-vim.keymap.set({ 'n', 'x' }, ']g', function()
-  for _ = 1, vim.v.count1 do
-    vim.fn.search(gitMarkReg, 'w')
-  end
-end, {
+vim.api.nvim_set_keymap('', ']g', '', {
+  noremap = true,
+  callback = function()
+    for _ = 1, vim.v.count1 do
+      vim.fn.search(gitMarkReg, 'w')
+    end
+  end,
   desc = 'goto next [count]th git marker',
 })
 
@@ -165,17 +171,21 @@ vim.api.nvim_set_keymap('o', ']g', ":<C-u>exe 'norm V'..v:count..']g'<CR>", {
   desc = 'goto next [count]th git marker (textobject)'
 })
 
-vim.keymap.set({ 'n', 'x', 'o' }, '[G', function()
-  vim.api.nvim_win_set_cursor(0, { 1, 0 })
-  vim.fn.search(gitMarkReg, 'wc')
-end, {
+vim.api.nvim_set_keymap('', '[G', '', {
+  noremap = true,
+  callback = function()
+    vim.api.nvim_win_set_cursor(0, { 1, 0 })
+    vim.fn.search(gitMarkReg, 'wc')
+  end,
   desc = 'goto first git marker'
 })
 
-vim.keymap.set({ 'n', 'x', 'o' }, ']G', function()
-  vim.api.nvim_win_set_cursor(0, { vim.api.nvim_buf_line_count(0), 0 })
-  vim.fn.search(gitMarkReg, 'wbc')
-end, {
+vim.api.nvim_set_keymap('', ']G', '', {
+  noremap = true,
+  callback = function()
+    vim.api.nvim_win_set_cursor(0, { vim.api.nvim_buf_line_count(0), 0 })
+    vim.fn.search(gitMarkReg, 'wbc')
+  end,
   desc = 'goto last git marker'
 })
 
@@ -387,16 +397,20 @@ vim.api.nvim_set_keymap('o', 'g#', '', {
   desc = '<cword> (w/o bounds) text object to replace g*NcgN with cg#'
 })
 
-vim.keymap.set({ 'n', 'x', 'o' }, 'n', function()
-  return vim.v.searchforward ~= 0 and 'n' or 'N'
-end, {
+vim.api.nvim_set_keymap('', 'n', '', {
+  noremap = true,
+  callback = function()
+    return vim.v.searchforward ~= 0 and 'n' or 'N'
+  end,
   expr = true,
   desc = 'always search forwards'
 })
 
-vim.keymap.set({ 'n', 'x', 'o' }, 'N', function()
-  return vim.v.searchforward ~= 0 and 'N' or 'n'
-end, {
+vim.api.nvim_set_keymap('', 'N', '', {
+  noremap = true,
+  callback = function()
+    return vim.v.searchforward ~= 0 and 'N' or 'n'
+  end,
   expr = true,
   desc = 'always search backwards'
 })
