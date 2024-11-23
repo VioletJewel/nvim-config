@@ -1,3 +1,5 @@
 require 'theme'
 require 'opts'
+require 'foldtext'
 require 'lazy-setup'
+require 'statusline'

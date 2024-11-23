@@ -1,174 +1,129 @@
-local function d(o, a, r)
-  local opt = vim.opt[o]
-  vim.o[o] = opt._info.default
-  if a then opt:append(a) end
-  if r then opt:remove(r) end
-end
-local au = require 'utils'.augroup 'ViOpts'
+-- local function d(o, a, r)
+--   local opt = vim.opt[o]
+--   vim.o[o] = opt._info.default
+--   if a then opt:append(a) end
+--   if r then opt:remove(r) end
+-- end
 
-local tty = os.getenv 'TERM' == 'linux'
+vim.g.mapleader = ' '        -- <Leader>      = <Space>
+vim.g.maplocalleader = '\\'  -- <LocalLeader> = <Bslash>
 
-vim.g.mapleader = ' '
-vim.g.maplocalleader = '\\'
+--- backup, undo
+vim.o.backup = true           -- backup file before :write
+vim.o.backupext = '.bak'      -- backup extension = .bak
+vim.opt.backupdir:remove '.'  -- do not store backups in CWD
+vim.o.undofile = true         -- persistent undo file!
+vim.o.undolevels = 5000       -- increase # of undos to 5000
 
-vim.o.backup = true
-vim.o.backupext = '.bak'
-vim.opt.backupdir:remove '.'
-vim.o.undofile = true
-vim.o.undolevels = 10000
+--- tabs, indentation
+vim.o.expandtab = true   -- use soft tabs
+vim.o.tabstop = 2        -- hard tabs = 2 visual spaces
+vim.o.softtabstop = 2    -- soft tabs = 2 actual spaces
+vim.o.shiftwidth = 0     -- <<, >> indent 'tabstop' spaces
+vim.o.shiftround = true  -- :>, i_^t rounded to 'shiftwidth' multiple
 
-vim.o.expandtab = true
-vim.o.tabstop = 2
-vim.o.softtabstop = 2
-vim.o.shiftwidth = 0
-vim.o.shiftround = true
+--- split direction
+vim.o.splitbelow = true  -- :sp splits below
+vim.o.splitright = true  -- :vsp splits right
 
-vim.o.splitbelow = true
-vim.o.splitright = true
+--- text width
+vim.o.textwidth = 80      -- text width = 80
+vim.o.colorcolumn = '+1'  -- colored line at 'textwidth' + 1
+vim.o.wrap = true         -- hard wrap text after 'textwidth'
 
-vim.o.textwidth = 80
-vim.o.colorcolumn = '' -- '+1'
-vim.o.wrap = true
-
+--- concealed text
 vim.o.conceallevel = 2
 vim.o.concealcursor = 'nv'
 
-vim.o.guifont = 'FiraCode Nerd Font:h12'
-vim.o.guicursor = 'a:block'
-vim.o.mouse = ''
-
-vim.o.termguicolors = true
-
-do -- {{{
-  local function getHl(c)
-    local p = nil
-    local hl = { link = c }
-    while p ~= hl and hl.link do
-      p, hl = hl, vim.api.nvim_get_hl(0, { name = hl.link })
-    end
-    return hl
-  end
-  local function stlHl(hl, to) ---@diagnostic disable: undefined-field
-    local f, sc, sn = getHl(hl), getHl 'StatusLine', getHl 'StatusLineNC'
-    vim.api.nvim_set_hl(0, 'Stl' .. hl, {
-      fg = f.fg,
-      bg = sc.reverse and sc.fg or sc.bg,
-      reverse = false,
-      ctermfg = f.ctermfg,
-      ctermbg = sc.ctermbg,
-    })
-    vim.api.nvim_set_hl(0, 'Stl' .. hl .. 'NC', {
-      fg = f.fg,
-      bg = sn.reverse and sn.fg or sn.bg,
-      reverse = false,
-      ctermfg = f.ctermfg,
-      ctermbg = sn.ctermbg,
-    })
-    vim.api.nvim_set_hl(0, 'Stl' .. to .. '', { link = 'Stl' .. hl })
-    vim.api.nvim_set_hl(0, 'Stl' .. to .. 'NC', { link = 'Stl' .. hl .. 'NC' })
-  end ---@diagnostic enable: undefined-field
-
-  au { 'ColorScheme', callback = function()
-    stlHl('Statement', 'Lnr')
-    stlHl('Identifier', 'Ft')
-  end, }
-
-  function StlHl(c, nc)
-    return '%#' .. (tonumber(vim.g.actual_curwin) == vim.api.nvim_get_current_win()
-      and c or (nc or c .. 'NC')) .. '#'
-  end
-
-  -- TODO: consider updating iconCache on autocmd FileType, but it's pretty fast as is
-  local icons = nil
-  local iconCache = {}
-  local iconOpts = { default = true }
-  function StlIcon()
-    local curBuf = vim.api.nvim_get_current_buf()
-    local ft = vim.bo.ft
-    if iconCache[curBuf] and iconCache[curBuf][ft] then return iconCache[curBuf][ft] end
-    if not icons then
-      local ok
-      ok, icons = pcall(require, 'nvim-web-devicons')
-      if not ok then return end
-    end
-    local icon = icons.get_icon(vim.api.nvim_buf_get_name(0), ft, iconOpts)
-    iconCache[curBuf] = { [ft] = icon }
-    return icon
-  end
-
-  if tty then
-    vim.o.statusline = '%=%80(%f%{%v:lua.StlHl("StlLnr")%}:%l%*%( [%M%R%W]%) [%{&ft}]  %)'
-    vim.o.rulerformat = '%80(%=%f%#Statement#:%l%*%( [%M%R%W]%) [%{&ft}] %)'
-  else
-    vim.o.statusline = '%=%80(%f%{%v:lua.StlHl("StlLnr")%}:%l%*%( [%M%R%W]%) %{%v:lua.StlHl("StlFt")%}%{v:lua.StlIcon()}  %)'
-    vim.o.rulerformat = '%80(%=%f%#Statement#:%l%*%( [%M%R%W]%) %#Identifier#%{v:lua.StlIcon()} %)'
-  end
-
-end -- }}}
-
-function Foldtext()
-  local l1 = vim.fn.getline(vim.v.foldstart)
-  local l2 = vim.fn.getline(vim.v.foldend)
-  if vim.wo.foldmethod == 'marker' then
-    local fmr = vim.wo.foldmarker
-    local com = fmr:find ','
-    local cms = vim.bo.commentstring
-    cms = cms:sub(1, cms:find '%s*%%s' - 1)
-    local f1 = fmr:sub(1, com - 1):gsub('[][%%.+*]', '%%%1')
-    local f2 = fmr:sub(com + 1):gsub('[][%%.+*]', '%%%1')
-    l1 = l1:gsub(cms .. '%s*' .. f1, ''):gsub('%s*' .. f1, '')
-    l2 = l2:gsub(cms .. '%s*' .. f2, ''):gsub('%s*' .. f2, ''):gsub('^%s+', '')
-  end
-  return string.format('%s (×%d) %s', l1:gsub('^ ? ?', '|>'), vim.v.foldend - vim.v.foldstart, l2)
+--- gui stuff
+if vim.fn.has 'gui_running' then
+  vim.o.guifont = 'FiraCode Nerd Font:h12'  -- use FiraCode Nerd in gui nvims
 end
-vim.opt.foldtext = 'v:lua.Foldtext()'
+vim.o.guicursor = 'a:block'  -- make cursor a block in all modes
+vim.o.mouse = ''             -- disable mouse in all modes
 
+vim.o.termguicolors = true  -- use 24-bit color for :colorscheme
 
--- function SetCmdHeight()
---   vim.o.cmdheight = #vim.api.nvim_tabpage_list_wins(0) > 1 and 0 or 1
--- end
+--- cmdline area mode, cmd statuses
+vim.o.showmode = false  -- do not show mode in cmdline
+vim.o.showcmd = false   -- do now show count/etc during op pending mode, etc
 
--- au { 'WinResized', callback = SetCmdHeight }
--- SetCmdHeight()
+--- shortmess
+--  a: l + m + r + w                  |  o: overwrite read w write msgs
+--   l: "99L" not "99 lines           |  O: overwrite any msg w read msg
+--   m: "[+]" not "[Modified]"        |  c: no ins-cmpl msgs
+--   r: "[RO]" not "[readonly]"       |  C: no "scanning tags" for ins-cmpl
+--   w: "[w]" not "written"           |  F: no :file on :edit
+--      "[a]" not "appended"          |  A: no ATTENTION for existing swap
+--  t: truncate long msgs at start    |  W: no [w] on :write
+--  T: truncate other msgs in middle  |  I: no :intro on VimEnter
+vim.opt.shortmess:append 'atToOcCFAWI'
 
-vim.o.laststatus = 1
-vim.o.ruler = true
+vim.o.virtualedit = 'insert,block'  -- cursor can be anywhere in insert/block
 
-vim.o.showmode = false
-vim.o.showcmd = false
+--- reduce cpu
+vim.o.synmaxcol = 256    -- reduce max syntax rendering per line to 256
+vim.o.lazyredraw = true  -- don't redraw during macros, registers, etc
 
-d('shortmess', 'acCAWI')
+--- cpoptions
+--  A: :w <file> set "# to <cfile>
+--  B: \<Esc> = <Bslash><Esc> in rhs of :map
+--  c: don't search part of a preexisting match
+--  e: add <CR> to :@r
+--  E: y/d/c/g~/gu/gU on empty region = error
+--  F: :w <file> = <cfile> -> <file> if no fname
+--  s: set buf opts when buffer entered (not created)
+--  y: yank can be repeated (".")
+vim.o.cpoptions = 'ABceEFsy'
 
-vim.o.virtualedit = 'insert,block'
+--- diffopt
+--  internal = internal diff lib
+--  filler = keep text sync'd w filler lines
+--  closeoff = :diffoff in last diff window if others closed
+--  foldcolumn:0 = disable foldcolumn
+--  indent-heuristic = remove noise by collapsing lines w same indent
+--  linematch:60 = enable 2nd stage diff (30 lines for 2-way diff)
+vim.o.diffopt = 'internal,filler,closeoff,foldcolumn:0,linematch:60,indent-heuristic'
 
-vim.o.synmaxcol = 256
-vim.o.lazyredraw = true
+--- ins-completion
+--  menuone = show menu (even for one result)
+--  noselect = do not select first match at first (so you can refine match)
+vim.o.completeopt = 'menuone,noselect'
 
-d('cpoptions', 'y')
+--- folding
+vim.o.foldlevelstart = 2     -- always open first 2 fold levels for new bufs
+vim.o.foldmethod = 'syntax'  -- use syntax for folding
 
-d('diffopt', 'foldcolumn:0,indent-heuristic')
-
-vim.o.completeopt = 'menuone,noinsert'
-
-vim.o.foldlevelstart = 2
-vim.o.foldmethod = 'marker'
-
+--- break indent
 vim.o.breakindent = true
-vim.o.showbreak = '->> '
+if os.getenv 'TERM' == 'st-256color' or vim.fn.has('gui_running') then
+  vim.o.showbreak = '->> ' -- looks nice with FiraCode Nerd ligatures
+end
 
+--- visuals
+--  show trailing ws, hard tabs, non-breaking ws
+--  set fold fillchar to emptiness and diff fillchar to squiggles
 vim.o.listchars = 'trail:·,tab:›·,nbsp:○'
 vim.o.fillchars = 'fold: ,diff:~'
-if tty then
-  vim.opt.fillchars:append 'eob:.'
+if os.getenv 'TERM' == 'linux' then
+  vim.opt.fillchars:append 'eob:.'  -- dots end of buffer for tty
 else
-  vim.opt.fillchars:append 'eob:'
+  vim.opt.fillchars:append 'eob:'  -- cute end of buffer >^_^<
 end
 
-vim.o.grepprg = vim.fn.executable 'rg' == 1 and 'rg --vimgrep --no-heading' or vim.opt.grepprg._info.default
+if vim.fn.executable 'rg' then
+  vim.o.grepprg = 'rg --vimgrep --no-heading'  -- use rg (if avail); not grep
+end
 
-vim.o.ignorecase = true
-vim.o.smartcase = true
-vim.o.wildignorecase = true
+--- case
+vim.o.ignorecase = true      -- ignore case for search and cmd-cmpl
+vim.o.smartcase = true       -- don't ignore case if capital letter used
+vim.o.wildignorecase = true  -- ignore case for file tab completion
+vim.o.tagcase = 'followscs'  -- tag case follows ignorecase and smartcase
 
-vim.o.timeout = false
-vim.o.ttimeoutlen = 5
+--- file completion
+vim.o.wildignore = '*.o,*.obj,*.jpg,*.png,*.gif'  -- don't complete these files
+
+--- timeout
+vim.o.timeout = false  -- wait forever for mappings; do not timeout
+vim.o.ttimeoutlen = 5  -- wait 5ms for next byte in multibyte key code sequence
