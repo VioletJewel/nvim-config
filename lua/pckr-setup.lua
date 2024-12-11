@@ -16,10 +16,18 @@ end
 
 local cmd = require 'pckr.loader.cmd'
 local keys = require 'pckr.loader.keys'
+local event = require 'pckr.loader.event'
 
 require 'pckr'.add {
 
-  'tpope/vim-abolish';
+  { 'tpope/vim-abolish',
+    cond = {
+      keys('n', 'cr'),
+      cmd 'Abolish',
+      cmd 'Subvert',
+      cmd 'S',
+    },
+  };
 
   -- 'https://git.sr.ht/~detegr/nvim-bqn';
 
@@ -57,6 +65,13 @@ require 'pckr'.add {
 
   { 'ibhagwan/fzf-lua',
     requires = { 'nvim-tree/nvim-web-devicons' },
+    cond = {
+      keys('n', '<Leader>f'),
+      keys('n', '<M-Esc>'),
+      keys('n', '<LocalLeader>c'),
+      cmd 'FZF',
+      cmd 'FzfLua',
+    },
     config = function()
       require 'fzf-lua'.setup {
         'max-perf',
@@ -92,22 +107,36 @@ require 'pckr'.add {
           }
         },
       }
-      -- <Space>f
-      vim.keymap.set('n', '<Leader>f', function()
-        require'fzf-lua'.files()
-      end, { desc = 'browse files in fzf' })
-      -- <M-Esc>
-      vim.keymap.set('n', '<M-Esc>', function()
-        require'fzf-lua'.resume()
-      end, { desc = 'resume fzf session' })
-      -- <Bslash>c
-      vim.keymap.set('n', '<LocalLeader>c', function()
-        require'fzf-lua'.files{ cwd = vim.fn.stdpath 'config' }
-      end, { desc = 'browse nvim config files in fzf' })
+      vim.keymap.set('n', '<Leader>f', function() require'fzf-lua'.files() end, { desc = 'browse files in fzf' })
+      vim.keymap.set('n', '<M-Esc>', function() require'fzf-lua'.resume() end, { desc = 'resume fzf session' })
+      vim.keymap.set('n', '<LocalLeader>c', function() require'fzf-lua'.files{ cwd = vim.fn.stdpath 'config' } end, { desc = 'browse nvim config files in fzf' })
     end,
   };
 
+  { 'nanotee/zoxide.vim',
+    requires = { 'ibhagwan/fzf-lua' },
+    config_pre = function() vim.g.zoxide_use_select = 1 end,
+    cond = keys('n', '<Leader>z', ':<C-u>Zi<CR>', { desc = '[F]ZF [Z]oxide CD' }),
+    config = function()
+      require 'fzf-lua'.register_ui_select()
+      -- vim.api.nvim_set_keymap('n', '<Leader>z', ':Zi<CR>', { desc = '[F]ZF [Z]oxide CD' })
+    end,
+  };
+
+
   { 'tpope/vim-fugitive',
+    cond = {
+      keys('n', '<Leader>gg'),
+      cmd 'G',
+      cmd 'Git',
+      cmd 'Ggrep',
+      cmd 'Glgrep',
+      cmd 'Gclog',
+      cmd 'Gcd',
+      cmd 'Glcd',
+      cmd 'Gedit',
+      cmd 'Gdiffsplit',
+    },
     config = function()
       vim.keymap.set('n', '<Leader>gg', function()
         local buf = vim.api.nvim_get_current_buf()
@@ -127,28 +156,34 @@ require 'pckr'.add {
     dependencies = { 'tpope/vim-fugitive' },
   };
 
-  'nvim-lua/plenary.nvim',
-  'sindrets/diffview.nvim',      -- optional
+  -- 'nvim-lua/plenary.nvim',
+  -- 'sindrets/diffview.nvim',      -- optional
   -- 'nvim-telescope/telescope.nvim', -- optional
-  'ibhagwan/fzf-lua',            -- optional
-  'nvim-tree/nvim-web-devicons', -- optional
+  -- 'nvim-tree/nvim-web-devicons', -- optional
 
-  { 'NeogitOrg/neogit',
-    config = function()
-      require 'neogit'.setup {
-        integrations = { fzf_lua = true, diffview = true, },
-      }
-    end,
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'sindrets/diffview.nvim',      -- optional
-      -- 'nvim-telescope/telescope.nvim', -- optional
-      'ibhagwan/fzf-lua',            -- optional
-      'nvim-tree/nvim-web-devicons', -- optional
+  -- { 'NeogitOrg/neogit',
+  --   config = function()
+  --     require 'neogit'.setup {
+  --       integrations = { fzf_lua = true, diffview = true, },
+  --     }
+  --   end,
+  --   dependencies = {
+  --     'nvim-lua/plenary.nvim',
+  --     'sindrets/diffview.nvim',      -- optional
+  --     -- 'nvim-telescope/telescope.nvim', -- optional
+  --     'ibhagwan/fzf-lua',            -- optional
+  --     'nvim-tree/nvim-web-devicons', -- optional
+  --   },
+  -- };
+
+  { 'lewis61/gitsigns.nvim',
+    cond = {
+      keys('n', '<LocalLeader>gss'),
+      keys('n', '<LocalLeader>gsn'),
+      keys('n', '<LocalLeader>gsl'),
+      keys('n', '<LocalLeader>gsw'),
+      keys('n', '<LocalLeader>gsb'),
     },
-  };
-
-  { 'lewis6991/gitsigns.nvim',
     config = function()
       require 'gitsigns'.setup {
         signcolumn = false, -- Toggle w :Gitsigns toggle_signs
@@ -309,10 +344,11 @@ require 'pckr'.add {
 
   { 'OXY2DEV/helpview.nvim',
     requires = { "nvim-treesitter/nvim-treesitter" },
+    cond = event('FileType', 'help')
   };
 
   { 'neovim/nvim-lspconfig',
-    -- event = { 'BufReadPost', 'BufNewFile' },
+    cond = event { 'BufReadPost', 'BufNewFile' },
     config = function()
       local lc = require 'lspconfig'
       local au = require 'utils'.augroup 'LspAttach'
@@ -443,6 +479,15 @@ require 'pckr'.add {
   { 'L3MON4D3/LuaSnip',
     tag = "v2.*",
     run = 'make install_jsregexp',
+    cond = {
+      keys({'n','i','s'}, '<M-Space>'),
+      keys({'n','i','s'}, '<M-h>'),
+      keys({'n','i','s'}, '<M-l>'),
+      keys({'n','i','s'}, '<M-j>'),
+      keys({'n','i','s'}, '<M-k>'),
+      cmd 'LuaSnipListAvailable',
+      cmd 'LuaSnipUnlinkCurrent',
+    },
     config = function()
       local ls = require 'luasnip'
       local cfg = vim.fn.stdpath 'config' ---@cast cfg string
@@ -477,7 +522,9 @@ require 'pckr'.add {
     end,
   };
 
-  'dhruvasagar/vim-table-mode';
+  { 'dhruvasagar/vim-table-mode',
+    cond = event('FileType', 'markdown'),
+  };
 
   { 'iamcco/markdown-preview.nvim',
     run = 'cd app && yarn install',
@@ -488,6 +535,10 @@ require 'pckr'.add {
 
   { 'toppair/peek.nvim',
     run = 'deno task --quiet build:fast',
+    cond = {
+      cmd 'PeekOpen',
+      cmd 'PeekClose',
+    },
     config = function()
       require 'peek'.setup {
         -- app = 'firefox'
@@ -502,6 +553,7 @@ require 'pckr'.add {
       'nvim-treesitter/nvim-treesitter',
       'nvim-tree/nvim-web-devicons'
     },
+    cond = event('FileType', 'markdown'),
     config = function()
       require 'render-markdown'.setup {
         enabled = false,
@@ -624,6 +676,7 @@ require 'pckr'.add {
   'vim-scripts/ReplaceWithRegister';
 
   { 'NStefan002/screenkey.nvim',
+    cond = cmd 'Screenkey',
     config_pre = function()
       vim.g.screenkey_statusline_component = true
     end,
@@ -646,10 +699,26 @@ require 'pckr'.add {
   };
 
   { 'kylechui/nvim-surround',
+    cond = {
+      keys('n', 'ys'),
+      keys('n', 'ds'),
+      keys('n', 'cs'),
+      keys('n', 'yS'),
+      keys('n', 'cS'),
+      keys('i', '<C-g>s'),
+      keys('i', '<C-g>S'),
+      keys({'n','x'}, 'S'),
+      keys('x', 'gS'),
+    },
     config = function() require 'nvim-surround'.setup() end,
   };
 
-  'godlygeek/tabular';
+  { 'godlygeek/tabular',
+    cond = {
+      cmd 'Tabularize',
+      cmd 'GTabularize',
+    },
+  };
 
   { 'lervag/vimtex',
     config_pre = function()
@@ -695,8 +764,8 @@ require 'pckr'.add {
   -- -- 'b0o/lavi.nvim';
 
   { 'nvim-treesitter/nvim-treesitter',
-    -- event = { 'BufReadPost', 'BufNewFile' },
     run = function() require 'nvim-treesitter.install'.update { with_sync = true } () end,
+    cond = event { 'BufReadPost', 'BufNewFile' },
     config = function()
       -- &ft to 0 or more tree-sitter grammars
       local ft2ts = {
@@ -746,6 +815,7 @@ require 'pckr'.add {
 
   { 'nvim-treesitter/nvim-treesitter-textobjects',
     requires = { 'nvim-treesitter/nvim-treesitter', },
+    cond = event { 'BufReadPost', 'BufNewFile' },
     config = function()
       require 'nvim-treesitter.configs'.setup {
         textobjects = {
@@ -802,38 +872,24 @@ require 'pckr'.add {
     end,
   };
 
-  'andymass/vim-matchup';
+  { 'andymass/vim-matchup',
+    cond = event 'UIEnter',
+  };
 
   -- 'puremourning/vimspector';
 
   { 'VioletJewel/vimterm.nvim',
-    config = function()
-      require 'vimterm'.setup { abbrevhack = false }
-      vim.keymap.set('ca', 'term',
-        "getcmdtype() is ':' && getcmdline() =~# '^term' && getcmdpos() is 5 ? 'Sterm' : 'term'", {
-        expr=true
-      })
-      -- (hack) expand :vterm to :vert Sterm.
-      vim.keymap.set('ca', 'vterm',
-        "getcmdtype() is ':' && getcmdline() =~# '^vterm' && getcmdpos() is 6 ? 'vert Sterm' : 'vterm'", {
-        expr=true
-      })
-    end
+    config = function() require 'vimterm'.setup() end,
   };
 
   { 'folke/zen-mode.nvim',
+    cond = {
+      keys('n', '<LocalLeader>z'),
+      cmd 'ZenMode',
+    },
     config = function()
       require 'zen-mode'.setup()
       vim.keymap.set('n', '<LocalLeader>z', function() require 'zen-mode'.toggle() end)
-    end,
-  };
-
-  { 'nanotee/zoxide.vim',
-    requires = { 'ibhagwan/fzf-lua' },
-    config_pre = function() vim.g.zoxide_use_select = 1 end,
-    config = function()
-      require 'fzf-lua'.register_ui_select()
-      vim.api.nvim_set_keymap('n', '<leader>z', ':Zi<CR>', { desc = '[F]ZF [Z]oxide CD' })
     end,
   };
 
