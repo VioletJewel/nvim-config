@@ -1,6 +1,4 @@
--- require 'theme'
 require 'opts'
 require 'foldtext'
--- require 'lazy-setup'
-require 'pckr-setup'
+require 'plugins'
 require 'statusline'

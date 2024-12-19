@@ -17,6 +17,9 @@ end
 local cmd = require 'pckr.loader.cmd'
 local keys = require 'pckr.loader.keys'
 local event = require 'pckr.loader.event'
+local datadir = vim.fn.stdpath 'data' --- @cast datadir string
+
+local auTheme = require 'utils'.augroup 'VioletTheme'
 
 require 'pckr'.add {
 
@@ -29,24 +32,28 @@ require 'pckr'.add {
     },
   };
 
-  -- 'https://git.sr.ht/~detegr/nvim-bqn';
+  { 'mlochbaum/BQN',
+    config = function()
+      vim.opt.rtp:append(vim.fs.joinpath(datadir, 'site', 'pack', 'pckr', 'opt', 'BQN', 'editors', 'vim'))
+    end,
+  };
 
-  -- { 'mlochbaum/BQN',
-  --   config = function(plugin)
-  --     vim.opt.rtp:append(vim.fs.joinpath(plugin.dir, 'editors', 'vim'))
-  --   end,
-  -- };
+  { 'https://git.sr.ht/~detegr/nvim-bqn',
+    cond = event('FileType', 'bqn'),
+    config_pre = function() vim.g.nvim_bqn = 'bqn' end,
+  };
 
   'rstacruz/vim-closer';
 
   'tpope/vim-commentary';
 
-  -- { 'vyfor/cord.nvim',
-  --   run = './build',
-  --   config = function()
-  --     require 'cord'.setup()
-  --   end,
-  -- };
+  { 'vyfor/cord.nvim',
+    run = './build',
+    cond = event 'UIEnter',
+    config = function()
+      require 'cord'.setup()
+    end,
+  };
 
   'VioletJewel/vim-ctrlg';
 
@@ -55,6 +62,7 @@ require 'pckr'.add {
   'tommcdo/vim-exchange';
 
   { 'nvim-tree/nvim-web-devicons',
+    cond = event 'UIEnter',
     config = function()
       require 'nvim-web-devicons'.setup {
         override = { markdown = { icon = "" } },
@@ -454,25 +462,16 @@ require 'pckr'.add {
             }
           }
         },
-      })):each(function(lsp, cfg) lc[lsp].setup(cfg) end)
+      })):each(function(lsp, cfg)
+        cfg.autostart = false
+        lc[lsp].setup(cfg)
+      end)
       au { 'LspAttach', callback = lspCallback }
       -- global keymaps
-      vim.keymap.set('n', '<Leader>e', vim.diagnostic.open_float, {
-        desc = 'open diagnostic float'
-      })
-      vim.keymap.set('n', '[d', function()
-        vim.diagnostic.jump { count = -1 }
-      end, {
-        desc = 'goto prev diagnostic'
-      })
-      vim.keymap.set('n', ']d', function()
-        vim.diagnostic.jump { count = 1 }
-      end, {
-        desc = 'goto next diagnostic'
-      })
-      vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist, {
-        desc = 'set diagnostic loclist'
-      })
+      vim.keymap.set('n', '<Leader>e', vim.diagnostic.open_float, { desc = 'open diagnostic float' })
+      vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'goto prev diagnostic' })
+      vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'goto next diagnostic' })
+      vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist, { desc = 'set diagnostic loclist' })
     end,
   };
 
@@ -633,6 +632,7 @@ require 'pckr'.add {
       -- { 'echasnovski/mini.icons', opts = {} },
       { 'nvim-tree/nvim-web-devicons' },
     },
+    cond = event 'UIEnter',
     config = function()
       require 'oil'.setup {
         default_file_explorer = true,
@@ -742,26 +742,25 @@ require 'pckr'.add {
 
   { 'folke/tokyonight.nvim',
     config = function()
-      local au = require 'utils'.augroup 'VioletTheme'
-      au { 'UIEnter', callback = function()
+      auTheme { 'UIEnter', callback = function()
         -- vim.cmd.syntax 'reset'
         vim.cmd.colorscheme 'tokyonight'
         vim.cmd.doautocmd { args = { 'colorscheme', 'tokyonight' } }
       end }
     end,
   };
-  -- -- other themes
-  -- 'rebelot/kanagawa.nvim';
-  -- 'catppuccin/nvim';
-  -- 'lifepillar/gruvbox8';
-  -- 'sainnhe/sonokai';
-  -- 'dracula/vim';
-  -- 'owickstrom/vim-colors-paramount';
-  -- 'violetjewel/color-nokto';
-  -- 'violetjewel/color-vulpo';
-  -- 'navarasu/onedark.nvim';
-  -- 'gbprod/nord.nvim';
-  -- -- 'b0o/lavi.nvim';
+  -- other themes
+  'rebelot/kanagawa.nvim';
+  'catppuccin/nvim';
+  'lifepillar/gruvbox8';
+  'sainnhe/sonokai';
+  'dracula/vim';
+  'owickstrom/vim-colors-paramount';
+  'violetjewel/color-nokto';
+  'violetjewel/color-vulpo';
+  'navarasu/onedark.nvim';
+  'gbprod/nord.nvim';
+  -- 'b0o/lavi.nvim';
 
   { 'nvim-treesitter/nvim-treesitter',
     run = function() require 'nvim-treesitter.install'.update { with_sync = true } () end,
@@ -879,6 +878,7 @@ require 'pckr'.add {
   -- 'puremourning/vimspector';
 
   { 'VioletJewel/vimterm.nvim',
+    cond = event 'UIEnter',
     config = function() require 'vimterm'.setup() end,
   };
 
