@@ -50,28 +50,3 @@ function! maps#nextFile(forwards)
   exe 'edit' fnameescape(dotpre ? files[ind][2:] : files[ind])
 endfunction
 
-function! maps#pastebin(type)
-  if a:type is# 'char'
-    let l:regsave = getreg('"')
-    normal! `[v`]y
-    let l:text = split(getreg('"', "\n"))
-    call setreg('"', l:regsave)
-  elseif a:type is# 'line'
-    let l:text = getline(line("'["), "']")
-  elseif a:type is# 'v' || a:type is# "\<c-v>"
-    let l:regsave = getreg('"')
-    normal! gvy
-    let l:text = split(@", "\n")
-    call setreg('"', l:regsave)
-  elseif a:type is# 'V'
-    let l:text = getline(line("'<"), "'>")
-  else
-    let l:text = getline(line("'["), "']")
-  endif
-  let l:tmp = tempname()
-  call writefile(l:text, l:tmp)
-  " ix.io
-  call setreg('+', systemlist('sh -c ''curl -NsF "text=<'..l:tmp..'" vpaste.net?ft='..&ft..'\&bg=dark''')[0])
-  unsilent echon "\rDone: @+ = "..@+
-endfunction
-

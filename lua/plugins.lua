@@ -1,4 +1,4 @@
-do
+do -- setup pckr{{{1
   local pckr_path = vim.fn.stdpath("data") .. "/pckr/pckr.nvim"
 
   if not (vim.uv or vim.loop).fs_stat(pckr_path) then
@@ -12,48 +12,137 @@ do
   end
 
   vim.opt.rtp:prepend(pckr_path)
-end
+end--}}}1
 
 local cmd = require 'pckr.loader.cmd'
 local keys = require 'pckr.loader.keys'
 local event = require 'pckr.loader.event'
-local datadir = vim.fn.stdpath 'data' --- @cast datadir string
 
-local auTheme = require 'utils'.augroup 'VioletTheme'
+local function lspBufSetup(evt)--{{{1
+  local bnr = evt.buf
+  local function bmap(mode, lhs, rhs, opts)
+    if type(opts) == 'string' then opts = { desc = opts } end
+    opts.buffer = opts.buffer or bnr
+    vim.keymap.set(
+      type(mode) == 'table' and mode or vim.split(mode, ''),
+      lhs,
+      type(rhs) == 'string' and vim.lsp.buf[rhs] or rhs,
+      opts
+    )
+  end
 
-require 'pckr'.add {
+  vim.bo[bnr].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
-  { 'tpope/vim-abolish',
+  bmap('n', 'gD', 'declaration', 'goto lsp declaration')
+  bmap('n', 'gd', 'definition', 'goto lsp definition')
+  bmap('n', 'K', 'hover', 'show lsp hover')
+  bmap('n', '<Space>K', 'K', 'preserve default K')
+  bmap('n', 'gi', 'implementation', 'goto lsp implementation')
+  bmap('nix', '<M-CR>', function()
+    local basewid = vim.api.nvim_get_current_win()
+    for _, wid in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+      if wid ~= basewid and vim.api.nvim_win_get_config(wid).win == basewid then
+        vim.print(wid)
+        vim.api.nvim_win_close(wid, false)
+        return
+      end
+    end
+    vim.lsp.buf.signature_help()
+  end, 'show lsp signature help')
+  bmap('n', '<Leader>wa', 'add_workspace_folder', 'add lsp workspace folder')
+  bmap('n', '<Leader>wr', 'remove_workspace_folder', 'remove lsp workspace folder')
+  bmap('n', '<Leader>wl', function() vim.print(vim.lsp.buf.list_workspace_folders()) end, 'list lsp workspace folders')
+  bmap('n', '<Leader>D', 'type_definition', 'goto lsp type definition')
+  bmap('n', '<Leader>r', 'rename', 'rename lsp symbol')
+  bmap('nx', '<Leader>ca', 'code_action', 'list lsp code action')
+  bmap('n', '<Leader>R', 'references', 'list lsp references')
+  bmap({ 'n', 'x' }, '<Leader>F', function() vim.lsp.buf.format { async = true } end, 'format file|range using lsp')
+end -- }}}
+
+require 'pckr'.add {--{{{1
+
+  { 'neovim/nvim-lspconfig',--{{{2
+    cond = event { 'BufReadPost', 'BufNewFile' },
+    config = function()
+      local lc = require 'lspconfig'
+      local au = require 'utils'.augroup 'LspAttach'
+      vim.iter(pairs({
+        clangd = {},
+        zls = {},
+        lua_ls = {--{{{3
+          on_init = function(client)
+            if client.workspace_folders then
+              local path = client.workspace_folders[1].name
+              if vim.uv.fs_stat(path..'/.luarc.json') or vim.uv.fs_stat(path..'/.luarc.jsonc') then
+                return
+              end
+            end
+            client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+              runtime = { version = 'LuaJIT' },
+              workspace = {
+                checkThirdParty = false,
+                library = { vim.env.VIMRUNTIME, "${3rd}/luv/library" --[["${3rd}/busted/library"]] }
+              }
+            })
+          end,
+          settings = { Lua = {} }
+        },--}}}3
+        rust_analyzer = {--{{{3
+          settings = {
+            ['rust-analyzer'] = {
+              diagnostics = {
+                enable = false,
+              },
+            }
+          }
+        },--}}}3
+        marksman = {},
+      })):each(function(lsp, cfg)
+        -- cfg.autostart = false -- disable auto :LspStart
+        lc[lsp].setup(cfg)
+      end)
+      au { 'LspAttach', callback = lspBufSetup }
+      -- global keymaps
+      vim.keymap.set('n', '<Leader>e', vim.diagnostic.open_float, { desc = 'open diagnostic float' })
+      vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'goto prev diagnostic' })
+      vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'goto next diagnostic' })
+      vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist, { desc = 'set diagnostic loclist' })
+
+    end,
+  };--}}}2
+
+  { 'tpope/vim-abolish',--{{{2
     cond = {
       keys('n', 'cr'),
       cmd 'Abolish',
       cmd 'Subvert',
       cmd 'S',
     },
-  };
+  };--}}}2
 
-  { 'mlochbaum/BQN',
+  { 'mlochbaum/BQN',--{{{2
     config = function()
+      local datadir = vim.fn.stdpath 'data' --- @cast datadir string
       vim.opt.rtp:append(vim.fs.joinpath(datadir, 'site', 'pack', 'pckr', 'opt', 'BQN', 'editors', 'vim'))
     end,
-  };
+  };--}}}2
 
-  { 'https://git.sr.ht/~detegr/nvim-bqn',
+  { 'https://git.sr.ht/~detegr/nvim-bqn',--{{{2
     cond = event('FileType', 'bqn'),
     config_pre = function() vim.g.nvim_bqn = 'bqn' end,
-  };
+  };--}}}2
 
   'rstacruz/vim-closer';
 
   'tpope/vim-commentary';
 
-  { 'vyfor/cord.nvim',
+  { 'vyfor/cord.nvim',--{{{2
     run = './build',
     cond = event 'UIEnter',
     config = function()
       require 'cord'.setup()
     end,
-  };
+  };--}}}2
 
   'VioletJewel/vim-ctrlg';
 
@@ -61,7 +150,7 @@ require 'pckr'.add {
 
   'tommcdo/vim-exchange';
 
-  { 'nvim-tree/nvim-web-devicons',
+  { 'nvim-tree/nvim-web-devicons',--{{{2
     cond = event 'UIEnter',
     config = function()
       require 'nvim-web-devicons'.setup {
@@ -69,14 +158,13 @@ require 'pckr'.add {
         override_by_extension = { md = { icon = "" } },
       }
     end,
-  };
+  };--}}}2
 
-  { 'ibhagwan/fzf-lua',
+  { 'ibhagwan/fzf-lua',--{{{2
     requires = { 'nvim-tree/nvim-web-devicons' },
     cond = {
-      keys('n', '<Leader>f'),
-      keys('n', '<M-Esc>'),
-      keys('n', '<LocalLeader>c'),
+      keys('n', '<Space>f'),
+      keys('n', '<Bslash>c'),
       cmd 'FZF',
       cmd 'FzfLua',
     },
@@ -119,22 +207,21 @@ require 'pckr'.add {
       vim.keymap.set('n', '<M-Esc>', function() require'fzf-lua'.resume() end, { desc = 'resume fzf session' })
       vim.keymap.set('n', '<LocalLeader>c', function() require'fzf-lua'.files{ cwd = vim.fn.stdpath 'config' } end, { desc = 'browse nvim config files in fzf' })
     end,
-  };
+  };--}}}2
 
-  { 'nanotee/zoxide.vim',
+  { 'nanotee/zoxide.vim',--{{{2
     requires = { 'ibhagwan/fzf-lua' },
     config_pre = function() vim.g.zoxide_use_select = 1 end,
-    cond = keys('n', '<Leader>z', ':<C-u>Zi<CR>', { desc = '[F]ZF [Z]oxide CD' }),
+    cond = keys('n', '<Space>z', ':<C-u>Zi<CR>', { desc = '[F]ZF [Z]oxide CD' }),
     config = function()
       require 'fzf-lua'.register_ui_select()
       -- vim.api.nvim_set_keymap('n', '<Leader>z', ':Zi<CR>', { desc = '[F]ZF [Z]oxide CD' })
     end,
-  };
+  };--}}}2
 
-
-  { 'tpope/vim-fugitive',
+  { 'tpope/vim-fugitive',--{{{2
     cond = {
-      keys('n', '<Leader>gg'),
+      keys('n', '<Space>gg'),
       cmd 'G',
       cmd 'Git',
       cmd 'Ggrep',
@@ -158,39 +245,19 @@ require 'pckr'.add {
         desc = 'open :Git|only (if no active windows) or :top vert Git (otherwise)'
       })
     end,
-  };
+  };--}}}2
 
-  { 'junegunn/gv.vim',
-    dependencies = { 'tpope/vim-fugitive' },
-  };
+  { 'junegunn/gv.vim',--{{{2
+    requires = { 'tpope/vim-fugitive' },
+  };--}}}2
 
-  -- 'nvim-lua/plenary.nvim',
-  -- 'sindrets/diffview.nvim',      -- optional
-  -- 'nvim-telescope/telescope.nvim', -- optional
-  -- 'nvim-tree/nvim-web-devicons', -- optional
-
-  -- { 'NeogitOrg/neogit',
-  --   config = function()
-  --     require 'neogit'.setup {
-  --       integrations = { fzf_lua = true, diffview = true, },
-  --     }
-  --   end,
-  --   dependencies = {
-  --     'nvim-lua/plenary.nvim',
-  --     'sindrets/diffview.nvim',      -- optional
-  --     -- 'nvim-telescope/telescope.nvim', -- optional
-  --     'ibhagwan/fzf-lua',            -- optional
-  --     'nvim-tree/nvim-web-devicons', -- optional
-  --   },
-  -- };
-
-  { 'lewis61/gitsigns.nvim',
+  { 'lewis61/gitsigns.nvim',--{{{2
     cond = {
-      keys('n', '<LocalLeader>gss'),
-      keys('n', '<LocalLeader>gsn'),
-      keys('n', '<LocalLeader>gsl'),
-      keys('n', '<LocalLeader>gsw'),
-      keys('n', '<LocalLeader>gsb'),
+      keys('n', '<Bslash>gss'),
+      keys('n', '<Bslash>gsn'),
+      keys('n', '<Bslash>gsl'),
+      keys('n', '<Bslash>gsw'),
+      keys('n', '<Bslash>gsb'),
     },
     config = function()
       require 'gitsigns'.setup {
@@ -200,7 +267,6 @@ require 'pckr'.add {
         -- word_diff  = false, -- Toggle w :Gitsigns toggle_word_diff
         on_attach = function(bufnr)
           local gitsigns = require 'gitsigns'
-
           -- Navigation
           vim.keymap.set('n', ']c', function()
             if vim.wo.diff then
@@ -212,7 +278,6 @@ require 'pckr'.add {
             buffer = bufnr,
             desc = 'go to next git hunk'
           })
-
           vim.keymap.set('n', '[c', function()
             if vim.wo.diff then
               vim.cmd.normal({ '[c', bang = true })
@@ -223,15 +288,12 @@ require 'pckr'.add {
             buffer = bufnr,
             desc = 'go to previous git hunk'
           })
-
           -- Actions
-
           vim.keymap.set('n',
             '<LocalLeader>hs', gitsigns.stage_hunk, {
               buffer = bufnr,
               desc = 'stage gitsigns hunk'
             })
-
           vim.keymap.set('x', '<LocalLeader>hs', function()
             gitsigns.stage_hunk {
               vim.fn.line('.'), vim.fn.line('v')
@@ -240,13 +302,11 @@ require 'pckr'.add {
             buffer = bufnr,
             desc = 'stage gitsigns hunk'
           })
-
           vim.keymap.set('n',
             '<LocalLeader>hr', gitsigns.reset_hunk, {
               buffer = bufnr,
               desc = 'reset gitsigns hunk'
             })
-
           vim.keymap.set('x', '<LocalLeader>hr', function()
             gitsigns.reset_hunk {
               vim.fn.line('.'), vim.fn.line('v') }
@@ -254,66 +314,53 @@ require 'pckr'.add {
             buffer = bufnr,
             desc = 'stage gitsigns hunk'
           })
-
           vim.keymap.set('n', '<LocalLeader>hS', gitsigns.stage_buffer, {
             buffer = bufnr,
             desc = 'stage gitsigns hunk'
           })
-
           vim.keymap.set('n', '<LocalLeader>hu', gitsigns.undo_stage_hunk, {
             buffer = bufnr,
             desc = 'stage gitsigns hunk'
           })
-
           vim.keymap.set('n', '<LocalLeader>hR', gitsigns.reset_buffer, {
             buffer = bufnr,
             desc = 'stage gitsigns hunk'
           })
-
           vim.keymap.set('n', '<LocalLeader>hp', gitsigns.preview_hunk, {
             buffer = bufnr,
             desc = 'stage gitsigns hunk'
           })
-
           vim.keymap.set('n', '<LocalLeader>hb', function()
             gitsigns.blame_line { full = true }
           end, {
             buffer = bufnr,
             desc = 'stage gitsigns hunk'
           })
-
           vim.keymap.set('n', '<LocalLeader>tb', gitsigns.toggle_current_line_blame, {
             buffer = bufnr,
             desc = 'stage gitsigns hunk'
           })
-
           vim.keymap.set('n', '<LocalLeader>hd', gitsigns.diffthis, {
             buffer = bufnr,
             desc = 'stage gitsigns hunk'
           })
-
           vim.keymap.set('n', '<LocalLeader>hD', function() gitsigns.diffthis('~') end, {
             buffer = bufnr,
             desc = 'stage gitsigns hunk'
           })
-
           vim.keymap.set('n', '<LocalLeader>td', gitsigns.toggle_deleted, {
             buffer = bufnr,
             desc = 'stage gitsigns hunk'
           })
-
           -- git blame
-
           vim.keymap.set('n', '<LocalLeader>gb', gitsigns.blame_line, {
             buffer = bufnr,
             desc = 'show git blame on current line'
           })
-
           vim.keymap.set('n', '<LocalLeader>gB', gitsigns.blame, {
             buffer = bufnr,
             desc = 'toggle git blame split'
           })
-
           -- Text object
           vim.keymap.set({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', {
             buffer = bufnr
@@ -346,136 +393,16 @@ require 'pckr'.add {
         desc = 'toggle gitsigns auto git blame'
       })
     end,
-  };
+  };--}}}2
 
   'tweekmonster/helpful.vim';
 
-  { 'OXY2DEV/helpview.nvim',
+  { 'OXY2DEV/helpview.nvim',--{{{2
     requires = { "nvim-treesitter/nvim-treesitter" },
     cond = event('FileType', 'help')
-  };
+  };--}}}2
 
-  { 'neovim/nvim-lspconfig',
-    cond = event { 'BufReadPost', 'BufNewFile' },
-    config = function()
-      local lc = require 'lspconfig'
-      local au = require 'utils'.augroup 'LspAttach'
-      local function lspCallback(evt)
-        vim.bo[evt.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
-        -- buffer keymaps
-        vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, {
-          buffer = evt.buf,
-          desc = 'goto lsp declaration'
-        })
-        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {
-          buffer = evt.buf,
-          desc = 'goto lsp definition'
-        })
-        vim.keymap.set('n', 'K', vim.lsp.buf.hover, {
-          buffer = evt.buf,
-          desc = 'show lsp hover'
-        })
-        vim.keymap.set('n', '<Space>K', 'K', {
-          buffer = evt.buf,
-          desc = 'preserve default K'
-        })
-        vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, {
-          buffer = evt.buf,
-          desc = 'goto lsp implementation'
-        })
-        vim.keymap.set({ 'n', 'i', 'x' }, '<M-Tab>', function()
-          local basewid = vim.api.nvim_get_current_win()
-          for _, wid in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-            if wid ~= basewid and vim.api.nvim_win_get_config(wid).win == basewid then
-              vim.print(wid)
-              vim.api.nvim_win_close(wid, false)
-              return
-            end
-          end
-          vim.lsp.buf.signature_help()
-        end, {
-          buffer = evt.buf,
-          desc = 'show lsp signature help'
-        })
-        vim.keymap.set('n', '<Leader>wa', vim.lsp.buf.add_workspace_folder, {
-          buffer = evt.buf,
-          desc = 'add lsp workspace folder'
-        })
-        vim.keymap.set('n', '<Leader>wr', vim.lsp.buf.remove_workspace_folder, {
-          buffer = evt.buf,
-          desc = 'remove lsp workspace folder'
-        })
-        vim.keymap.set('n', '<Leader>wl', function()
-          vim.print(vim.lsp.buf.list_workspace_folders())
-        end, {
-          buffer = evt.buf,
-          desc = 'list lsp workspace folders'
-        })
-        vim.keymap.set('n', '<Leader>D', vim.lsp.buf.type_definition, {
-          buffer = evt.buf,
-          desc = 'goto lsp type definition'
-        })
-        vim.keymap.set('n', '<Leader>r', vim.lsp.buf.rename, {
-          buffer = evt.buf,
-          desc = 'rename lsp symbol'
-        })
-        vim.keymap.set({ 'n', 'x' }, '<Leader>ca', vim.lsp.buf.code_action, {
-          buffer = evt.buf,
-          desc = 'list lsp code action'
-        })
-        vim.keymap.set('n', '<Leader>R', vim.lsp.buf.references, {
-          buffer = evt.buf,
-          desc = 'list lsp references'
-        })
-        vim.keymap.set({ 'n', 'x' }, '<Leader>F', function() vim.lsp.buf.format { async = true } end, {
-          buffer = evt.buf,
-          desc = 'format file|range using lsp'
-        })
-      end
-      vim.iter(pairs({
-        clangd = {},
-        zls = {},
-        lua_ls = {
-          on_init = function(client)
-            if client.workspace_folders then
-              local path = client.workspace_folders[1].name
-              if vim.uv.fs_stat(path..'/.luarc.json') or vim.uv.fs_stat(path..'/.luarc.jsonc') then
-                return
-              end
-            end
-            client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
-              runtime = { version = 'LuaJIT' },
-              workspace = {
-                checkThirdParty = false,
-                library = { vim.env.VIMRUNTIME, "${3rd}/luv/library" --[["${3rd}/busted/library"]] }
-              }
-            })
-          end,
-          settings = { Lua = {} }
-        },
-        rust_analyzer = {
-          settings = {
-            ['rust-analyzer'] = {
-              diagnostics = {
-                enable = false,
-              },
-            }
-          }
-        },
-      })):each(function(lsp, cfg)
-        cfg.autostart = false
-        lc[lsp].setup(cfg)
-      end)
-      au { 'LspAttach', callback = lspCallback }
-      -- global keymaps
-      vim.keymap.set('n', '<Leader>e', vim.diagnostic.open_float, { desc = 'open diagnostic float' })
-      vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'goto prev diagnostic' })
-      vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'goto next diagnostic' })
-      vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist, { desc = 'set diagnostic loclist' })
-    end,
-  };
-
-  { 'L3MON4D3/LuaSnip',
+  { 'L3MON4D3/LuaSnip',--{{{2
     tag = "v2.*",
     run = 'make install_jsregexp',
     cond = {
@@ -519,20 +446,20 @@ require 'pckr'.add {
         desc = 'cycle backwards through luasnip node choices',
       })
     end,
-  };
+  };--}}}2
 
-  { 'dhruvasagar/vim-table-mode',
+  { 'dhruvasagar/vim-table-mode',--{{{2
     cond = event('FileType', 'markdown'),
-  };
+  };--}}}2
 
-  { 'iamcco/markdown-preview.nvim',
+  { 'iamcco/markdown-preview.nvim',--{{{2
     run = 'cd app && yarn install',
     config_pre = function()
       vim.g.mkdp_auto_close = 0
     end,
-  };
+  };--}}}2
 
-  { 'toppair/peek.nvim',
+  { 'toppair/peek.nvim',--{{{2
     run = 'deno task --quiet build:fast',
     cond = {
       cmd 'PeekOpen',
@@ -545,9 +472,9 @@ require 'pckr'.add {
       vim.api.nvim_create_user_command('PeekOpen', require('peek').open, {})
       vim.api.nvim_create_user_command('PeekClose', require('peek').close, {})
     end,
-  };
+  };--}}}2
 
-  { 'MeanderingProgrammer/render-markdown.nvim',
+  { 'MeanderingProgrammer/render-markdown.nvim',--{{{2
     requires = {
       'nvim-treesitter/nvim-treesitter',
       'nvim-tree/nvim-web-devicons'
@@ -625,9 +552,9 @@ require 'pckr'.add {
         -- }
       }
     end,
-  };
+  };--}}}2
 
-  { 'stevearc/oil.nvim',
+  { 'stevearc/oil.nvim',--{{{2
     requires = {
       -- { 'echasnovski/mini.icons', opts = {} },
       { 'nvim-tree/nvim-web-devicons' },
@@ -669,13 +596,13 @@ require 'pckr'.add {
       vim.api.nvim_set_keymap('n', '<Leader>ds', "<Cmd>exe'bel sp'empty(expand('%')) ? '.' : '%:h'<CR>", {})
       vim.api.nvim_set_keymap('n', '<Leader>dS', "<Cmd>exe'abo sp'empty(expand('%')) ? '.' : '%:h'<CR>", {})
     end,
-  };
+  };--}}}2
 
   'tpope/vim-repeat';
 
   'vim-scripts/ReplaceWithRegister';
 
-  { 'NStefan002/screenkey.nvim',
+  { 'NStefan002/screenkey.nvim',--{{{2
     cond = cmd 'Screenkey',
     config_pre = function()
       vim.g.screenkey_statusline_component = true
@@ -696,9 +623,9 @@ require 'pckr'.add {
         vim.o.winbar = vim.o.winbar and nil or "%{%v:lua.require('screenkey').get_keys()%}"
       end, {})
     end,
-  };
+  };--}}}2
 
-  { 'kylechui/nvim-surround',
+  { 'kylechui/nvim-surround',--{{{2
     cond = {
       keys('n', 'ys'),
       keys('n', 'ds'),
@@ -711,16 +638,16 @@ require 'pckr'.add {
       keys('x', 'gS'),
     },
     config = function() require 'nvim-surround'.setup() end,
-  };
+  };--}}}2
 
-  { 'godlygeek/tabular',
+  { 'godlygeek/tabular',--{{{2
     cond = {
       cmd 'Tabularize',
       cmd 'GTabularize',
     },
-  };
+  };--}}}2
 
-  { 'lervag/vimtex',
+  { 'lervag/vimtex',--{{{2
     config_pre = function()
       vim.g.vimtex_view_general_viewer = 'zathura'
       vim.g.vimtex_compiler_latexmk = {
@@ -736,33 +663,11 @@ require 'pckr'.add {
         },
       }
     end,
-  };
+  };--}}}2
 
   'KeitaNakamura/tex-conceal.vim';
 
-  { 'folke/tokyonight.nvim',
-    config = function()
-      auTheme { 'UIEnter', callback = function()
-        -- vim.cmd.syntax 'reset'
-        vim.cmd.colorscheme 'tokyonight'
-        vim.cmd.doautocmd { args = { 'colorscheme', 'tokyonight' } }
-      end }
-    end,
-  };
-  -- other themes
-  'rebelot/kanagawa.nvim';
-  'catppuccin/nvim';
-  'lifepillar/gruvbox8';
-  'sainnhe/sonokai';
-  'dracula/vim';
-  'owickstrom/vim-colors-paramount';
-  'violetjewel/color-nokto';
-  'violetjewel/color-vulpo';
-  'navarasu/onedark.nvim';
-  'gbprod/nord.nvim';
-  -- 'b0o/lavi.nvim';
-
-  { 'nvim-treesitter/nvim-treesitter',
+  { 'nvim-treesitter/nvim-treesitter',--{{{2
     run = function() require 'nvim-treesitter.install'.update { with_sync = true } () end,
     cond = event { 'BufReadPost', 'BufNewFile' },
     config = function()
@@ -810,9 +715,9 @@ require 'pckr'.add {
         matchup = { enable = true, },
       }
     end,
-  };
+  };--}}}2
 
-  { 'nvim-treesitter/nvim-treesitter-textobjects',
+  { 'nvim-treesitter/nvim-treesitter-textobjects',--{{{2
     requires = { 'nvim-treesitter/nvim-treesitter', },
     cond = event { 'BufReadPost', 'BufNewFile' },
     config = function()
@@ -869,28 +774,62 @@ require 'pckr'.add {
         },
       }
     end,
-  };
+  };--}}}2
 
-  { 'andymass/vim-matchup',
+  { 'andymass/vim-matchup',--{{{2
     cond = event 'UIEnter',
-  };
+  };--}}}2
 
-  -- 'puremourning/vimspector';
-
-  { 'VioletJewel/vimterm.nvim',
+  { 'VioletJewel/vimterm.nvim',--{{{2
     cond = event 'UIEnter',
     config = function() require 'vimterm'.setup() end,
-  };
+  };--}}}2
 
-  { 'folke/zen-mode.nvim',
+  { 'folke/zen-mode.nvim',--{{{2
     cond = {
-      keys('n', '<LocalLeader>z'),
+      keys('n', '<Bslasz'),
       cmd 'ZenMode',
     },
     config = function()
       require 'zen-mode'.setup()
       vim.keymap.set('n', '<LocalLeader>z', function() require 'zen-mode'.toggle() end)
     end,
-  };
+  };--}}}2
 
-}
+  -- themes{{{2
+
+  { 'folke/tokyonight.nvim',--{{{3
+    config = function()
+      require 'utils'.augroup 'VioletTheme' { 'UIEnter', callback = function()
+        -- vim.cmd.syntax 'reset'
+        vim.cmd.colorscheme 'tokyonight'
+        vim.cmd.doautocmd { args = { 'colorscheme', 'tokyonight' } }
+      end }
+    end,
+  };--}}}3
+
+  'rebelot/kanagawa.nvim';
+
+  'catppuccin/nvim';
+
+  'lifepillar/gruvbox8';
+
+  'sainnhe/sonokai';
+
+  'dracula/vim';
+
+  'owickstrom/vim-colors-paramount';
+
+  'violetjewel/color-nokto';
+
+  'violetjewel/color-vulpo';
+
+  'navarasu/onedark.nvim';
+
+  'gbprod/nord.nvim';
+
+  -- 'b0o/lavi.nvim';
+
+  --}}}2
+
+}--}}}1

@@ -77,4 +77,4 @@ end
 -- SetCmdHeight()
 
 vim.o.laststatus = 1
-vim.o.ruler = true
+vim.o.ruler = false
