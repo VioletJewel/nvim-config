@@ -1,11 +1,10 @@
-
 local M = {}
 
---- Wrapper around nvim API's augroup and autocmd using a closure.
--- local au = require'utils'.augroup'MyAugroup'
--- au{'VimEnter', command='echo "hi"'}
-function M.augroup(name, clear)
-  local group = vim.api.nvim_create_augroup(name, {clear=clear})
+function M.augroup(name, clear)-->
+  --- Wrapper around nvim API's augroup and autocmd using a closure.
+  -- local au = require'utils'.augroup'MyAugroup'
+  -- au{'VimEnter', command='echo "hi"'}
+  local group = vim.api.nvim_create_augroup(name, { clear = clear })
   return function(opts)
     local evt = table.remove(opts, 1)
     if type(evt) == 'string' then
@@ -15,7 +14,6 @@ function M.augroup(name, clear)
     if not opts.group then opts.group = group end
     return vim.api.nvim_create_autocmd(evt, opts)
   end
-end
+end--<
 
 return M
-

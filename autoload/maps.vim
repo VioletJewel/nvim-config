@@ -1,7 +1,7 @@
 " Author: Violet
 " Last Change: 04 June 2022
 
-" Quick: {{{1
+" moveLine {{{1
 
 function! maps#moveLine(down, count, visual)
   if a:visual
@@ -28,6 +28,8 @@ function! maps#moveLine(down, count, visual)
   "     norm! gvo
   " endif
 endfunction
+
+" nextFile {{{1
 
 function! maps#nextFile(forwards)
   let file = &ft is 'netrw' ? b:netrw_curdir : expand('%')

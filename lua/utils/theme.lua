@@ -1,4 +1,3 @@
-
 local M = {}
 
 local _defaultTheme = 'habamax'
@@ -7,18 +6,18 @@ function M.setup(opts)
   Theme = opts.theme or _defaultTheme
 end
 
-local function parseuri(uri)
+local function parseuri(uri) -->
   local name = uri:match '([^/]*)/n?vim$' or uri:match '[^/]*/([^/]*)$'
   if not name then return end
   return name
       :gsub('^n?vim%-', ''):gsub('^colors?%-', '')
       :gsub('%.n?vim$', ''):gsub('%-?colors?$', '')
-end
+end --<
 
 local _trim = { trimempty = true }
 local _cmp
 
-function M.parse(pkgs)
+function M.parse(pkgs) -->
   local cmpi = 0
   local cmp = {}
   local inittheme = type(Theme) == 'table' and Theme or { Theme }
@@ -32,8 +31,8 @@ function M.parse(pkgs)
     if type(pkg) == 'table' then -- { 'my/theme', ... }
       uri = pkg[1]
       name = parseuri(uri)
-      local g = pkg.g or name..'_style' -- { 'my/theme', g = 'theme_style', ... }
-      if pkg.pats then -- { 'my/theme', pats = ..., ... }
+      local g = pkg.g or name .. '_style'  -- { 'my/theme', g = 'theme_style', ... }
+      if pkg.pats then                     -- { 'my/theme', pats = ..., ... }
         if type(pkg.pats) == 'string' then -- { 'my/theme', pats = '%:g=red,%-{blue,pink}-dark', ... }
           pats = pkg.pats:gsub('%%', name)
           pats = pats:gsub('([^,]*){([^}]*)}([^,]*)', function(pre, spat, post)
@@ -103,9 +102,9 @@ function M.parse(pkgs)
   if not didinittheme then vim.cmd.colorscheme(Theme) end
   _cmp = vim.iter(cmp):flatten():totable()
   return uris
-end
+end                         --<
 
-local function getCmpIter()
+local function getCmpIter() -->
   return vim.iter(ipairs(_cmp)):map(function(_, cmp)
     if type(cmp) == 'table' then
       if cmp._g then
@@ -116,7 +115,7 @@ local function getCmpIter()
     end
     return cmp
   end)
-end
+end -->
 
 function M.getCompletions()
   return getCmpIter():totable()
@@ -137,8 +136,9 @@ vim.api.nvim_create_user_command('ColorScheme', function(opts)
     if g1 then
       local style = theme:sub(g2)
       theme = theme:sub(1, g1)
-      local _, t = vim.iter(ipairs(_cmp)):filter(function(_, t) return type(t) == 'table' end):find(function(_, t) return t[1] == theme and t.globals[t._g] == style end)
-      vim.g[t and t._g or theme..'_style'] = style
+      local _, t = vim.iter(ipairs(_cmp)):filter(function(_, t) return type(t) == 'table' end):find(function(_, t) return
+        t[1] == theme and t.globals[t._g] == style end)
+      vim.g[t and t._g or theme .. '_style'] = style
     end
   end
   vim.cmd.colorscheme(theme)

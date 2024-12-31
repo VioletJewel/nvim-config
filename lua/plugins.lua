@@ -1,4 +1,4 @@
-do -- setup pckr{{{1
+do -->1 pckr setup
   local pckr_path = vim.fn.stdpath("data") .. "/pckr/pckr.nvim"
 
   if not (vim.uv or vim.loop).fs_stat(pckr_path) then
@@ -12,13 +12,14 @@ do -- setup pckr{{{1
   end
 
   vim.opt.rtp:prepend(pckr_path)
-end--}}}1
+end
 
 local cmd = require 'pckr.loader.cmd'
 local keys = require 'pckr.loader.keys'
 local event = require 'pckr.loader.event'
 
-local function lspBufSetup(evt)--{{{1
+--<1
+local function lspBufSetup(evt)-->1
   local bnr = evt.buf
   local function bmap(mode, lhs, rhs, opts)
     if type(opts) == 'string' then opts = { desc = opts } end
@@ -59,9 +60,9 @@ local function lspBufSetup(evt)--{{{1
   bmap({ 'n', 'x' }, '<Leader>F', function() vim.lsp.buf.format { async = true } end, 'format file|range using lsp')
 end -- }}}
 
-require 'pckr'.add {--{{{1
+require 'pckr'.add {-->1
 
-  { 'neovim/nvim-lspconfig',--{{{2
+  { 'neovim/nvim-lspconfig',-->2
     cond = event { 'BufReadPost', 'BufNewFile' },
     config = function()
       local lc = require 'lspconfig'
@@ -69,7 +70,7 @@ require 'pckr'.add {--{{{1
       vim.iter(pairs({
         clangd = {},
         zls = {},
-        lua_ls = {--{{{3
+        lua_ls = {-->3
           on_init = function(client)
             if client.workspace_folders then
               local path = client.workspace_folders[1].name
@@ -86,8 +87,8 @@ require 'pckr'.add {--{{{1
             })
           end,
           settings = { Lua = {} }
-        },--}}}3
-        rust_analyzer = {--{{{3
+        },--<3
+        rust_analyzer = {-->3
           settings = {
             ['rust-analyzer'] = {
               diagnostics = {
@@ -95,7 +96,7 @@ require 'pckr'.add {--{{{1
               },
             }
           }
-        },--}}}3
+        },--<3
         marksman = {},
       })):each(function(lsp, cfg)
         -- cfg.autostart = false -- disable auto :LspStart
@@ -109,40 +110,40 @@ require 'pckr'.add {--{{{1
       vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist, { desc = 'set diagnostic loclist' })
 
     end,
-  };--}}}2
+  };--<2
 
-  { 'tpope/vim-abolish',--{{{2
+  { 'tpope/vim-abolish',-->2
     cond = {
       keys('n', 'cr'),
       cmd 'Abolish',
       cmd 'Subvert',
       cmd 'S',
     },
-  };--}}}2
+  };--<2
 
-  { 'mlochbaum/BQN',--{{{2
+  { 'mlochbaum/BQN',-->2
     config = function()
       local datadir = vim.fn.stdpath 'data' --- @cast datadir string
       vim.opt.rtp:append(vim.fs.joinpath(datadir, 'site', 'pack', 'pckr', 'opt', 'BQN', 'editors', 'vim'))
     end,
-  };--}}}2
+  };--<2
 
-  { 'https://git.sr.ht/~detegr/nvim-bqn',--{{{2
+  { 'https://git.sr.ht/~detegr/nvim-bqn',-->2
     cond = event('FileType', 'bqn'),
     config_pre = function() vim.g.nvim_bqn = 'bqn' end,
-  };--}}}2
+  };--<2
 
   'rstacruz/vim-closer';
 
   'tpope/vim-commentary';
 
-  { 'vyfor/cord.nvim',--{{{2
+  { 'vyfor/cord.nvim',-->2
     run = './build',
     cond = event 'UIEnter',
     config = function()
       require 'cord'.setup()
     end,
-  };--}}}2
+  };--<2
 
   'VioletJewel/vim-ctrlg';
 
@@ -150,7 +151,7 @@ require 'pckr'.add {--{{{1
 
   'tommcdo/vim-exchange';
 
-  { 'nvim-tree/nvim-web-devicons',--{{{2
+  { 'nvim-tree/nvim-web-devicons',-->2
     cond = event 'UIEnter',
     config = function()
       require 'nvim-web-devicons'.setup {
@@ -158,9 +159,9 @@ require 'pckr'.add {--{{{1
         override_by_extension = { md = { icon = "" } },
       }
     end,
-  };--}}}2
+  };--<2
 
-  { 'ibhagwan/fzf-lua',--{{{2
+  { 'ibhagwan/fzf-lua',-->2
     requires = { 'nvim-tree/nvim-web-devicons' },
     cond = {
       keys('n', '<Space>f'),
@@ -207,9 +208,9 @@ require 'pckr'.add {--{{{1
       vim.keymap.set('n', '<M-Esc>', function() require'fzf-lua'.resume() end, { desc = 'resume fzf session' })
       vim.keymap.set('n', '<LocalLeader>c', function() require'fzf-lua'.files{ cwd = vim.fn.stdpath 'config' } end, { desc = 'browse nvim config files in fzf' })
     end,
-  };--}}}2
+  };--<2
 
-  { 'nanotee/zoxide.vim',--{{{2
+  { 'nanotee/zoxide.vim',-->2
     requires = { 'ibhagwan/fzf-lua' },
     config_pre = function() vim.g.zoxide_use_select = 1 end,
     cond = keys('n', '<Space>z', ':<C-u>Zi<CR>', { desc = '[F]ZF [Z]oxide CD' }),
@@ -217,9 +218,9 @@ require 'pckr'.add {--{{{1
       require 'fzf-lua'.register_ui_select()
       -- vim.api.nvim_set_keymap('n', '<Leader>z', ':Zi<CR>', { desc = '[F]ZF [Z]oxide CD' })
     end,
-  };--}}}2
+  };--<2
 
-  { 'tpope/vim-fugitive',--{{{2
+  { 'tpope/vim-fugitive',-->2
     cond = {
       keys('n', '<Space>gg'),
       cmd 'G',
@@ -245,13 +246,13 @@ require 'pckr'.add {--{{{1
         desc = 'open :Git|only (if no active windows) or :top vert Git (otherwise)'
       })
     end,
-  };--}}}2
+  };--<2
 
-  { 'junegunn/gv.vim',--{{{2
+  { 'junegunn/gv.vim',-->2
     requires = { 'tpope/vim-fugitive' },
-  };--}}}2
+  };--<2
 
-  { 'lewis61/gitsigns.nvim',--{{{2
+  { 'lewis61/gitsigns.nvim',-->2
     cond = {
       keys('n', '<Bslash>gss'),
       keys('n', '<Bslash>gsn'),
@@ -393,16 +394,16 @@ require 'pckr'.add {--{{{1
         desc = 'toggle gitsigns auto git blame'
       })
     end,
-  };--}}}2
+  };--<2
 
   'tweekmonster/helpful.vim';
 
-  { 'OXY2DEV/helpview.nvim',--{{{2
+  { 'OXY2DEV/helpview.nvim',-->2
     requires = { "nvim-treesitter/nvim-treesitter" },
     cond = event('FileType', 'help')
-  };--}}}2
+  };--<2
 
-  { 'L3MON4D3/LuaSnip',--{{{2
+  { 'L3MON4D3/LuaSnip',-->2
     tag = "v2.*",
     run = 'make install_jsregexp',
     cond = {
@@ -446,20 +447,20 @@ require 'pckr'.add {--{{{1
         desc = 'cycle backwards through luasnip node choices',
       })
     end,
-  };--}}}2
+  };--<2
 
-  { 'dhruvasagar/vim-table-mode',--{{{2
+  { 'dhruvasagar/vim-table-mode',-->2
     cond = event('FileType', 'markdown'),
-  };--}}}2
+  };--<2
 
-  { 'iamcco/markdown-preview.nvim',--{{{2
+  { 'iamcco/markdown-preview.nvim',-->2
     run = 'cd app && yarn install',
     config_pre = function()
       vim.g.mkdp_auto_close = 0
     end,
-  };--}}}2
+  };--<2
 
-  { 'toppair/peek.nvim',--{{{2
+  { 'toppair/peek.nvim',-->2
     run = 'deno task --quiet build:fast',
     cond = {
       cmd 'PeekOpen',
@@ -472,9 +473,9 @@ require 'pckr'.add {--{{{1
       vim.api.nvim_create_user_command('PeekOpen', require('peek').open, {})
       vim.api.nvim_create_user_command('PeekClose', require('peek').close, {})
     end,
-  };--}}}2
+  };--<2
 
-  { 'MeanderingProgrammer/render-markdown.nvim',--{{{2
+  { 'MeanderingProgrammer/render-markdown.nvim',-->2
     requires = {
       'nvim-treesitter/nvim-treesitter',
       'nvim-tree/nvim-web-devicons'
@@ -552,9 +553,15 @@ require 'pckr'.add {--{{{1
         -- }
       }
     end,
-  };--}}}2
+  };--<2
 
-  { 'stevearc/oil.nvim',--{{{2
+  { 'zk-org/zk-nvim',-->2
+    config = function()
+      require 'zk'.setup()
+    end,
+  };--<2
+
+  { 'stevearc/oil.nvim',-->2
     requires = {
       -- { 'echasnovski/mini.icons', opts = {} },
       { 'nvim-tree/nvim-web-devicons' },
@@ -596,13 +603,13 @@ require 'pckr'.add {--{{{1
       vim.api.nvim_set_keymap('n', '<Leader>ds', "<Cmd>exe'bel sp'empty(expand('%')) ? '.' : '%:h'<CR>", {})
       vim.api.nvim_set_keymap('n', '<Leader>dS', "<Cmd>exe'abo sp'empty(expand('%')) ? '.' : '%:h'<CR>", {})
     end,
-  };--}}}2
+  };--<2
 
   'tpope/vim-repeat';
 
   'vim-scripts/ReplaceWithRegister';
 
-  { 'NStefan002/screenkey.nvim',--{{{2
+  { 'NStefan002/screenkey.nvim',-->2
     cond = cmd 'Screenkey',
     config_pre = function()
       vim.g.screenkey_statusline_component = true
@@ -623,9 +630,9 @@ require 'pckr'.add {--{{{1
         vim.o.winbar = vim.o.winbar and nil or "%{%v:lua.require('screenkey').get_keys()%}"
       end, {})
     end,
-  };--}}}2
+  };--<2
 
-  { 'kylechui/nvim-surround',--{{{2
+  { 'kylechui/nvim-surround',-->2
     cond = {
       keys('n', 'ys'),
       keys('n', 'ds'),
@@ -638,16 +645,16 @@ require 'pckr'.add {--{{{1
       keys('x', 'gS'),
     },
     config = function() require 'nvim-surround'.setup() end,
-  };--}}}2
+  };--<2
 
-  { 'godlygeek/tabular',--{{{2
+  { 'godlygeek/tabular',-->2
     cond = {
       cmd 'Tabularize',
       cmd 'GTabularize',
     },
-  };--}}}2
+  };--<2
 
-  { 'lervag/vimtex',--{{{2
+  { 'lervag/vimtex',-->2
     config_pre = function()
       vim.g.vimtex_view_general_viewer = 'zathura'
       vim.g.vimtex_compiler_latexmk = {
@@ -663,11 +670,11 @@ require 'pckr'.add {--{{{1
         },
       }
     end,
-  };--}}}2
+  };--<2
 
   'KeitaNakamura/tex-conceal.vim';
 
-  { 'nvim-treesitter/nvim-treesitter',--{{{2
+  { 'nvim-treesitter/nvim-treesitter',-->2
     run = function() require 'nvim-treesitter.install'.update { with_sync = true } () end,
     cond = event { 'BufReadPost', 'BufNewFile' },
     config = function()
@@ -715,9 +722,9 @@ require 'pckr'.add {--{{{1
         matchup = { enable = true, },
       }
     end,
-  };--}}}2
+  };--<2
 
-  { 'nvim-treesitter/nvim-treesitter-textobjects',--{{{2
+  { 'nvim-treesitter/nvim-treesitter-textobjects',-->2
     requires = { 'nvim-treesitter/nvim-treesitter', },
     cond = event { 'BufReadPost', 'BufNewFile' },
     config = function()
@@ -774,18 +781,18 @@ require 'pckr'.add {--{{{1
         },
       }
     end,
-  };--}}}2
+  };--<2
 
-  { 'andymass/vim-matchup',--{{{2
+  { 'andymass/vim-matchup',-->2
     cond = event 'UIEnter',
-  };--}}}2
+  };--<2
 
-  { 'VioletJewel/vimterm.nvim',--{{{2
+  { 'VioletJewel/vimterm.nvim',-->2
     cond = event 'UIEnter',
     config = function() require 'vimterm'.setup() end,
-  };--}}}2
+  };--<2
 
-  { 'folke/zen-mode.nvim',--{{{2
+  { 'folke/zen-mode.nvim',-->2
     cond = {
       keys('n', '<Bslasz'),
       cmd 'ZenMode',
@@ -794,11 +801,11 @@ require 'pckr'.add {--{{{1
       require 'zen-mode'.setup()
       vim.keymap.set('n', '<LocalLeader>z', function() require 'zen-mode'.toggle() end)
     end,
-  };--}}}2
+  };--<2
 
-  -- themes{{{2
+  -->2 themes
 
-  { 'folke/tokyonight.nvim',--{{{3
+  { 'folke/tokyonight.nvim',-->3
     config = function()
       require 'utils'.augroup 'VioletTheme' { 'UIEnter', callback = function()
         -- vim.cmd.syntax 'reset'
@@ -806,7 +813,7 @@ require 'pckr'.add {--{{{1
         vim.cmd.doautocmd { args = { 'colorscheme', 'tokyonight' } }
       end }
     end,
-  };--}}}3
+  };--<3
 
   'rebelot/kanagawa.nvim';
 
@@ -830,6 +837,6 @@ require 'pckr'.add {--{{{1
 
   -- 'b0o/lavi.nvim';
 
-  --}}}2
+  --<2
 
-}--}}}1
+}--<1

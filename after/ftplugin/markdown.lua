@@ -14,7 +14,7 @@ lo.shiftwidth = 2
 
 local todo_items = ' x/-'
 
-vim.keymap.set('n', '<Tab>', function()
+vim.keymap.set('n', '<Tab>', function()-->
   local lr = vim.go.lazyredraw
   vim.go.lazyredraw = true
   local line = vim.api.nvim_get_current_line()
@@ -31,9 +31,9 @@ end, {
   buffer = true,
   silent = true,
   desc = 'Cycle through markdown things!'
-})
+})--<
 
-vim.keymap.set('n', '<S-Tab>', function()
+vim.keymap.set('n', '<S-Tab>', function()-->
   local line = vim.api.nvim_get_current_line()
   local _, beg = line:find('^%s*- %[[' .. todo_items .. ']%]')
   if beg then
@@ -46,9 +46,9 @@ end, {
   buffer = true,
   silent = true,
   desc = 'Cycle backwards through markdown things!'
-})
+})--<
 
-vim.keymap.set('n', '<CR>', function()
+vim.keymap.set('n', '<CR>', function()-->
   local lnr = vim.api.nvim_win_get_cursor(0)[1]
   local ep = vim.fn.searchpos([[\[\[.\{-}\]\]\%(\%>.c\)\@=]], 'ce', lnr)[2]
   if ep == 0 then return end
@@ -72,11 +72,12 @@ end, {
   buffer = true,
   silent = true,
   desc = 'Create file under cursor'
-})
+})--<
 
+--> undo_ftplugin
 vim.b.undo_ftplugin = table.concat(vim.tbl_map(function(t)
   return "exe 'sil! " .. t[1] .. ' <buffer> ' .. t[2] .. "'"
 end, {
     { 'nunmap', '<Tab>' },
     { 'nunmap', '<S-Tab>' },
-}), '|')
+}), '|')--<

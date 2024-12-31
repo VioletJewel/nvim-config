@@ -1,5 +1,5 @@
 -- different themes for different times of day
-local themes = {
+local themes = {-->
   { '00:00', 'kanagawa-dragon' },
   { '02:00', 'nokto' },
   { '04:00', 'paramount' },
@@ -14,7 +14,7 @@ local themes = {
   { '21:00', 'gruvbox8' },
   { '22:00', 'gruvbox8_hard' },
   { '23:00', 'vulpo' },
-}
+}--<
 
 -- for _, tt in ipairs(themes) do
 --   -- local h, m = tt[1]:match '^(%d%d?)[:. ]?(%d?%d?)$'

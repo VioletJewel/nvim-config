@@ -2,7 +2,7 @@ local au = require 'utils'.augroup 'VioletAutocmds'
 
 local no_mkview_filetypes = { '', 'gitcommit', 'netrw', 'help' }
 
-local function should_mkview(evt)
+local function should_mkview(evt) -->
   -- tl;dr: :let g:no_mkview_filetypes = ['python', 'lua']
   --        :let b:no_mkview = 1
   local nomkvft = {}
@@ -14,46 +14,54 @@ local function should_mkview(evt)
       and #vim.api.nvim_buf_get_name(evt.buf) > 0
       and not (vim.g.no_mkview or vim.b[evt.buf].no_mkview or vim.w.no_mkview)
       and not vim.list_contains(nomkvft, vim.bo[evt.buf].filetype)
-end
+end                                                                   --<
 
-au { 'BufWinLeave,VimLeave',
+au { 'BufWinLeave,VimLeave,WinLeave,BufLeave,BufUnload,CmdlineEnter', --> Auto save view
   callback = function(evt)
     if should_mkview(evt) then
-      local vop = vim.go.viewoptions
-      vim.go.viewoptions = 'cursor,folds'
-      vim.cmd.mkview { bang = true, mods = { emsg_silent = true } }
-      vim.go.viewoptions = vop
+      vim.b[evt.buf]._auto_view = vim.fn.winsaveview()
     end
   end,
   desc = 'Auto make view (restore cursor, folds, scroll) for most filetypes'
-}
+}                            --<
 
-au { 'BufWinEnter',
+au { 'BufWinEnter,WinEnter', --> Auto load view
   callback = function(evt)
     if should_mkview(evt) then
-      vim.cmd.loadview { mods = { emsg_silent = true } }
+      local av = vim.b[evt.buf]._auto_view
+      if av then
+        vim.fn.winrestview {
+          lnum = av.lnum,
+          col = av.col,
+          curswant = av.curswant,
+          topline = av.topline,
+          leftcol = av.leftcol,
+        }
+      else
+        vim.api.nvim_input 'g`"'
+      end
     end
   end,
   desc = 'Auto load view (restore cursor, folds, scroll) for most filetypes'
-}
+}                            --<
 
-au { 'BufWinEnter,Filetype',
+au { 'BufWinEnter,Filetype', --> fix o/O
   callback = function()
     vim.opt_local.formatoptions:append 'r'
     vim.opt_local.formatoptions:remove 'o'
   end,
   desc = 'normal o/O do NOT insert comment; insert <CR> DOES insert comment',
-}
+}                   --<
 
-au { 'CmdwinEnter',
+au { 'CmdwinEnter', --> don't fold cmdwin
   callback = function()
     vim.wo.foldenable = false
     vim.wo.foldlevel = 99
   end,
   desc = 'Never fold the command window',
-}
+}                               --<
 
-au { 'VimEnter,BufNew,BufRead',
+au { 'VimEnter,BufNew,BufRead', --> no swap for /tmp
   pattern = '/tmp*',
   callback = function(evt)
     if evt.file:match '^/tmp' then
@@ -62,9 +70,9 @@ au { 'VimEnter,BufNew,BufRead',
   end,
   desc = 'Do NOT store swapfiles for /tmp/*'
   -- 'backupskip' also ignores backups in /tmp
-}
+}                --<
 
-au { 'FileType',
+au { 'FileType', --> set foldexpr to treesitter
   pattern = '*',
   callback = function()
     if require 'vim.treesitter.highlighter'.active[vim.api.nvim_get_current_buf()] then
@@ -73,7 +81,7 @@ au { 'FileType',
     end
   end,
   desc = 'auto-set fdm=nvim_treesitter#foldexpr() if ts enabled'
-}
+} --<
 
 au { 'FileType',
   pattern = 'help',
@@ -95,7 +103,7 @@ end
 
 local eobsav
 
-local function ColorSchemePost()
+local function ColorSchemePost() -->
   -- if synIDattr(hlID('@variable'), 'fg') == 'NvimLightGrey2'
   if vim.deep_equal(gethl '@variable', { fg = 14738154 }) then
     -- hi clear @variable
@@ -146,10 +154,10 @@ local function ColorSchemePost()
   else
     vim.opt.fillchars:append('eob:' .. eobsav)
   end
-end
+end --<
 
 --- @type table<string, fun()|table>
-local colorschemeFixes = {
+local colorschemeFixes = { -->
 
   dracula = function()
     hlLink 'SpecialKey DraculaPink'
@@ -169,11 +177,11 @@ local colorschemeFixes = {
     hlLink 'EndOfBuffer Comment'
   end,
 
-}
+} --<
 
 local function nullop() end
 
-for theme, opts in pairs(colorschemeFixes) do
+for theme, opts in pairs(colorschemeFixes) do -->
   local desc = 'modify ' .. theme .. ' to be cuter :3 and better :)'
   if type(opts) == 'function' then
     opts = { callback = opts }
@@ -189,14 +197,13 @@ for theme, opts in pairs(colorschemeFixes) do
     end,
     desc = opts.desc or desc,
   }
-end
+end                 --<
 
-au { 'ColorScheme',
+au { 'ColorScheme', -->
   callback = function(opts)
     if not vim.list_contains(vim.tbl_keys(colorschemeFixes), opts.match) then
       ColorSchemePost()
     end
   end,
   desc = 'fix older colorschemes'
-}
-
+} --<
