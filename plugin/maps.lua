@@ -14,21 +14,21 @@ local _c_e = vim.api.nvim_replace_termcodes('<C-e>', true, true, true)
 local _c_y = vim.api.nvim_replace_termcodes('<C-y>', true, true, true)
 
 local function zz4()
-  vim.api.nvim_feedkeys('zz', 'nx', false)
+  vim.api.nvim_feedkeys('zz', 'nxi', false)
   local c = vim.api.nvim_win_get_cursor(0)
   local wH, wL = vim.fn.line 'w0', vim.fn.line 'w$'
   local wh = vim.api.nvim_win_get_height(0)
   local wq = math.floor(wh / 4)
   local vl = vim.api.nvim_win_text_height(0, { start_row = wH - 1, end_row = c[1] - 1 }).all
   local vt = vim.api.nvim_win_text_height(0, { start_row = wH - 1, end_row = wL - 1 }).all
-  if wq > vl then if wh > vt then vim.api.nvim_feedkeys((wh - vt) .. _c_y, 'nx', false) end return end
+  if wq > vl then if wh > vt then vim.api.nvim_feedkeys((wh - vt) .. _c_y, 'nxi', false) end return end
   local scroll = wq - (math.ceil(wh / 2) - vl)
-  if scroll > 0 then vim.api.nvim_feedkeys(scroll .. _c_e, 'nx', false) end
+  if scroll > 0 then vim.api.nvim_feedkeys(scroll .. _c_e, 'nxi', false) end
   wH = vim.fn.line 'w0'
   wL = vim.fn.line 'w$'
   vt = vim.api.nvim_win_text_height(0, { start_row = wH - 1, end_row = wL - 1 }).all
   if wh > vt then
-    vim.api.nvim_feedkeys((wh - vt) .. _c_y, 'nx', false)
+    vim.api.nvim_feedkeys((wh - vt) .. _c_y, 'nxi', false)
     return
   end
 end
@@ -440,8 +440,10 @@ vim.api.nvim_set_keymap('', 'z4', '', { callback = zz4, desc = 'center cursor at
 
 vim.api.nvim_set_keymap('', 'n', '', {
   callback = function()
+    local wH = vim.fn.line 'w0'
     local ci = vim.api.nvim_win_get_cursor(0)
     vim.api.nvim_feedkeys((vim.v.searchforward and 'n' or 'N') .. 'zv', 'nx', false)
+    if wH == vim.fn.line 'w0' then return end
     local c = vim.api.nvim_win_get_cursor(0)
     if ci[1] == c[1] and ci[2] == c[2] then return end
     zz4()
@@ -450,8 +452,10 @@ vim.api.nvim_set_keymap('', 'n', '', {
 })
 vim.api.nvim_set_keymap('', 'N', '', {
   callback = function()
+    local wH = vim.fn.line 'w0'
     local ci = vim.api.nvim_win_get_cursor(0)
     vim.api.nvim_feedkeys((vim.v.searchforward and 'N' or 'n') .. 'zv', 'nx', false)
+    if wH == vim.fn.line 'w0' then return end
     local c = vim.api.nvim_win_get_cursor(0)
     if ci[1] == c[1] and ci[2] == c[2] then return end
     zz4()

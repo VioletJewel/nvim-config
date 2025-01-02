@@ -657,6 +657,7 @@ require 'pckr'.add {-->1
   { 'lervag/vimtex',-->2
     config_pre = function()
       vim.g.vimtex_view_general_viewer = 'zathura'
+      vim.g.vimtex_echo_verbose_input = 0
       vim.g.vimtex_compiler_latexmk = {
         aux_dir = function() return './.' .. vim.fn.expand '%:t:r' .. '.out' end,
         out_dir = function() return './.' .. vim.fn.expand '%:t:r' .. '.out' end,
