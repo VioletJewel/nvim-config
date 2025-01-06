@@ -112,8 +112,8 @@ vim.o.fillchars = 'fold: ,diff:~' -- ,eob:.'
 if os.getenv 'TERM' == 'linux' then
   vim.opt.fillchars:append 'eob:.'  -- dots end of buffer for tty
 else
-  -- vim.opt.fillchars:append 'eob:'  -- cute end of buffer >^_^<
-  vim.opt.fillchars:append 'eob:❣️'  -- cute end of buffer >^_^<
+  vim.opt.fillchars:append 'eob:'  -- cute end of buffer >^_^<
+  -- vim.opt.fillchars:append 'eob:❣️'  -- cute end of buffer >^_^<
 end
 
 -->1 grep

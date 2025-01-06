@@ -9,6 +9,7 @@ return {
 
   { 'iamcco/markdown-preview.nvim',
     run = 'cd app && yarn install',
+    cond = event('FileType', 'markdown'),
     config_pre = function()
       vim.g.mkdp_auto_close = 0
     end,

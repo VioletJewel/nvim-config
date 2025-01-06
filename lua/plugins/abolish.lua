@@ -3,13 +3,14 @@ local keys = require 'pckr.loader.keys'
 
 return {
 
- { 'tpope/vim-abolish',
-   cond = {
-     keys('n', 'cr'),
-     cmd 'Abolish',
-     cmd 'Subvert',
-     cmd 'S',
-   },
- };
+  { 'tpope/vim-abolish',
+    start = true,
+    cond = {
+      keys('n', 'cr'),
+      cmd 'Abolish',
+      cmd 'Subvert',
+      cmd 'S',
+    },
+  },
 
 }

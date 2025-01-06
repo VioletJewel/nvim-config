@@ -4,7 +4,8 @@ return {
 
   { 'nvim-treesitter/nvim-treesitter',
     run = function() require 'nvim-treesitter.install'.update { with_sync = true } () end,
-    cond = event { 'BufReadPost', 'BufNewFile' },
+    -- cond = event { 'BufReadPost', 'BufNewFile' },
+    start = true,
     config = function()
       -- &ft to 0 or more tree-sitter grammars
       local ft2ts = {
@@ -18,6 +19,7 @@ return {
         typescript = { 'typescript', 'tsx' },
         lua = { 'lua', 'luadoc' },
         vim = { 'vim', 'vimdoc' },
+        norg = { 'norg', 'norg_meta' },
         javascriptreact = {},
         typescriptreact = {},
       }

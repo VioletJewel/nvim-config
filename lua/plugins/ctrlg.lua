@@ -1,3 +1,7 @@
 return {
-  'VioletJewel/vim-ctrlg';
+
+  { 'VioletJewel/vim-ctrlg',
+    start = true,
+  },
+
 }

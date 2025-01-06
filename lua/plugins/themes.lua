@@ -1,6 +1,7 @@
 return {
 
   { 'folke/tokyonight.nvim',
+    start = true,
     config = function()
       require 'utils'.augroup 'VioletTheme' { 'UIEnter', callback = function()
         -- vim.cmd.syntax 'reset'

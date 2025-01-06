@@ -25,7 +25,7 @@ au { 'BufWinLeave,VimLeave,WinLeave,BufLeave,BufUnload,CmdlineEnter', --> Auto s
   desc = 'Auto make view (restore cursor, folds, scroll) for most filetypes'
 }                            --<
 
-au { 'BufWinEnter,WinEnter', --> Auto load view
+au { 'BufWinEnter', --> Auto load view
   callback = function(evt)
     if should_mkview(evt) then
       local av = vim.b[evt.buf]._auto_view

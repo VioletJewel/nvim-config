@@ -1,14 +1,14 @@
-local event = require 'pckr.loader.event'
+-- local event = require 'pckr.loader.event'
 
-local lsps = {-->1
-  clangd = {};
-  zls = {};
-  marksman = {};
-  lua_ls = {-->2
+local lsps = { -->1
+  clangd = {},
+  zls = {},
+  marksman = {},
+  lua_ls = { -->2
     on_init = function(client)
       if client.workspace_folders then
         local path = client.workspace_folders[1].name
-        if vim.uv.fs_stat(path..'/.luarc.json') or vim.uv.fs_stat(path..'/.luarc.jsonc') then
+        if vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc') then
           return
         end
       end
@@ -21,17 +21,17 @@ local lsps = {-->1
       })
     end,
     settings = { Lua = {} }
-  };
-  rust_analyzer = {-->2
+  },
+  rust_analyzer = { -->2
     -- settings = {
     --   ['rust-analyzer'] = {
     --     diagnostics = { enable = false, },
     --   }
     -- }
-  };
+  },
 }
 
-local function lspBufSetup(evt)-->1
+local function lspBufSetup(evt) -->1
   local bnr = evt.buf
   local function bmap(mode, lhs, rhs, opts)
     if type(opts) == 'string' then opts = { desc = opts } end
@@ -69,12 +69,14 @@ local function lspBufSetup(evt)-->1
   bmap('nx', '<Leader>ca', 'code_action', 'list lsp code action')
   bmap('n', '<Leader>R', 'references', 'list lsp references')
   bmap({ 'n', 'x' }, '<Leader>F', function() vim.lsp.buf.format { async = true } end, 'format file|range using lsp')
-end--<1
+end --<1
 
 return {
 
-  { 'neovim/nvim-lspconfig',
-    cond = event { 'BufReadPost', 'BufNewFile' },
+  {
+    'neovim/nvim-lspconfig',
+    -- cond = event { 'BufReadPost', 'BufNewFile' },
+    start = true,
     config = function()
       local lc = require 'lspconfig'
       local au = require 'utils'.augroup 'LspAttach'
@@ -90,9 +92,7 @@ return {
       vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'goto prev diagnostic' })
       vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'goto next diagnostic' })
       vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist, { desc = 'set diagnostic loclist' })
-
     end,
   }
 
 }
-

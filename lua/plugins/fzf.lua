@@ -7,6 +7,7 @@ return {
     cond = {
       keys('n', '<Space>f'),
       keys('n', '<Bslash>c'),
+      keys('n', '<Bslash>C'),
       cmd 'FZF',
       cmd 'FzfLua',
     },
@@ -48,6 +49,8 @@ return {
       vim.keymap.set('n', '<Leader>f', function() require'fzf-lua'.files() end, { desc = 'browse files in fzf' })
       vim.keymap.set('n', '<M-Esc>', function() require'fzf-lua'.resume() end, { desc = 'resume fzf session' })
       vim.keymap.set('n', '<LocalLeader>c', function() require'fzf-lua'.files{ cwd = vim.fn.stdpath 'config' } end, { desc = 'browse nvim config files in fzf' })
+      ---@diagnostic disable-next-line: param-type-mismatch
+      vim.keymap.set('n', '<LocalLeader>C', function() require'fzf-lua'.files{ cwd = vim.fs.joinpath(vim.fn.stdpath 'config', 'lua', 'plugins') } end, { desc = 'browse nvim config files in fzf' })
     end,
   };
 }

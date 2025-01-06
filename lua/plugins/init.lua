@@ -34,14 +34,14 @@ do
 end
 
 local specs = vim.iter(files)
-  :flatten(1)
-  :filter(function(p)
-    return p.type == 'file' and p.name ~= 'init.lua' and not p.name:find '/init%.lua$' and p.name:find '%.lua'
-  end)
-  :map(function(p)
-    local lf, err = loadfile(plugd .. p.name)
-    if lf then return lf() end
-    vim.notify(string.format('Error loading plugin file %q: %s', p.name, err), vim.log.levels.ERROR, {})
-  end)
+    :flatten(1)
+    :filter(function(p)
+      return p.type == 'file' and p.name ~= 'init.lua' and not p.name:find '/init%.lua$' and p.name:find '%.lua'
+    end)
+    :map(function(p)
+      local lf, err = loadfile(plugd .. p.name)
+      if lf then return lf() end
+      vim.notify(string.format('Error loading plugin file %q: %s', p.name, err), vim.log.levels.ERROR, {})
+    end)
 
 require 'pckr'.add(specs:flatten(1):totable())
