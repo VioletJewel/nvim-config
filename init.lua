@@ -6,6 +6,8 @@ local function req(file)-->
   end
   return res
 end--<
+
+req 'rocksdeps'
 req 'opts'
 req 'foldtext'
 req 'plugins'

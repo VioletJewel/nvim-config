@@ -9,7 +9,7 @@ return {
     cond = keys('n', '<Space>z', ':<C-u>Zi<CR>', { desc = '[F]ZF [Z]oxide CD' }),
     config = function()
       require 'fzf-lua'.register_ui_select()
-      -- vim.api.nvim_set_keymap('n', '<Leader>z', ':Zi<CR>', { desc = '[F]ZF [Z]oxide CD' })
+      vim.api.nvim_set_keymap('n', '<Leader>z', ':Zi<CR>', { desc = '[F]ZF [Z]oxide CD' })
     end,
   },
 
