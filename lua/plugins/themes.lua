@@ -1,35 +1,39 @@
+-- local cmd = require 'pckr.loader.cmd'
+-- local keys = require 'pckr.loader.keys'
+local event = require 'pckr.loader.event'
+
 return {
 
-  { 'folke/tokyonight.nvim',
-    start = true,
+  {
+    'folke/tokyonight.nvim',
+    cond = event 'UIEnter',
     config = function()
-      require 'utils'.augroup 'VioletTheme' { 'UIEnter', callback = function()
-        -- vim.cmd.syntax 'reset'
-        vim.cmd.colorscheme 'tokyonight'
-        vim.cmd.doautocmd { args = { 'colorscheme', 'tokyonight' } }
-      end }
+      vim.cmd.colorscheme 'tokyonight'
+      vim.cmd.doautocmd { args = { 'colorscheme', 'tokyonight' } }
     end,
-  };
+  },
 
-  'rebelot/kanagawa.nvim';
+  'rebelot/kanagawa.nvim',
 
-  'catppuccin/nvim';
+  'catppuccin/nvim',
 
-  'lifepillar/gruvbox8';
+  'lifepillar/gruvbox8',
 
-  'sainnhe/sonokai';
+  'sainnhe/sonokai',
 
-  'dracula/vim';
+  'dracula/vim',
 
-  'owickstrom/vim-colors-paramount';
+  'owickstrom/vim-colors-paramount',
 
-  'violetjewel/color-nokto';
+  'violetjewel/color-nokto',
 
-  'violetjewel/color-vulpo';
+  'violetjewel/color-vulpo',
 
-  'navarasu/onedark.nvim';
+  'navarasu/onedark.nvim',
 
-  'gbprod/nord.nvim';
+  'gbprod/nord.nvim',
+
+  'loctvl842/monokai-pro.nvim',
 
   -- 'b0o/lavi.nvim';
 

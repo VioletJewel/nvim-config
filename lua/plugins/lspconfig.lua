@@ -1,4 +1,6 @@
--- local event = require 'pckr.loader.event'
+-- local cmd = require 'pckr.loader.cmd'
+-- local keys = require 'pckr.loader.keys'
+local event = require 'pckr.loader.event'
 
 local lsps = { -->1
   clangd = {},
@@ -35,23 +37,23 @@ local function lspBufSetup(evt) -->1
   local bnr = evt.buf
   local function bmap(mode, lhs, rhs, opts)
     if type(opts) == 'string' then opts = { desc = opts } end
+    rhs = type(rhs) == 'string' and vim.lsp.buf[rhs] or rhs
     opts.buffer = opts.buffer or bnr
-    vim.keymap.set(
-      type(mode) == 'table' and mode or vim.split(mode, ''),
-      lhs,
-      type(rhs) == 'string' and vim.lsp.buf[rhs] or rhs,
-      opts
-    )
+    for _, m in ipairs(type(mode) == 'table' and mode or {mode}) do
+      if vim.fn.maparg(lhs, m, false, true).buffer ~= 1 then
+        vim.keymap.set(mode, lhs, rhs, opts)
+      end
+    end
   end
 
   vim.bo[bnr].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
-  bmap('n', 'gD', 'declaration', 'goto lsp declaration')
-  bmap('n', 'gd', 'definition', 'goto lsp definition')
+  bmap('n', '<M-D>', 'declaration', 'goto lsp declaration')
+  bmap('n', '<M-d>', 'definition', 'goto lsp definition')
   bmap('n', 'K', 'hover', 'show lsp hover')
   bmap('n', '<Space>K', 'K', 'preserve default K')
-  bmap('n', 'gi', 'implementation', 'goto lsp implementation')
-  bmap('nix', '<M-s>', function()
+  bmap('n', 'gI', 'implementation', 'goto lsp implementation')
+  bmap({'n', 'i', 'x'}, '<M-s>', function()
     local basewid = vim.api.nvim_get_current_win()
     for _, wid in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
       if wid ~= basewid and vim.api.nvim_win_get_config(wid).win == basewid then
@@ -66,17 +68,26 @@ local function lspBufSetup(evt) -->1
   bmap('n', '<Leader>wl', function() vim.print(vim.lsp.buf.list_workspace_folders()) end, 'list lsp workspace folders')
   bmap('n', '<Leader>D', 'type_definition', 'goto lsp type definition')
   bmap('n', '<Leader>r', 'rename', 'rename lsp symbol')
-  bmap('nx', '<Leader>ca', 'code_action', 'list lsp code action')
+  bmap({'n', 'x'}, '<Leader>ca', 'code_action', 'list lsp code action')
   bmap('n', '<Leader>R', 'references', 'list lsp references')
   bmap({ 'n', 'x' }, '<Leader>F', function() vim.lsp.buf.format { async = true } end, 'format file|range using lsp')
+  bmap('n', '<LocalLeader>ls', function()
+    local firstclient = vim.lsp.get_clients({ bufnr = 0 })[1]
+    if firstclient and not vim.lsp.client_is_stopped(firstclient.id) then
+      vim.cmd.LspStop()
+      print('LSP stopped')
+    else
+      vim.cmd.LspStart()
+      print('LSP started')
+    end
+  end, 'toggle lspclient')
 end --<1
 
 return {
 
   {
     'neovim/nvim-lspconfig',
-    -- cond = event { 'BufReadPost', 'BufNewFile' },
-    start = true,
+    cond = event { 'BufReadPost', 'BufNewFile' },
     config = function()
       local lc = require 'lspconfig'
       local au = require 'utils'.augroup 'LspAttach'

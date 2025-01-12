@@ -1,8 +1,11 @@
+-- local cmd = require 'pckr.loader.cmd'
+-- local keys = require 'pckr.loader.keys'
 local event = require 'pckr.loader.event'
 
 return {
 
-  { 'lervag/vimtex',
+  {
+    'lervag/vimtex',
     cond = event('FileType', 'tex'),
     config_pre = function()
       vim.g.vimtex_view_general_viewer = 'zathura'
@@ -23,7 +26,8 @@ return {
 
   },
 
-  { 'KeitaNakamura/tex-conceal.vim',
+  {
+    'KeitaNakamura/tex-conceal.vim',
     cond = event('FileType', 'tex'),
   },
 

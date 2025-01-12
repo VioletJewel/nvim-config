@@ -1,13 +1,14 @@
--- local event = require 'pckr.loader.event'
-return {
+-- local cmd = require 'pckr.loader.cmd'
+-- local keys = require 'pckr.loader.keys'
+local event = require 'pckr.loader.event'
 
-  { 'vyfor/cord.nvim',
+return {
+  {
+    'vyfor/cord.nvim',
     run = './build',
-    -- cond = event 'UIEnter',
-    start = true,
+    cond = event 'UIEnter',
     config = function()
       require 'cord'.setup()
     end,
   },
-
 }

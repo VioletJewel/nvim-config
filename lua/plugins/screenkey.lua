@@ -1,7 +1,10 @@
 local cmd = require 'pckr.loader.cmd'
+-- local keys = require 'pckr.loader.keys'
+-- local event = require 'pckr.loader.event'
 
 return {
-  { 'NStefan002/screenkey.nvim',
+  {
+    'NStefan002/screenkey.nvim',
     cond = cmd 'Screenkey',
     config_pre = function()
       vim.g.screenkey_statusline_component = true
@@ -19,8 +22,8 @@ return {
         }
       }
       vim.api.nvim_create_user_command('Screenkey', function()
-        vim.o.winbar = vim.o.winbar and vim.o.winbar:match'%w' and '' or "%{%v:lua.require('screenkey').get_keys()%}"
+        vim.o.winbar = vim.o.winbar and vim.o.winbar:match '%w' and '' or "%{%v:lua.require('screenkey').get_keys()%}"
       end, {})
     end,
-  };
+  },
 }

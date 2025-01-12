@@ -1,12 +1,28 @@
 local cmd = vim.api.nvim_create_user_command
 local opts
 
+local docsdir
+do
+  local fh = io.popen 'xdg-user-dir DOCUMENTS'
+  if fh then
+    docsdir = fh:read()
+    fh:close()
+  end
+end
+
+cmd('Journal', function(day)
+  -- TODO: support day
+  vim.cmd.edit(vim.fs.joinpath(docsdir, 'journal', os.date '%Y-%m-%d.md'))
+end, {
+  nargs = 0
+})
+
 local cfg = vim.fn.stdpath 'config'
 if type(cfg) == 'table' then cfg = cfg[1] end
 
 local snipdir = vim.fn.stdpath 'config' .. '/snippets/'
 
-local snipCompl = function(lead, _, _)-->
+local snipCompl = function(lead, _, _) -->
   ---@diagnostic disable-next-line: param-type-mismatch
   local fd = vim.uv.fs_opendir(snipdir, nil, 10)
   local fs = vim.uv.fs_readdir(fd)
@@ -22,21 +38,21 @@ local snipCompl = function(lead, _, _)-->
   end
   vim.uv.fs_closedir(fd)
   return snipfiles
-end--<
+end                         --<
 
-cmd('Snipedit', function(c)-->
+cmd('Snipedit', function(c) -->
   local f = snipdir .. (c.args == '' and vim.o.filetype or c.args) .. '.lua'
   vim.cmd.edit(f)
-end, { nargs = '?', complete = snipCompl })--<
+end, { nargs = '?', complete = snipCompl }) --<
 
-cmd('Snip', function(c)-->
+cmd('Snip', function(c)                     -->
   local f = snipdir .. (c.args == '' and vim.o.filetype or c.args) .. '.lua'
   vim.cmd {
     cmd = 'new',
     args = { f },
     mods = c.smods,
   }
-end, { nargs = '?', complete = snipCompl })--<
+end, { nargs = '?', complete = snipCompl }) --<
 
 opts = { bang = true, bar = true, nargs = '?' }
 cmd('Q', 'q<bang> <args>', opts)
@@ -51,31 +67,31 @@ cmd('Wqa', 'wqa<bang> <args>', opts)
 -- :{arg,buf,win}do without mucking syntax or changing buffers
 opts = { nargs = '+' }
 
-cmd('Argdo', function(a)-->
+cmd('Argdo', function(a) -->
   local bufnr = vim.api.nvim_get_current_buf()
   local ei = vim.o.eventignore
   vim.cmd('argdo ' .. a.args, { output = false })
   vim.o.eventignore = ei
   vim.api.nvim_set_current_buf(bufnr)
-end, opts)--<
+end, opts)               --<
 
-cmd('Bufdo', function(a)-->
+cmd('Bufdo', function(a) -->
   local bufnr = vim.api.nvim_get_current_buf()
   local ei = vim.o.eventignore
   vim.cmd('bufdo ' .. a.args, { output = false })
   vim.o.eventignore = ei
   vim.api.nvim_set_current_buf(bufnr)
-end, opts)--<
+end, opts)               --<
 
-cmd('Windo', function(a)-->
+cmd('Windo', function(a) -->
   local winnr = vim.api.nvim_get_current_win()
   local ei = vim.o.eventignore
   vim.cmd('windo ' .. a.args, { output = false })
   vim.o.eventignore = ei
   vim.api.nvim_set_current_win(winnr)
-end, opts)--<
+end, opts)                                         --<
 
-local function filelistGrep(search, list, vimgrep)-->
+local function filelistGrep(search, list, vimgrep) -->
   vim.fn.setqflist({})
   local c = vimgrep and 'vimgrepadd' or 'grepadd'
   local s = vim.fn.escape(search, '"')
@@ -86,9 +102,9 @@ local function filelistGrep(search, list, vimgrep)-->
   end
   vim.cmd.cwindow { mods = { split = 'botright' } }
   vim.cmd.redraw { bang = true }
-end--<
+end                         --<
 
-local function getBuffers()-->
+local function getBuffers() -->
   local bufs = {}
   for b = 1, vim.fn.bufnr '$' do
     if vim.fn.buflisted(b) and vim.bo[b].buftype == '' then
@@ -96,7 +112,7 @@ local function getBuffers()-->
     end
   end
   return bufs
-end--<
+end --<
 
 -- :{Arg,Buf}grep
 
@@ -110,22 +126,22 @@ cmd('BufVimGrep', function(a) filelistGrep(a.args, getBuffers(), true) end, opts
 
 opts = { range = true, nargs = 1, complete = 'command' }
 -- :redir => out | sil <args> | redir end | sil put= out | sil 1d
-cmd('Put', function(a)-->
+cmd('Put', function(a) -->
   local out = vim.split(vim.api.nvim_exec2(a.args, { output = true }).output, '\n')
   vim.api.nvim_put(out, 'l', true, false)
-end, opts)--<
+end, opts) --<
 
 -- split (below) :redir => out | sil <args> | redir end | sil put= out | sil 1d
-cmd('Sput', function(a)-->
+cmd('Sput', function(a) -->
   local out = vim.split(vim.api.nvim_exec2(a.args, { output = true }).output, '\n')
   vim.api.nvim_open_win(vim.api.nvim_create_buf(true, true), true, { split = 'below' })
   vim.api.nvim_put(out, 'l', true, false)
   vim.api.nvim_win_set_cursor(0, { 1, 0 })
   vim.api.nvim_del_current_line()
-end, opts)--<
+end, opts) --<
 
 -- floating :redir => out | sil <args> | redir end | sil put= out | sil 1d
-cmd('Fput', function(a)-->
+cmd('Fput', function(a) -->
   local out = vim.split(vim.api.nvim_exec2(a.args, { output = true }).output, '\n')
   local x = math.ceil(.1 * vim.o.columns)
   local y = math.ceil(.1 * vim.o.lines)
@@ -141,7 +157,7 @@ cmd('Fput', function(a)-->
   vim.api.nvim_put(out, 'l', true, false)
   vim.api.nvim_win_set_cursor(0, { 1, 0 })
   vim.api.nvim_del_current_line()
-end, opts)--<
+end, opts) --<
 
 
 -- :help :DiffOrig

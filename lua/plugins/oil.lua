@@ -1,13 +1,15 @@
--- local event = require 'pckr.loader.event'
+-- local cmd = require 'pckr.loader.cmd'
+-- local keys = require 'pckr.loader.keys'
+local event = require 'pckr.loader.event'
 
 return {
-  { 'stevearc/oil.nvim',
+  {
+    'stevearc/oil.nvim',
     requires = {
       -- { 'echasnovski/mini.icons', opts = {} },
       { 'nvim-tree/nvim-web-devicons' },
     },
-    -- cond = event 'UIEnter',
-    start = true,
+    cond = event 'UIEnter',
     config = function()
       require 'oil'.setup {
         default_file_explorer = true,
@@ -38,11 +40,11 @@ return {
           }
         }
       }
-      vim.api.nvim_set_keymap('n', '<Leader>dd', "<Cmd>exe'e'empty(expand('%'))?'.':'%:h'<CR>", {})
-      vim.api.nvim_set_keymap('n', '<Leader>dv', "<Cmd>exe'bel vs'empty(expand('%')) ? '.' : '%:h'<CR>", {})
-      vim.api.nvim_set_keymap('n', '<Leader>dV', "<Cmd>exe'abo vs'empty(expand('%')) ? '.' : '%:h'<CR>", {})
-      vim.api.nvim_set_keymap('n', '<Leader>ds', "<Cmd>exe'bel sp'empty(expand('%')) ? '.' : '%:h'<CR>", {})
-      vim.api.nvim_set_keymap('n', '<Leader>dS', "<Cmd>exe'abo sp'empty(expand('%')) ? '.' : '%:h'<CR>", {})
+      vim.api.nvim_set_keymap('n', '<Leader>dd', "<Cmd>exe'e'empty(expand('%'))?'.':'%:h'<CR>", { noremap = true })
+      vim.api.nvim_set_keymap('n', '<Leader>dv', "<Cmd>exe'bel vs'empty(expand('%')) ? '.' : '%:h'<CR>", { noremap = true })
+      vim.api.nvim_set_keymap('n', '<Leader>dV', "<Cmd>exe'abo vs'empty(expand('%')) ? '.' : '%:h'<CR>", { noremap = true })
+      vim.api.nvim_set_keymap('n', '<Leader>ds', "<Cmd>exe'bel sp'empty(expand('%')) ? '.' : '%:h'<CR>", { noremap = true })
+      vim.api.nvim_set_keymap('n', '<Leader>dS', "<Cmd>exe'abo sp'empty(expand('%')) ? '.' : '%:h'<CR>", { noremap = true })
     end,
-  };
+  },
 }

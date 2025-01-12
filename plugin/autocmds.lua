@@ -83,6 +83,21 @@ au { 'FileType', --> set foldexpr to treesitter
   desc = 'auto-set fdm=nvim_treesitter#foldexpr() if ts enabled'
 } --<
 
+au { 'BufNewFile',
+  ---@diagnostic disable-next-line: param-type-mismatch
+  pattern = vim.fs.joinpath(vim.fn.fnameescape(vim.fn.stdpath 'config'), 'lua', 'plugins', '*.lua'),
+  callback = function(evt)
+    vim.api.nvim_buf_set_lines(evt.buf, 0, 1, true, {
+      "-- local cmd = require 'pckr.loader.cmd'",
+      "-- local keys = require 'pckr.loader.keys'",
+      "-- local event = require 'pckr.loader.event'",
+      "",
+      "return {",
+      "}",
+    })
+  end,
+}
+
 au { 'FileType',
   pattern = 'help',
   command = [[syn match VimHelpModeline /^\s*vim:.*:\%$/ conceal]]

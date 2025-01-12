@@ -1,10 +1,11 @@
 local cmd = require 'pckr.loader.cmd'
 local keys = require 'pckr.loader.keys'
+-- local event = require 'pckr.loader.event'
 
 return {
 
-  { 'tpope/vim-abolish',
-    start = true,
+  {
+    'tpope/vim-abolish',
     cond = {
       keys('n', 'cr'),
       cmd 'Abolish',

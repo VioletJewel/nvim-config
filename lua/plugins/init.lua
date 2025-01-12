@@ -12,6 +12,8 @@ end
 
 vim.opt.rtp:prepend(pckr_path)
 
+require 'utils.rocks'.setup()
+
 ---@diagnostic disable-next-line: param-type-mismatch
 local plugd = vim.fs.joinpath(vim.fn.stdpath 'config', 'lua', 'plugins') .. '/'
 local files = {}

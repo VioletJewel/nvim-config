@@ -4,6 +4,12 @@ local fmt = '%-' .. llen .. 's +%3d'
 
 function Foldtext()
   local l1 = vim.fn.getline(vim.v.foldstart)
+  if l1:gsub('%W', '') == '' then
+    local l2 = vim.fn.getline(vim.v.foldstart + 1)
+    if l2:gsub('%W', '') ~= '' then
+      l1 = l1 .. l2:gsub('^(%s?)%s*', '%1↩ ')
+    end
+  end
   if vim.wo.foldmethod == 'marker' then
     local f1
     local fmr = fmrs[vim.wo.foldmarker]
@@ -15,11 +21,11 @@ function Foldtext()
       f1 = fmr[1]
     end
     local cms = vim.bo.commentstring
-    cms = cms:sub(1, cms:find '%s*%%s' - 1)
+    cms = cms and cms:sub(1, cms:find '%s*%%s' - 1) or ''
     l1 = l1:gsub(cms .. '%s*' .. f1 .. '%d*', ''):gsub('%s*' .. f1 .. '%d*', '')
     if l1:len() > llen then l1 = l1:sub(1, llen) .. '...' end
   end
-  return string.format(fmt, l1:gsub('^ ? ?', '|>'), vim.v.foldend - vim.v.foldstart)
+  return string.format(fmt, l1:gsub('^ ?', '▷'), vim.v.foldend - vim.v.foldstart)
 end
 
 vim.opt.foldtext = 'v:lua.Foldtext()'

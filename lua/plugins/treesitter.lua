@@ -1,17 +1,15 @@
+-- local cmd = require 'pckr.loader.cmd'
+-- local keys = require 'pckr.loader.keys'
 local event = require 'pckr.loader.event'
 
 return {
 
-  { 'nvim-treesitter/nvim-treesitter',
+  {
+    'nvim-treesitter/nvim-treesitter',
     run = function() require 'nvim-treesitter.install'.update { with_sync = true } () end,
-    -- cond = event { 'BufReadPost', 'BufNewFile' },
-    start = true,
     config = function()
       -- &ft to 0 or more tree-sitter grammars
       local ft2ts = {
-        -- additional ts grammars
-        -- (if markdown not in tsFts above, ADD IT HERE)
-        { 'regex' },
         -- ft -> ts grammars converstion
         markdown = { 'markdown', 'markdown_inline' },
         tex = { 'latex' },
@@ -19,7 +17,6 @@ return {
         typescript = { 'typescript', 'tsx' },
         lua = { 'lua', 'luadoc' },
         vim = { 'vim', 'vimdoc' },
-        norg = { 'norg', 'norg_meta' },
         javascriptreact = {},
         typescriptreact = {},
       }
@@ -29,8 +26,9 @@ return {
         'markdown', 'c', 'cpp', 'make', 'lisp', 'haskell', 'ocaml', 'lua', 'vim',
         'query', 'json', 'json5', 'yaml', 'toml', 'rasi', 'elixir', 'heex',
         'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'html', 'tex',
+        'norg', 'org',
       } do
-        for _, g in ipairs(ft2ts[ft] or {ft}) do
+        for _, g in ipairs(ft2ts[ft] or { ft }) do
           glen = glen + 1
           grammars[glen] = g
         end
@@ -52,9 +50,10 @@ return {
         matchup = { enable = true, },
       }
     end,
-  };
+  },
 
-  { 'nvim-treesitter/nvim-treesitter-textobjects',
+  {
+    'nvim-treesitter/nvim-treesitter-textobjects',
     requires = { 'nvim-treesitter/nvim-treesitter', },
     cond = event { 'BufReadPost', 'BufNewFile' },
     config = function()
@@ -111,6 +110,6 @@ return {
         },
       }
     end,
-  };
+  },
 
 }
