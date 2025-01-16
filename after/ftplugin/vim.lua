@@ -1,6 +1,4 @@
-vim.keymap.set('n', '<LocalLeader>S', '<Cmd>source %<CR>', {
-  buffer = true,
+local ft = require 'utils.ftplugin'
+ft.addMap('n', '<LocalLeader>S', '<Cmd>source %<CR>', {
   desc = 'source current vim file'
 })
-
-vim.b.undo_ftplugin = 'nunmap <buffer> <LocalLeader>S'

@@ -7,7 +7,7 @@ local function req(file)-->
   return res
 end--<
 
-req 'opts'
-req 'foldtext'
-req 'plugins'
-req 'statusline'
+req 'opts'       -- ./lua/opts.lua
+-- req 'foldtext'   -- ./lua/foldtext.lua
+req 'plugins'    -- ./lua/plugins/init.lua
+req 'statusline' -- ./lua/statusline.lua

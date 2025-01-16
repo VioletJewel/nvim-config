@@ -1,3 +1,4 @@
-vim.opt_local.commentstring = '// %s'
-vim.opt_local.expandtab = false
-vim.opt_local.list = true
+local ft = require 'utils.ftplugin'
+ft.setOpt('commentstring', '// %s')
+ft.setOpt('expandtab', false)
+ft.setOpt('list', true)

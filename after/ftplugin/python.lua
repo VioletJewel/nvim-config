@@ -1,6 +1,6 @@
-vim.keymap.set('n', '<LocalLeader>S', '<Cmd>pyfile %<CR>', {
-  buffer = true,
+local ft = require 'utils.ftplugin'
+
+ft.addMap('n', '<LocalLeader>S', '<Cmd>pyfile %<CR>', {
   desc = 'run current python file'
 })
 
-vim.b.undo_ftplugin = 'nunmap <buffer> <LocalLeader>S'

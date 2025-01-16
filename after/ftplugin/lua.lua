@@ -1,21 +1,23 @@
-vim.keymap.set('i', '<C-r>:', [[histget(':')->substitute('\v^\s*%(lua\=?|h%[elp])\s*', '', '')]], { expr = true })
+local ft = require 'utils.ftplugin'
 
+ft.addMap('i', '<C-r>:',
+  [[histget(':')->substitute('\v^\s*%(lua\=?|h%[elp])\s*', '', '')]],
+  { expr = true })
 
 ----> options specific to nvim config
 local bufname = vim.api.nvim_buf_get_name(0)
 local cfgdir = vim.fn.stdpath 'config' .. '/'
 if vim.startswith(bufname, cfgdir) then
-  vim.wo.foldmarker = '-->,--<'
-  vim.wo.foldmethod = 'marker'
-  vim.wo.foldlevel = 0
+  ft.setOpt('foldmarker', '-->,--<')
+  ft.setOpt('foldmethod', 'marker')
+  ft.setOpt('foldlevel', 1)
 
-  vim.api.nvim_buf_set_keymap(0, 'n', 'zf', ':<C-u>set opfunc=luafold#createFold<CR>g@',
-    { noremap = true, silent = true })
-  vim.api.nvim_buf_set_keymap(0, 'x', 'zf', ':<C-u>call luafold#createFold(visualmode())<CR>',
-    { noremap = true, silent = true })
+  ft.addMap('n', 'zf', ':<C-u>set opfunc=luafold#createFold<CR>g@')
+  ft.addMap('x', 'zf', ':<C-u>call luafold#createFold(visualmode())<CR>')
 
+  -- mappings for plugin specifications
   if bufname ~= 'init.lua' and vim.fs.dirname(bufname):find '/lua/plugins$' then
-    vim.keymap.set('n', '<LocalLeader>s', function()
+    local function sourcePluginSpec() -->
       local load = loadfile(bufname)
       if load then
         local env = {}
@@ -59,6 +61,21 @@ if vim.startswith(bufname, cfgdir) then
             vim.log.leves.ERROR)
         end
       end
-    end)
+    end --<
+    ft.addMap('n', '<LocalLeader>s', sourcePluginSpec)
+
+    local function addPluginToSpec() -->
+      local repo = vim.fn.getreg '+':gsub('%?.*', ''):gsub('.-/([^/]*/[^/]*)/?$', '%1')
+      vim.api.nvim_buf_set_lines(0, -2, -2, true, {
+        '',
+        '  {',
+        "    '" .. repo .. "',",
+        '  },',
+        '',
+      })
+
+      vim.api.nvim_win_set_cursor(0, { vim.api.nvim_buf_line_count(0) - 3, 5 })
+    end --<
+    ft.addMap('n', '<M-p>', addPluginToSpec, {})
   end
 end --<

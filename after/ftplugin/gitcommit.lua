@@ -1,7 +1,6 @@
-local l = vim.opt_local
-
-l.foldmethod = 'syntax'
-l.foldlevel = 0
-l.textwidth = 72
-l.colorcolumn = '50,+0'
-l.formatoptions = 'tlncr'
+local ft = require 'utils.ftplugin'
+ft.setOpt('foldmethod', 'syntax')
+ft.setOpt('foldlevel', 0)
+ft.setOpt('textwidth', 72)
+ft.setOpt('colorcolumn', '50,+0')
+ft.setOpt('formatoptions', 'tlncr')

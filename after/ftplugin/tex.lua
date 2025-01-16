@@ -1,1 +1,2 @@
-vim.opt_local.concealcursor = ''
+local ft = require 'utils.ftplugin'
+ft.addOpt('concealcursor', '')
