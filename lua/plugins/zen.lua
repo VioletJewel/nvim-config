@@ -6,12 +6,12 @@ return {
   {
     'folke/zen-mode.nvim',
     cond = {
-      keys('n', '<Space>z'),
+      keys('n', '<M-CR>'),
       cmd 'ZenMode',
     },
     config = function()
       require 'zen-mode'.setup()
-      vim.keymap.set('n', '<Leader>z', function() require 'zen-mode'.toggle() end)
+      vim.keymap.set('n', '<M-CR>', function() require 'zen-mode'.toggle() end)
     end,
   },
 }

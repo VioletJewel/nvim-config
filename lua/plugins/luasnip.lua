@@ -22,7 +22,7 @@ return {
       require 'luasnip.loaders.from_lua'.lazy_load {
         lazy_paths = vim.fs.joinpath(cfg, 'snippets')
       }
-      vim.keymap.set({ 'n', 'i', 's' }, '<M-space>', function()
+      vim.keymap.set({ 'n', 'i', 's' }, '<M-Space>', function()
         if ls.expandable() then ls.expand() end
       end, {
         desc = 'expand luasnip snippet when possible'

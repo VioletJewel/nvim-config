@@ -1,8 +1,8 @@
-local au = require 'utils'.augroup 'VioletAutocmds'
+local au = require 'utils.augroup' 'VioletAutocmds'
 
 local no_mkview_filetypes = { '', 'gitcommit', 'netrw', 'help' }
 
-local function should_mkview(evt) -->
+local function should_mkview(evt)
   -- tl;dr: :let g:no_mkview_filetypes = ['python', 'lua']
   --        :let b:no_mkview = 1
   local nomkvft = {}
@@ -14,42 +14,86 @@ local function should_mkview(evt) -->
       and #vim.api.nvim_buf_get_name(evt.buf) > 0
       and not (vim.g.no_mkview or vim.b[evt.buf].no_mkview or vim.w.no_mkview)
       and not vim.list_contains(nomkvft, vim.bo[evt.buf].filetype)
-end                                                                   --<
+end
 
-au { 'BufWinLeave,VimLeave,WinLeave,BufLeave,BufUnload,CmdlineEnter', --> Auto save view
+au { 'BufWinLeave,VimLeave,WinLeave,BufLeave,BufUnload,CmdlineEnter',
   callback = function(evt)
     if should_mkview(evt) then
-      vim.b[evt.buf]._auto_view = vim.fn.winsaveview()
+      local vop = vim.go.viewoptions
+      vim.go.viewoptions = 'cursor,folds'
+      vim.cmd.mkview { bang = true, mods = { emsg_silent = true } }
+      vim.go.viewoptions = vop
     end
   end,
   desc = 'Auto make view (restore cursor, folds, scroll) for most filetypes'
-}                            --<
+}
 
-au { 'BufWinEnter', --> Auto load view
+au { 'BufWinEnter',
   callback = function(evt)
     if should_mkview(evt) then
-      local av = vim.b[evt.buf]._auto_view
-      if av then
-        vim.fn.winrestview {
-          lnum = av.lnum,
-          col = av.col,
-          curswant = av.curswant,
-          topline = av.topline,
-          leftcol = av.leftcol,
-        }
-      else
-        vim.api.nvim_input 'g`"'
-      end
+      local fdm = vim.wo.foldmarker
+      local fde = vim.wo.foldexpr
+      local fdl = vim.wo.foldlevel
+      local fmr = vim.wo.foldmarker
+      vim.cmd.loadview { mods = { emsg_silent = true } }
+      -- vim.b[evt.buf].no_mkview = true
+      vim.opt_local.foldmarker = fdm
+      vim.opt_local.foldexpr   = fde
+      vim.opt_local.foldlevel  = fdl
+      vim.opt_local.foldmarker = fmr
     end
   end,
   desc = 'Auto load view (restore cursor, folds, scroll) for most filetypes'
-}                            --<
+}
+
+-- local function should_mkview(evt) -->
+--   -- tl;dr: :let g:no_mkview_filetypes = ['python', 'lua']
+--   --        :let b:no_mkview = 1
+--   local nomkvft = {}
+--   vim.list_extend(nomkvft, no_mkview_filetypes)
+--   vim.list_extend(nomkvft, vim.g.no_mkview_filetypes or {})
+--   vim.list_extend(nomkvft, vim.b[evt.buf].no_mkview_filetypes or {})
+--   vim.list_extend(nomkvft, vim.w.no_mkview_filetypes or {})
+--   return vim.bo[evt.buf].buflisted
+--       and #vim.api.nvim_buf_get_name(evt.buf) > 0
+--       and not (vim.g.no_mkview or vim.b[evt.buf].no_mkview or vim.w.no_mkview)
+--       and not vim.list_contains(nomkvft, vim.bo[evt.buf].filetype)
+-- end                                                                   --<
+
+-- au { 'BufWinLeave,VimLeave,WinLeave,BufLeave,BufUnload,CmdlineEnter', --> Auto save view
+--   callback = function(evt)
+--     if should_mkview(evt) then
+--       vim.b[evt.buf]._auto_view = vim.fn.winsaveview()
+--     end
+--   end,
+--   desc = 'Auto make view (restore cursor, folds, scroll) for most filetypes'
+-- }                            --<
+
+-- au { 'BufWinEnter', --> Auto load view
+--   callback = function(evt)
+--     if should_mkview(evt) then
+--       local av = vim.b[evt.buf]._auto_view
+--       if av then
+--         vim.fn.winrestview {
+--           lnum = av.lnum,
+--           col = av.col,
+--           curswant = av.curswant,
+--           topline = av.topline,
+--           leftcol = av.leftcol,
+--         }
+--       else
+--         vim.api.nvim_input 'g`"'
+--       end
+--     end
+--   end,
+--   desc = 'Auto load view (restore cursor, folds, scroll) for most filetypes'
+-- }                            --<
 
 au { 'BufWinEnter,Filetype', --> fix o/O
-  callback = function()
+  callback = function()-->
     vim.opt_local.formatoptions:append 'r'
     vim.opt_local.formatoptions:remove 'o'
-  end,
+  end,--<
   desc = 'normal o/O do NOT insert comment; insert <CR> DOES insert comment',
 }                   --<
 
@@ -72,16 +116,16 @@ au { 'VimEnter,BufNew,BufRead', --> no swap for /tmp
   -- 'backupskip' also ignores backups in /tmp
 }                --<
 
-au { 'FileType', --> set foldexpr to treesitter
-  pattern = '*',
-  callback = function()
-    if require 'vim.treesitter.highlighter'.active[vim.api.nvim_get_current_buf()] then
-      -- vim.opt_local.foldmethod = 'expr'
-      vim.opt_local.foldexpr = 'nvim_treesitter#foldexpr()'
-    end
-  end,
-  desc = 'auto-set fdm=nvim_treesitter#foldexpr() if ts enabled'
-} --<
+-- au { 'FileType', --> set foldexpr to treesitter
+--   pattern = '*',
+--   callback = function()
+--     if require 'vim.treesitter.highlighter'.active[vim.api.nvim_get_current_buf()] then
+--       -- vim.opt_local.foldmethod = 'expr'
+--       vim.opt_local.foldexpr = 'nvim_treesitter#foldexpr()'
+--     end
+--   end,
+--   desc = 'auto-set fdm=nvim_treesitter#foldexpr() if ts enabled'
+-- } --<
 
 au { 'BufNewFile',
   ---@diagnostic disable-next-line: param-type-mismatch
@@ -98,10 +142,10 @@ au { 'BufNewFile',
   end,
 }
 
-au { 'FileType',
-  pattern = 'help',
-  command = [[syn match VimHelpModeline /^\s*vim:.*:\%$/ conceal]]
-}
+-- au { 'FileType',
+--   pattern = 'help',
+--   command = [[syn match VimHelpModeline /^\s*vim:.*:\%$/ conceal]]
+-- }
 
 local function hlLink(group)
   local from, to = group:match '^(%S+)%s+(%S+)$'

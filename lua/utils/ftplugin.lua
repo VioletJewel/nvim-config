@@ -50,10 +50,37 @@ end
 --- @param name string
 --- @param val any
 --- @param bufnr? number
-function M.addOpt(name, val, bufnr)
+function M.setOpt(name, val, bufnr)
   bufnr = ensureBufnr(bufnr)
   vim.opt_local[name] = val
   lookup[bufnr].opts[name] = val
+end
+
+--- @param name string
+--- @param val any
+--- @param bufnr? number
+function M.appendOpt(name, val, bufnr)
+  bufnr = ensureBufnr(bufnr)
+  vim.opt_local[name]:append(val)
+  lookup[bufnr].opts[name] = vim.opt_local[name]
+end
+
+--- @param name string
+--- @param val any
+--- @param bufnr? number
+function M.prependOpt(name, val, bufnr)
+  bufnr = ensureBufnr(bufnr)
+  vim.opt_local[name]:prepend(val)
+  lookup[bufnr].opts[name] = vim.opt_local[name]
+end
+
+--- @param name string
+--- @param val any
+--- @param bufnr? number
+function M.removeOpt(name, val, bufnr)
+  bufnr = ensureBufnr(bufnr)
+  vim.opt_local[name]:remove(val)
+  lookup[bufnr].opts[name] = vim.opt_local[name]
 end
 
 --- @param name string

@@ -1,4 +1,4 @@
-local au = require 'utils'.augroup 'VioletStatusline'
+local au = require 'utils.augroup' 'VioletStatusline'
 
 local function getHl(c)
   local p = nil
@@ -74,9 +74,8 @@ end
 -- function SetCmdHeight()
 --   vim.o.cmdheight = #vim.api.nvim_tabpage_list_wins(0) > 1 and 0 or 1
 -- end
-
 -- au { 'WinResized', callback = SetCmdHeight }
 -- SetCmdHeight()
 
 vim.o.laststatus = 1
-vim.o.ruler = false
+vim.o.ruler = true

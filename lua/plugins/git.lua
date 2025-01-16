@@ -68,6 +68,8 @@ return {
   {
     'lewis6991/gitsigns.nvim',
     cond = {
+      keys('n', ']c'),
+      keys('n', '[c'),
       keys('n', '<Bslash>gss'),
       keys('n', '<Bslash>gsn'),
       keys('n', '<Bslash>gsl'),
@@ -84,7 +86,9 @@ return {
       keys('n', '<LocalLeader>td'),
       keys('n', '<LocalLeader>gb'),
       keys('n', '<LocalLeader>gB'),
-      keys({ 'o', 'x' }, 'ih'),
+      keys({ 'o', 'x' }, 'ih', function()
+        require 'gitsigns'.select_hunk()
+      end) -- ':<C-U>Gitsigns select_hunk<CR>'),
     },
     config = function()
       require 'gitsigns'.setup {
@@ -188,10 +192,10 @@ return {
             buffer = bufnr,
             desc = 'toggle git blame split'
           })
-          -- Text object
-          vim.keymap.set({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', {
-            buffer = bufnr
-          })
+          -- -- Text object
+          -- vim.keymap.set({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', {
+          --   buffer = bufnr
+          -- })
         end
       }
       local function toggle(desc, action)
@@ -201,22 +205,27 @@ return {
       end
       vim.keymap.set('n', '<LocalLeader>gss',
         toggle('sign-column signs', 'toggle_signs'), {
+          buffer = true,
           desc = 'toggle gitsigns sign-column signs'
         })
       vim.keymap.set('n', '<LocalLeader>gsn',
         toggle('linenr highlight', 'toggle_numhl'), {
+          buffer = true,
           desc = 'toggle gitsigns linenr highlight'
         })
       vim.keymap.set('n', '<LocalLeader>gsl',
         toggle('inline highlight', 'toggle_linehl'), {
+          buffer = true,
           desc = 'toggle gitsigns inline highlight'
         })
       vim.keymap.set('n', '<LocalLeader>gsw',
         toggle('word diff', 'toggle_word_diff'), {
+          buffer = true,
           desc = 'toggle gitsigns word diff'
         })
       vim.keymap.set('n', '<LocalLeader>gsb',
         toggle('auto git blame', 'toggle_current_line_blame'), {
+          buffer = true,
           desc = 'toggle gitsigns auto git blame'
         })
     end,

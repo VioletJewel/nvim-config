@@ -4,8 +4,9 @@ local event = require 'pckr.loader.event'
 
 return {
 
-  {
+  {-->
     'nvim-treesitter/nvim-treesitter',
+    cond = event 'UIEnter',
     run = function() require 'nvim-treesitter.install'.update { with_sync = true } () end,
     config = function()
       -- &ft to 0 or more tree-sitter grammars
@@ -50,9 +51,9 @@ return {
         matchup = { enable = true, },
       }
     end,
-  },
+  },--<
 
-  {
+  {-->
     'nvim-treesitter/nvim-treesitter-textobjects',
     requires = { 'nvim-treesitter/nvim-treesitter', },
     cond = event { 'BufReadPost', 'BufNewFile' },
@@ -110,6 +111,14 @@ return {
         },
       }
     end,
-  },
+  },--<
+
+  {-->
+    'nvim-treesitter/nvim-treesitter-context',
+    cond = event { 'BufReadPost', 'BufNewFile' },
+    config = function()
+
+    end,
+  }--<
 
 }

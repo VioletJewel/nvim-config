@@ -93,9 +93,9 @@ vim.o.completeopt = 'menuone,noselect'
 
 ---->1 folding
 
-vim.o.foldlevelstart = 1     -- always open first 2 fold levels for new bufs
-vim.o.foldmethod = 'marker'  -- use syntax for folding
-vim.o.foldmarker = '-->,--<'
+vim.o.foldlevelstart = 2     -- always open first 2 fold levels for new bufs
+vim.o.foldmethod = 'syntax'  -- use syntax for folding
+-- vim.o.foldmarker = '-->,--<'
 
 ---->1 break indent
 

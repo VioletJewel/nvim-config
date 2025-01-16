@@ -2,7 +2,7 @@
 -- -- local keys = require 'pckr.loader.keys'
 -- -- local event = require 'pckr.loader.event'
 
--- local au = require 'utils'.augroup 'ViNabla'
+-- local au = require 'utils.augroup' 'ViNabla'
 
 -- return {
 --   {

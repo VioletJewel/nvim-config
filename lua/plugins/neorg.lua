@@ -20,14 +20,17 @@ local rocksDeps = {
 return {
   {
     'nvim-neorg/neorg',
-    requires = { '3rd/image.nvim' },
+    requires = {
+      '3rd/image.nvim',
+      'nvim-treesitter',
+    },
     tag = '*', -- Pin Neorg to the latest stable release
-    -- cond = {
-    --   cmd 'Neorg',
-    --   keys('n', '<Leader>nj'),
-    --   keys('n', '<Leader>ni'),
-    --   keys('n', '<Leader>nc'),
-    -- },
+    cond = {
+      cmd 'Neorg',
+      keys('n', '<Space>nj'),
+      keys('n', '<Space>ni'),
+      keys('n', '<Space>nc'),
+    },
     run = function()
       require 'utils.rocks'.ensureRocks(rocksDeps)
     end,

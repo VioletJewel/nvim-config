@@ -5,7 +5,9 @@ local keys = require 'pckr.loader.keys'
 return {
   {-->
     'ibhagwan/fzf-lua',
-    requires = { 'nvim-tree/nvim-web-devicons' },
+    -- requires = {
+    --   'nvim-tree/nvim-web-devicons' -- ./devicons.lua (opt)
+    -- },
     cond = {
       keys('n', '<Space>f'),
       keys('n', '<Bslash>c'),
@@ -47,32 +49,35 @@ return {
             render_markdown = { enabled = true, filetypes = { markdown = true } },
           },
         },
-        files = {
-          git_icons = true,
-          file_icons = true,
-          color_icons = false,
-        },
-        git = {
-          files = {
-            git_icons = true,
-          },
-          status = {
-            git_icons = true,
-          }
-        },
+        -- files = {
+        --   git_icons = true,
+        --   file_icons = true,
+        --   color_icons = false,
+        -- },
+        -- git = {
+        --   files = {
+        --     git_icons = true,
+        --   },
+        --   status = {
+        --     git_icons = true,
+        --   }
+        -- },
         keymap = {
           builtin = {
-            true,
-            ['<M-f>'] = 'toggle-fullscreen',
+            false,
+            ['<M-Esc>'] = 'hide',
+            ['<M-CR>'] = 'toggle-fullscreen',
+            ['<F7>'] = 'toggle-preview-ts-ctx',
           },
           fzf = {
             true,
-            ['alt-j']  = 'preview-down',
-            ['alt-k']  = 'preview-up',
-            ['ctrl-j'] = 'preview-page-down',
-            ['ctrl-k'] = 'preview-page-up',
+            -- ['alt-j']  = 'preview-down',
+            -- ['alt-k']  = 'preview-up',
+            -- ['alt-J'] = 'preview-page-down',
+            -- ['alt-K'] = 'preview-page-up',
             ['alt-w']  = 'toggle-preview-wrap',
             ['alt-p']  = 'toggle-preview',
+            ['alt-space']  = 'toggle+down',
           },
         },
         actions = {
@@ -97,5 +102,3 @@ return {
     end,
   },--<
 }
-
-

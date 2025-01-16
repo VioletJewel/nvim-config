@@ -90,7 +90,7 @@ return {
     cond = event { 'BufReadPost', 'BufNewFile' },
     config = function()
       local lc = require 'lspconfig'
-      local au = require 'utils'.augroup 'LspAttach'
+      local au = require 'utils.augroup' 'LspAttach'
 
       vim.iter(pairs(lsps)):each(function(lsp, cfg)
         lc[lsp].setup(cfg)

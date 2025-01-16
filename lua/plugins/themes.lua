@@ -6,10 +6,10 @@ return {
 
   {
     'folke/tokyonight.nvim',
-    cond = event 'UIEnter',
+    cond = event 'VimEnter',
     config = function()
       vim.cmd.colorscheme 'tokyonight'
-      vim.cmd.doautocmd { args = { 'colorscheme', 'tokyonight' } }
+      vim.cmd.doautocmd { args = { 'ColorScheme', 'tokyonight' } }
     end,
   },
 

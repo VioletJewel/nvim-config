@@ -1,4 +1,4 @@
-local au = require 'utils'.augroup 'VioletTagordoj'
+local au = require 'utils.augroup' 'VioletTagordoj'
 
 local tagordujo
 
