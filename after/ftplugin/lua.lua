@@ -4,13 +4,13 @@ ft.addMap('i', '<C-r>:',
   [[histget(':')->substitute('\v^\s*%(lua\=?|h%[elp])\s*', '', '')]],
   { expr = true })
 
-----> options specific to nvim config
+--> options specific to nvim config
 local bufname = vim.api.nvim_buf_get_name(0)
 local cfgdir = vim.fn.stdpath 'config' .. '/'
 if vim.startswith(bufname, cfgdir) then
   ft.setOpt('foldmarker', '-->,--<')
-  ft.setOpt('foldmethod', 'marker')
-  ft.setOpt('foldlevel', 1)
+  -- ft.setOpt('foldmethod', 'marker')
+  -- ft.setOpt('foldlevel', 1)
 
   ft.addMap('n', 'zf', ':<C-u>set opfunc=luafold#createFold<CR>g@')
   ft.addMap('x', 'zf', ':<C-u>call luafold#createFold(visualmode())<CR>')

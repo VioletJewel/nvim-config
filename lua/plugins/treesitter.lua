@@ -48,7 +48,10 @@ return {
             node_decremental = '<M-o>',
           },
         },
-        matchup = { enable = true, },
+        matchup = {
+          enable = true,
+          disable_virtual_text = true,
+        },
       }
     end,
   },--<

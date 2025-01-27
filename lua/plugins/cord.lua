@@ -7,7 +7,7 @@ return {
   {
     'vyfor/cord.nvim',
     run = './build',
-    cond = event 'UIEnter',
+    -- cond = event 'UIEnter',
     config = function()
       require 'cord'.setup()
     end,

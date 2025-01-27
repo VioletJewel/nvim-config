@@ -89,6 +89,8 @@ return {
     'neovim/nvim-lspconfig',
     cond = event { 'BufReadPost', 'BufNewFile' },
     config = function()
+      vim.diagnostic.config { signs = true, virtual_text = false, underline = false }
+
       local lc = require 'lspconfig'
       local au = require 'utils.augroup' 'LspAttach'
 

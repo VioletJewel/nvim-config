@@ -10,11 +10,29 @@ do
   end
 end
 
-cmd('Journal', function(day)
-  -- TODO: support day
-  vim.cmd.edit(vim.fs.joinpath(docsdir, 'journal', os.date '%Y-%m-%d.md'))
+-- egs :WhatDayIsIt 10days ago :WhatDayIsIt in 5y20w10d
+cmd('WhatDayIsIt', function(o)
+  local time, err = require 'utils.date'.relDateToTime(o.args:lower())
+  if err then
+    print "That's not a real time!"
+  end
+  print('The date ' .. ((o.args == '' or err) and 'today' or o.args) .. ' is ' .. os.date('%A, %d %B, %Y', time))
 end, {
-  nargs = 0
+  nargs = '?',
+})
+
+cmd('Journal', function(o)
+  local time, err = require 'utils.date'.relDateToTime(o.args:lower())
+  if err then
+    print "That's not a real time!"
+  end
+  vim.print(o.smods)
+  vim.cmd.split {
+    docsdir .. os.date('/journal/%Y-%m-%d.md', time), 
+    mods = o.smods
+  }
+end, {
+  nargs = '?',
 })
 
 local cfg = vim.fn.stdpath 'config'
@@ -159,6 +177,17 @@ cmd('Fput', function(a) -->
   vim.api.nvim_del_current_line()
 end, opts) --<
 
+vim.api.nvim_create_user_command('Rename', function(o)
+  local curfile = vim.api.nvim_buf_get_name(0) -- current file path
+  local cwd = assert(vim.uv.cwd()) -- cwd
+  local relfile = curfile:gsub('^' .. vim.pesc(cwd) .. '/', '') -- `curfile` relative to cwd
+  local reldir = vim.fs.dirname(relfile) .. '/' -- dirname of `curfile`
+  local newfile = vim.fn.input('rename ' .. relfile .. ' to: ', reldir)
+  if newfile:sub(1, 1) ~= '/' then
+    newfile = vim.fs.normalize(cwd .. '/' .. newfile)
+  end
+  vim.lsp.util.rename(o.fargs[1] or curfile, newfile)
+end, { nargs = '?', complete = 'file' })
 
 -- :help :DiffOrig
 opts = { bar = true, nargs = '?' }

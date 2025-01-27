@@ -9,7 +9,7 @@ return {
     --   'nvim-tree/nvim-web-devicons' -- ./devicons.lua (opt)
     -- },
     cond = {
-      keys('n', '<Space>f'),
+      keys('n', '<Bslash>f'),
       keys('n', '<Bslash>c'),
       keys('n', '<Bslash>C'),
       cmd 'FZF',
@@ -91,7 +91,7 @@ return {
           }
         },
       }
-      vim.keymap.set('n', '<Leader>f', function() require 'fzf-lua'.files() end, { desc = 'browse files in fzf' })
+      vim.keymap.set('n', '<LocalLeader>f', function() require 'fzf-lua'.files() end, { desc = 'browse files in fzf' })
       vim.keymap.set('n', '<M-Esc>', function() require 'fzf-lua'.resume() end, { desc = 'resume fzf session' })
       vim.keymap.set('n', '<LocalLeader>c', function() require 'fzf-lua'.files { cwd = vim.fn.stdpath 'config' } end,
         { desc = 'browse nvim config files in fzf' })

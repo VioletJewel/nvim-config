@@ -1,4 +1,4 @@
----->1 leader setup
+-->1 leader setup
 
 vim.g.mapleader = ' '        -- <Leader>      = <Space>
 vim.g.maplocalleader = '\\'  -- <LocalLeader> = <Bslash>
@@ -8,7 +8,7 @@ vim.api.nvim_set_keymap('n', '<Leader>', '', {
   desc = 'map <Leader> to <Nop> to fix side effects'
 })
 
----->1 setup
+-->1 setup
 
 local _c_e = vim.api.nvim_replace_termcodes('<C-e>', true, true, true)
 local _c_y = vim.api.nvim_replace_termcodes('<C-y>', true, true, true)
@@ -55,7 +55,7 @@ end
 
 local abCmds = 'al:l ba:ll diffs:plit dsp:lit h:elp isp:lit sN:ext sa:rgument sal:l sbN:ext sb:uffer sba:ll sbf:irst sbl:ast sbm:odified sbn:ext sbp:revious sbr:ewind sf:ind sfi sfi:rst sla:st sn:xt splitfind spr:evious sre:wind sta:g stj:ump sts:elect sv:iew Man'
 
----->1 save
+-->1 save
 
 vim.keymap.set({ 'n', 'x', 'i', 'c' }, '<M-w>', '<Cmd>silent write ++p<Bar>redrawstatus!<CR>', {
   desc = 'update current file quickly'
@@ -73,28 +73,28 @@ vim.keymap.set({ 'n', 'x', 'i', 'c' }, '<M-E>', '<Cmd>silent noautocmd wall', {
   desc = 'write all files quickly without triggering noautocmds'
 })
 
----->1 quit
+-->1 quit
 
 vim.api.nvim_set_keymap('n', '<LocalLeader>q', '<Cmd>qall<CR>', {
   noremap = true,
   desc = 'quit quickly if no unsaved files'
 })
 
----->1 source
+-->1 source
 
 vim.api.nvim_set_keymap('n', '<LocalLeader>s', "<Cmd>source %<Bar>unsil echo 'sourced' expand('%')<CR>", {
   noremap = true,
   desc = 'source current file'
 })
 
----->1 overload <C-l>
+-->1 overload <C-l>
 
 vim.api.nvim_set_keymap('n', "<C-l>", "<Cmd>nohlsearch | diffupdate | redraw! | echon ''<CR>", {
   noremap = true,
   desc = '<C-l> clears search hls, updates diffs, and redraws'
 })
 
----->1 previous command
+-->1 previous command
 
 vim.api.nvim_set_keymap('', '<C-p>', '', {
   noremap = true,
@@ -104,7 +104,7 @@ vim.api.nvim_set_keymap('', '<C-p>', '', {
   desc = 'open command-line and go <Up> to last command' -- this works in visual mode, too
 })
 
----->1 recursive zO on open fold
+-->1 recursive zO on open fold
 
 vim.api.nvim_set_keymap('n', 'zO', "foldclosed('.') == -1 ? 'zczO' : 'zO'", {
   noremap = true,
@@ -113,7 +113,7 @@ vim.api.nvim_set_keymap('n', 'zO', "foldclosed('.') == -1 ? 'zczO' : 'zO'", {
   desc = 'like zO but close an open fold first to trigger recursive gO'
 })
 
----->1 pastebin
+-->1 pastebin
 
 vim.api.nvim_set_keymap('n', '<Leader>B', ':<C-u>set opfunc=pastebin#paste<CR>g@', {
   noremap = true, silent = true
@@ -122,7 +122,7 @@ vim.api.nvim_set_keymap('x', '<Leader>B', ':<C-u>call pastebin#paste(visualmode(
   noremap = true, silent = true
 })
 
----->1 loclist jump
+-->1 loclist jump
 
 vim.api.nvim_set_keymap('n', "[w", ":<C-u>execute v:count..'lprevious'<CR>", {
   noremap = true,
@@ -136,7 +136,7 @@ vim.api.nvim_set_keymap('n', "]w", ":<C-u>execute v:count..'lnext'<CR>", {
   desc = 'goto [count]th next loclist error'
 })
 
----->1 quickfix jump
+-->1 quickfix jump
 
 vim.api.nvim_set_keymap('n', "[q", ":<C-u>execute v:count..'cprevious'<CR>", {
   noremap = true,
@@ -150,7 +150,7 @@ vim.api.nvim_set_keymap('n', "]q", ":<C-u>execute v:count..'cnext'<CR>", {
   desc = '<count>cnext'
 })
 
----->1 line move
+-->1 line move
 
 vim.api.nvim_set_keymap('n', '[e', ':<C-u>call maps#moveLine(0, v:count, 0)<CR>', {
   noremap = true,
@@ -176,7 +176,7 @@ vim.api.nvim_set_keymap('x', ']e', ':<C-u>call maps#moveLine(1, v:count, 1)<CR>'
   desc = 'move selection down [count]th lines'
 })
 
----->1 git jump
+-->1 git jump
 
 vim.api.nvim_set_keymap('', '[g', '', {
   noremap = true,
@@ -226,7 +226,7 @@ vim.api.nvim_set_keymap('', ']G', '', {
   desc = 'goto last git marker'
 })
 
----->1 buffer jump
+-->1 buffer jump
 
 vim.api.nvim_set_keymap('n', '[b', ":<C-u>execute v:count..'bprevious'<CR>", {
   noremap = true,
@@ -250,7 +250,7 @@ vim.api.nvim_set_keymap('n', ']B', '<Cmd>blast<CR>', {
   desc = 'goto last buffer'
 })
 
----->1 arg jump
+-->1 arg jump
 
 vim.api.nvim_set_keymap('n', "[a", ":<C-u>execute v:count..'previous'<CR>", {
   noremap = true,
@@ -274,7 +274,7 @@ vim.api.nvim_set_keymap('n', ']A', '<Cmd>last<CR>', {
   desc = 'goto last argument'
 })
 
----->1 file jump
+-->1 file jump
 
 vim.api.nvim_set_keymap('n', ']f', ':call maps#nextFile(1)<CR>', {
   noremap = true,
@@ -288,7 +288,7 @@ vim.api.nvim_set_keymap('n', '[f', ':call maps#nextFile(0)<CR>', {
   desc = 'edit previous file in current file\'s dir'
 })
 
----->1 spell
+-->1 spell
 
 vim.api.nvim_set_keymap('n', '<M-s>', '[s1z=``:sil! call repeat#set("\\<M-s>")<CR>', {
   noremap = true,
@@ -332,7 +332,7 @@ vim.api.nvim_set_keymap('i', '<M-S>', '', {
   desc = 'set previous spelling mistake as good (internal, insert mode)'
 })
 
----->1 searching
+-->1 searching
 
 vim.api.nvim_set_keymap('n', '*', [[<Cmd>let v:hlsearch=setreg('/', '\<'..expand('<cword>')..'\>\C')+1<CR>n]], {
   noremap = true,
@@ -380,7 +380,7 @@ vim.api.nvim_set_keymap('n', '<LocalLeader>N', 'N', {
   desc = 'original backwards search'
 })
 
----->1 faster *N{operator}gn{replacementText} w */#/g*/g# as pending operators
+-->1 faster *N{operator}gn{replacementText} w */#/g*/g# as pending operators
 
 --   eg: c*BAR<Esc>.. changes "foo hi foo hi foo" to "BAR hi BAR hi BAR"
 --   notes: . = dot operator and cursor starts on first 'foo' in example
@@ -463,7 +463,7 @@ vim.api.nvim_set_keymap('', 'N', '', {
   desc = 'always search backwards'
 })
 
----->1 command line
+-->1 command line
 
 vim.api.nvim_set_keymap('c', '<M-h>', '<left>', {
   noremap = true,
@@ -505,7 +505,7 @@ vim.api.nvim_set_keymap('c', '<M-e>', '<C-e>', {
   desc = 'go to end of cmdline'
 })
 
----->1 simple text objects
+-->1 simple text objects
 
 vim.api.nvim_set_keymap('x', 'il', '<Esc>g_v^', {
   noremap = true,
@@ -537,7 +537,7 @@ vim.api.nvim_set_keymap('o', 'id', '<Cmd>norm!G$Vgg0<Cr>', {
   desc = 'in-document text object (operator-pending)'
 })
 
----->1 visual (block) column/line alignment to other corner
+-->1 visual (block) column/line alignment to other corner
 
 --   ↓ other corner's column
 --   o----------------+ ← other corner's line
@@ -610,7 +610,7 @@ vim.api.nvim_set_keymap('x', 'gL', '', {
   desc = "Grab other Line - realign visual's other corner's line to current corner's line"
 })
 
----->1 number text objects (eg: cin40 on/before "65" -> "40")
+-->1 number text objects (eg: cin40 on/before "65" -> "40")
 
 vim.keymap.set({ 'x', 'o' }, 'in', function()
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-Bslash><C-n>', true, true, true), 'nx', false)
@@ -643,7 +643,7 @@ end, {
   desc = 'Around Number text object'
 })
 
----->1 indentation text objects
+-->1 indentation text objects
 
 vim.keymap.set({ 'x', 'o' }, 'ii', function()
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-Bslash><C-n>^', true, true, true), 'nx', false)
@@ -679,7 +679,7 @@ end, {
   desc = 'Around Indentation text object'
 })
 
----->1 cmdline abbreviations (egs, :vhelp => :vert help, :tsbn => :tab sbn)
+-->1 cmdline abbreviations (egs, :vhelp => :vert help, :tsbn => :tab sbn)
 
 vim.iter(vim.gsplit(abCmds, '%s')):each(function(w)
   local ab, r = w:match '^(%S+):(%S-)$'
@@ -688,7 +688,7 @@ vim.iter(vim.gsplit(abCmds, '%s')):each(function(w)
   if r ~= nil then vtca(ab .. r) end
 end)
 
----->1 abbreviations for typos
+-->1 abbreviations for typos
 
 vim.api.nvim_set_keymap('ia', 'unkown', 'unknown', {
   noremap = true,
