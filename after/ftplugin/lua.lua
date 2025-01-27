@@ -29,6 +29,7 @@ if vim.startswith(bufname, cfgdir) then
         if ok then
           local loaded = vim.iter(pkgs)
               :map(function(pkg)
+                if not pkg or not pkg[1] then return nil end
                 local p = pkg[1]:gsub('^.*/', ''):gsub('[-.]n?vim$', ''):gsub('^vim%-?', '')
                 if pkg.config and package.loaded[p] then
                   local err
@@ -43,6 +44,9 @@ if vim.startswith(bufname, cfgdir) then
                 end
               end)
               :totable()
+          vim.api.nvim__redraw {
+            flush = true
+          }
           if #loaded == 0 then
             vim.notify(string.format('No packages reloaded from plugins/%s',
               vim.fs.basename(bufname)), vim.log.levels.INFO)

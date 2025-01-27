@@ -8,8 +8,16 @@ return {
     'folke/tokyonight.nvim',
     cond = event 'VimEnter',
     config = function()
-      vim.cmd.colorscheme 'tokyonight'
-      vim.cmd.doautocmd { args = { 'ColorScheme', 'tokyonight' } }
+      if os.getenv 'ASCIINEMA_REC' == '1' then
+        vim.o.termguicolors = false
+        vim.g.sonokai_enable_italic = 1
+        vim.g.sonokai_style = 'andromeda'
+        vim.cmd.colorscheme 'sonokai'
+        vim.cmd.doautocmd { args = { 'ColorScheme', 'sonokai' } }
+      else
+        vim.cmd.colorscheme 'tokyonight'
+        vim.cmd.doautocmd { args = { 'ColorScheme', 'tokyonight' } }
+      end
     end,
   },
 

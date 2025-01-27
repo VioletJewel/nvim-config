@@ -19,6 +19,7 @@ return {
       require 'fzf-lua'.setup {
         { 'max-perf', 'border-fused' },
         winopts = {
+          backdrop = os.getenv 'ASCIINEMA_REC' == '1' and 100 or nil,
           preview = {
             default = 'builtin',
             scrollbar = false,
