@@ -2,9 +2,21 @@ local M = {}
 
 Omnilist = {}
 
--- eg: after/ftplugin/myfiletype.lua
--- vim.bo.omnifunc = require 'omnilist'.omnifunc { 'someword', 'another', 'etc' }
--- vim.bo.omnifunc = require 'omnilist'.omnifunc({'word1','word2'}, '[A-Za-z]') -- only match /[[:alpha:]]/
+-- -- tl;dr: put in, eg, after/ftplugin/myfiletype.lua
+--
+-- local ofu = require 'omnilist'.omnifunc
+--
+-- -- complete "someword", "another", "etc" with i_^x^o omnifunc completion
+-- vim.bo.ofu =  ofu { 'someword', 'another', 'etc' }
+--
+-- -- -or- complete "word1"/"word2" and only match /[[:alpha:]]/
+-- vim.bo.ofu = ofu({'word1','word2'}, '[A-Za-z]+')
+
+--- @param words string[] list of words to complete; eg { 'a', 'b', 'c' }
+--- @param match string   string pattern to match (lua string.match);
+---                       default: '[A-Za-z.]+'
+--- @param ft    string   can be any unique key; probably leave empty;
+---                       default: (&ft or '_'.bufnr())
 function M.omnifunc(words, match, ft)
   if ft == nil then
     ft = #vim.bo.filetype > 0 and vim.bo.filetype or '_' .. vim.api.nvim_get_current_buf()
