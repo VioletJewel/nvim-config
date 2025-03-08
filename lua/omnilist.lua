@@ -4,6 +4,7 @@ Omnilist = {}
 
 -- eg: after/ftplugin/myfiletype.lua
 -- vim.bo.omnifunc = require 'omnilist'.omnifunc { 'someword', 'another', 'etc' }
+-- vim.bo.omnifunc = require 'omnilist'.omnifunc({'word1','word2'}, '[A-Za-z]') -- only match /[[:alpha:]]/
 function M.omnifunc(words, match, ft)
   if ft == nil then
     ft = #vim.bo.filetype > 0 and vim.bo.filetype or '_' .. vim.api.nvim_get_current_buf()
