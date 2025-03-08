@@ -1,25 +1,41 @@
 -- local cmd = require 'pckr.loader.cmd'
 -- local keys = require 'pckr.loader.keys'
-local event = require 'pckr.loader.event'
+-- local event = require 'pckr.loader.event'
+
+local au = require 'utils.augroup' 'ViPluginThemes'
+
+local theme
+if os.getenv 'TERM' == 'linux' then
+  theme = 'linux'
+  vim.o.termguicolors = false
+elseif os.getenv 'DVTM' and os.getenv 'DVTM_WINDOW_ID' then
+  theme = 'sonokai'
+  vim.o.termguicolors = false
+  vim.g.sonokai_enable_italic = 1
+  vim.g.sonokai_style = 'andromeda'
+elseif os.getenv 'ASCIINEMA_REC' == '1' then
+  theme = 'sonokai'
+  vim.o.termguicolors = false
+  vim.g.sonokai_enable_italic = 1
+  vim.g.sonokai_style = 'andromeda'
+else
+  theme = os.getenv 'NVIM_THEME' or 'tokyonight'
+  if os.getenv 'NVIM_NOTGC' then
+    vim.o.termguicolors = false
+  end
+end
+
+au {
+  'VimEnter',
+  callback = function()
+    pcall(vim.cmd.colorscheme, theme)
+    vim.cmd.doautocmd { args = { 'ColorScheme', theme } }
+  end
+}
 
 return {
 
-  {
-    'folke/tokyonight.nvim',
-    cond = event 'VimEnter',
-    config = function()
-      if os.getenv 'ASCIINEMA_REC' == '1' then
-        vim.o.termguicolors = false
-        vim.g.sonokai_enable_italic = 1
-        vim.g.sonokai_style = 'andromeda'
-        vim.cmd.colorscheme 'sonokai'
-        vim.cmd.doautocmd { args = { 'ColorScheme', 'sonokai' } }
-      else
-        vim.cmd.colorscheme 'tokyonight'
-        vim.cmd.doautocmd { args = { 'ColorScheme', 'tokyonight' } }
-      end
-    end,
-  },
+  'folke/tokyonight.nvim',
 
   'rebelot/kanagawa.nvim',
 
@@ -43,6 +59,8 @@ return {
 
   'loctvl842/monokai-pro.nvim',
 
-  -- 'b0o/lavi.nvim';
+  -- 'b0o/lavi.nvim',
+
+  'EdenEast/nightfox.nvim',
 
 }

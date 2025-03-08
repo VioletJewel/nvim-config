@@ -120,8 +120,25 @@ return {
     'nvim-treesitter/nvim-treesitter-context',
     cond = event { 'BufReadPost', 'BufNewFile' },
     config = function()
-
+      require 'treesitter-context'.setup {
+        trim_scope = 'inner',
+        max_lines = 2,
+        mode = 'topline',
+      }
     end,
-  }--<
+  },--<
+
+
+  -- {-->
+  --   'theHamsta/nvim-treesitter-pairs',
+  --   cond = event { 'BufReadPost', 'BufNewFile' },
+  --   config = function()
+  --     require'nvim-treesitter.configs'.setup {
+  --       pairs = {
+  --         enable = true,
+  --       }
+  --     }
+  --   end,
+  -- },--<
 
 }

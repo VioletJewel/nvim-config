@@ -1,5 +1,4 @@
 local pckr_path = vim.fn.stdpath("data") .. "/pckr/pckr.nvim"
-
 if not vim.uv.fs_stat(pckr_path) then
   vim.fn.system({
     'git',
@@ -9,15 +8,12 @@ if not vim.uv.fs_stat(pckr_path) then
     pckr_path
   })
 end
-
 vim.opt.rtp:prepend(pckr_path)
-
 require 'utils.rocks'.setup()
 
 ---@diagnostic disable-next-line: param-type-mismatch
 local plugd = vim.fs.joinpath(vim.fn.stdpath 'config', 'lua', 'plugins') .. '/'
 local files = {}
-
 do
   ---@diagnostic disable-next-line: param-type-mismatch
   local dir, err = vim.uv.fs_opendir(plugd, nil, 100)
@@ -35,15 +31,16 @@ do
   vim.uv.fs_closedir(dir)
 end
 
-local specs = vim.iter(files)
-    :flatten(1)
-    :filter(function(p)
-      return p.type == 'file' and p.name ~= 'init.lua' and not p.name:find '/init%.lua$' and p.name:find '%.lua'
-    end)
-    :map(function(p)
-      local lf, err = loadfile(plugd .. p.name)
-      if lf then return lf() end
-      vim.notify(string.format('Error loading plugin file %q: %s', p.name, err), vim.log.levels.ERROR, {})
-    end)
-
-require 'pckr'.add(specs:flatten(1):totable())
+require 'pckr'.add(vim.iter(files)
+  :flatten(1):filter(function(p)
+    return p.type == 'file' and p.name ~= 'init.lua' and not p.name:find '/init%.lua$' and p.name:find '%.lua'
+  end)
+  :map(function(p)
+    local lf, err = loadfile(plugd .. p.name)
+    if lf then
+      local ok, mod = pcall(lf)
+      if ok then return mod end
+      err = mod
+    end
+    vim.notify(string.format('Error loading plugin file %q: %s', p.name, err), vim.log.levels.ERROR, {})
+  end):flatten(1):totable())

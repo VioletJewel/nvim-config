@@ -8,6 +8,6 @@ local function req(file)-->
 end--<
 
 req 'opts'       -- ./lua/opts.lua
--- req 'foldtext'   -- ./lua/foldtext.lua
+req 'foldtext'   -- ./lua/foldtext.lua
 req 'plugins'    -- ./lua/plugins/init.lua
 req 'statusline' -- ./lua/statusline.lua

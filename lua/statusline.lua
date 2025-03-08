@@ -62,15 +62,17 @@ function StlIcon() -->
   return icon
 end --<
 
+local stlLen = 40
+
 if os.getenv 'TERM' == 'linux' then
-  vim.o.statusline = '%=%80(%f%{%v:lua.StlHl("StlLnr")%}:%-3l%*%( [%M%R%W]%) [%{&ft}]  %)'
-  vim.o.rulerformat = '%80(%=%f%#Statement#:%-3l%*%( [%M%R%W]%) [%{&ft}] %)'
+  vim.o.statusline = '%=%'..stlLen..'(%f%{%v:lua.StlHl("StlLnr")%}:%-3l%*%( [%M%R%W]%) [%{&ft}]  %)'
+  vim.o.rulerformat = '%'..stlLen..'(%=%f%#Statement#:%-3l%*%( [%M%R%W]%) [%{&ft}] %)'
 elseif os.getenv 'ASCIINEMA_REC' == '1' then
-  vim.o.statusline = '%=%80(%f%{%v:lua.StlHl("StlLnr")%}:%-3l%*%( [%M%R%W]%) %{%v:lua.StlHl("StlFt")%}%{&ft}%*  %)'
-  vim.o.rulerformat = '%80(%=%f%#Statement#:%-3l%*%( [%M%R%W]%) %#Identifier#%{&ft}%* %)'
+  vim.o.statusline = '%=%'..stlLen..'(%f%{%v:lua.StlHl("StlLnr")%}:%-3l%*%( [%M%R%W]%) %{%v:lua.StlHl("StlFt")%}%{&ft}%*  %)'
+  vim.o.rulerformat = '%'..stlLen..'(%=%f%#Statement#:%-3l%*%( [%M%R%W]%) %#Identifier#%{&ft}%* %)'
 else
-  vim.o.statusline = '%=%80(%f%{%v:lua.StlHl("StlLnr")%}:%-3l%*%( [%M%R%W]%) %{%v:lua.StlHl("StlFt")%}%{v:lua.StlIcon()}  %)'
-  vim.o.rulerformat = '%80(%=%f%#Statement#:%-3l%*%( [%M%R%W]%) %#Identifier#%{v:lua.StlIcon()} %)'
+  vim.o.statusline = '%=%'..stlLen..'(%f%{%v:lua.StlHl("StlLnr")%}:%-3l%*%( [%M%R%W]%) %{%v:lua.StlHl("StlFt")%}%{v:lua.StlIcon()}  %)'
+  vim.o.rulerformat = '%'..stlLen..'(%=%f%#Statement#:%-3l%*%( [%M%R%W]%) %#Identifier#%{v:lua.StlIcon()} %)'
 end
 
 -- function SetCmdHeight()

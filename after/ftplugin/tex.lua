@@ -1,2 +1,2 @@
-local ft = require 'utils.ftplugin'
-ft.addOpt('concealcursor', '')
+-- local ft = require 'utils.ftplugin'
+-- ft.addOpt('concealcursor', '')

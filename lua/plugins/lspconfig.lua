@@ -31,6 +31,9 @@ local lsps = { -->1
     --   }
     -- }
   },
+  -- ruff = {},
+  pyright = {},
+  -- html = {},
 }
 
 local function lspBufSetup(evt) -->1
@@ -48,8 +51,8 @@ local function lspBufSetup(evt) -->1
 
   vim.bo[bnr].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
-  bmap('n', '<M-D>', 'declaration', 'goto lsp declaration')
-  bmap('n', '<M-d>', 'definition', 'goto lsp definition')
+  bmap('n', 'gD', 'declaration', 'goto lsp declaration')
+  bmap('n', 'gd', 'definition', 'goto lsp definition')
   bmap('n', 'K', 'hover', 'show lsp hover')
   bmap('n', '<Space>K', 'K', 'preserve default K')
   bmap('n', 'gI', 'implementation', 'goto lsp implementation')
@@ -89,7 +92,7 @@ return {
     'neovim/nvim-lspconfig',
     cond = event { 'BufReadPost', 'BufNewFile' },
     config = function()
-      vim.diagnostic.config { signs = true, virtual_text = false, underline = false }
+      vim.diagnostic.config { signs = false, virtual_text = true, underline = false }
 
       local lc = require 'lspconfig'
       local au = require 'utils.augroup' 'LspAttach'

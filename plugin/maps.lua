@@ -439,27 +439,19 @@ vim.api.nvim_set_keymap('o', 'g#', '', {
 vim.api.nvim_set_keymap('', 'z4', '', { callback = zz4, desc = 'center cursor at 1/4 instead of 1/2' })
 
 vim.api.nvim_set_keymap('', 'n', '', {
+  noremap = true,
   callback = function()
-    -- local wH = vim.fn.line 'w0'
-    -- local ci = vim.api.nvim_win_get_cursor(0)
-    vim.api.nvim_feedkeys((vim.v.searchforward and 'n' or 'N') .. 'zv', 'nx', false)
-    -- if wH == vim.fn.line 'w0' then return end
-    -- local c = vim.api.nvim_win_get_cursor(0)
-    -- if ci[1] == c[1] and ci[2] == c[2] then return end
-    -- zz4()
+    return vim.v.searchforward ~= 0 and 'n' or 'N'
   end,
-  desc = 'always search forwards, center cursor'
+  expr = true,
+  desc = 'always search forwards'
 })
 vim.api.nvim_set_keymap('', 'N', '', {
+  noremap = true,
   callback = function()
-    local wH = vim.fn.line 'w0'
-    -- local ci = vim.api.nvim_win_get_cursor(0)
-    vim.api.nvim_feedkeys((vim.v.searchforward and 'N' or 'n') .. 'zv', 'nx', false)
-    -- if wH == vim.fn.line 'w0' then return end
-    local c = vim.api.nvim_win_get_cursor(0)
-    -- if ci[1] == c[1] and ci[2] == c[2] then return end
-    -- zz4()
+    return vim.v.searchforward ~= 0 and 'N' or 'n'
   end,
+  expr = true,
   desc = 'always search backwards'
 })
 

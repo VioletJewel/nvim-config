@@ -1,5 +1,5 @@
-local cmd = require 'pckr.loader.cmd'
-local keys = require 'pckr.loader.keys'
+-- local cmd = require 'pckr.loader.cmd'
+-- local keys = require 'pckr.loader.keys'
 -- local event = require 'pckr.loader.event'
 
 return {
@@ -7,21 +7,17 @@ return {
     'L3MON4D3/LuaSnip',
     tag = "v2.*",
     run = 'make install_jsregexp',
-    cond = {
-      keys({ 'n', 'i', 's' }, '<M-Space>'),
-      keys({ 'n', 'i', 's' }, '<M-h>'),
-      keys({ 'n', 'i', 's' }, '<M-l>'),
-      keys({ 'n', 'i', 's' }, '<M-j>'),
-      keys({ 'n', 'i', 's' }, '<M-k>'),
-      cmd 'LuaSnipListAvailable',
-      cmd 'LuaSnipUnlinkCurrent',
-    },
+    -- cond = {
+    --   keys({ 'n', 'i', 's' }, '<M-Space>'),
+    --   keys({ 'n', 'i', 's' }, '<M-h>'),
+    --   keys({ 'n', 'i', 's' }, '<M-l>'),
+    --   keys({ 'n', 'i', 's' }, '<M-j>'),
+    --   keys({ 'n', 'i', 's' }, '<M-k>'),
+    --   cmd 'LuaSnipListAvailable',
+    --   cmd 'LuaSnipUnlinkCurrent',
+    -- },
     config = function()
       local ls = require 'luasnip'
-      local cfg = vim.fn.stdpath 'config' ---@cast cfg string
-      require 'luasnip.loaders.from_lua'.lazy_load {
-        lazy_paths = vim.fs.joinpath(cfg, 'snippets')
-      }
       vim.keymap.set({ 'n', 'i', 's' }, '<M-Space>', function()
         if ls.expandable() then ls.expand() end
       end, {
@@ -47,6 +43,10 @@ return {
       end, {
         desc = 'cycle backwards through luasnip node choices',
       })
+      local cfg = vim.fn.stdpath 'config' ---@cast cfg string
+      require 'luasnip.loaders.from_lua'.lazy_load {
+        lazy_paths = vim.fs.joinpath(cfg, 'snippets')
+      }
     end,
   },
 }

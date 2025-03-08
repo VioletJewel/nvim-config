@@ -33,13 +33,13 @@ au { 'BufWinEnter',
     if should_mkview(evt) then
       local fdm = vim.wo.foldmarker
       local fde = vim.wo.foldexpr
-      local fdl = vim.wo.foldlevel
+      -- local fdl = vim.wo.foldlevel
       local fmr = vim.wo.foldmarker
       vim.cmd.loadview { mods = { emsg_silent = true } }
       -- vim.b[evt.buf].no_mkview = true
       vim.opt_local.foldmarker = fdm
       vim.opt_local.foldexpr   = fde
-      vim.opt_local.foldlevel  = fdl
+      -- vim.opt_local.foldlevel  = fdl
       vim.opt_local.foldmarker = fmr
     end
   end,
@@ -90,10 +90,10 @@ au { 'BufWinEnter',
 -- }                            --<
 
 au { 'BufWinEnter,Filetype', --> fix o/O
-  callback = function()-->
+  callback = function()      -->
     vim.opt_local.formatoptions:append 'r'
     vim.opt_local.formatoptions:remove 'o'
-  end,--<
+  end,              --<
   desc = 'normal o/O do NOT insert comment; insert <CR> DOES insert comment',
 }                   --<
 
@@ -114,7 +114,7 @@ au { 'VimEnter,BufNew,BufRead', --> no swap for /tmp
   end,
   desc = 'Do NOT store swapfiles for /tmp/*'
   -- 'backupskip' also ignores backups in /tmp
-}                --<
+} --<
 
 -- au { 'FileType', --> set foldexpr to treesitter
 --   pattern = '*',
@@ -127,10 +127,38 @@ au { 'VimEnter,BufNew,BufRead', --> no swap for /tmp
 --   desc = 'auto-set fdm=nvim_treesitter#foldexpr() if ts enabled'
 -- } --<
 
+--au { 'BufNew',
+--  ---@diagnostic disable-next-line: param-type-mismatch
+--  pattern = vim.fs.joinpath(vim.fn.fnameescape(vim.fn.stdpath 'config'), 'lua', 'plugins', '*.lua'),
+--  callback = function(evt)
+--    -- if vim.b[evt.buf].pckrPluginSkeletonLoad then
+--    --   print 'pckr skeleton load again :('
+--    --   return
+--    -- end
+--    -- print 'pckr skeleton load'
+--    -- vim.b[evt.buf].pckrPluginSkeletonLoad = true
+--    vim.bo[evt.buf].filetype = 'lua'
+--    vim.api.nvim_buf_set_lines(evt.buf, 0, 1, true, {
+--      "-- local cmd = require 'pckr.loader.cmd'",
+--      "-- local keys = require 'pckr.loader.keys'",
+--      "-- local event = require 'pckr.loader.event'",
+--      "",
+--      "return {",
+--      "}",
+--    })
+--  end,
+--  desc = 'Populate new plugin with a skeleton'
+--}
+
+
 au { 'BufNewFile',
   ---@diagnostic disable-next-line: param-type-mismatch
   pattern = vim.fs.joinpath(vim.fn.fnameescape(vim.fn.stdpath 'config'), 'lua', 'plugins', '*.lua'),
   callback = function(evt)
+    if vim.b[evt.buf].pckrPluginGuard then
+      return
+    end
+    vim.b[evt.buf].pckrPluginGuard = true
     vim.api.nvim_buf_set_lines(evt.buf, 0, 1, true, {
       "-- local cmd = require 'pckr.loader.cmd'",
       "-- local keys = require 'pckr.loader.keys'",
@@ -140,6 +168,7 @@ au { 'BufNewFile',
       "}",
     })
   end,
+  desc = 'Populate new plugin with a skeleton'
 }
 
 -- au { 'FileType',

@@ -1,10 +1,10 @@
 local ls = require("luasnip")
-local s = ls.s
--- local sn = ls.snippet_node
+local s = ls.snippet
+local sn = ls.snippet_node
 -- local isn = ls.indent_snippet_node
 local t = ls.text_node
 local i = ls.insert_node
--- local f = ls.function_node
+local f = ls.function_node
 local c = ls.choice_node
 local d = ls.dynamic_node
 -- local r = ls.restore_node
@@ -29,36 +29,37 @@ local d = ls.dynamic_node
 return {
 
   s('main', {
-    t{'int main(int argc, char *argv[]) {', '\t'},
+    t { 'int main(int argc, char *argv[]) {', '\t' },
     i(1, ''),
-    t{'', '\treturn 0;', '}'}
+    t { '', '\treturn 0;', '}' }
   }),
 
   s('p', {
-    t'printf("',
+    t 'printf("',
     i(1, '%d'),
-    t'"',
+    t '"',
     d(2, function(args)
       local toks = {}
-      if args[1][1]:gsub('%%%%', ''):match'%%' then
-        table.insert(toks, t', ')
+      if args[1][1]:gsub('%%%%', ''):match '%%' then
+        table.insert(toks, t ', ')
         table.insert(toks, i(1, ''))
       end
       return ls.snippet_node(nil, toks)
     end, 1),
-    t');',
+    t ');',
   }),
 
   s('i', {
-    t'#include ',
+    t '#include ',
     c(2, {
-      t'<',
-      t'"',
+      t '<',
+      t '"',
     }),
     i(1, 'stdio'),
-    t'.h',
+    t '.h',
     d(3, function(args)
-      return s(nil, {t(args[1][1] == '<' and '>' or args[1][1])})
+      vim.print(args)
+      return sn(nil, { t(args[1][1] == '<' and '>' or args[1][1]) })
     end, 2),
   }),
 

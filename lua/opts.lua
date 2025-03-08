@@ -93,13 +93,14 @@ vim.o.completeopt = 'menuone'
 
 -->1 folding
 
--- vim.o.foldlevelstart = 2     -- always open first 2 fold levels for new bufs
--- vim.o.foldmethod = 'syntax'  -- use syntax for folding
--- -- vim.o.foldmarker = '-->,--<'
+vim.o.foldlevelstart = 2     -- always open first 2 fold levels for new bufs
+vim.o.foldmethod = 'syntax'  -- use syntax for folding
 
--- ufo
-vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
-vim.o.foldlevelstart = 99
+-- -- ufo
+-- vim.o.foldenable = true
+-- vim.o.foldcolumn = '0'
+-- vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+-- vim.o.foldlevelstart = 99
 
 
 -->1 break indent
@@ -118,7 +119,7 @@ vim.o.fillchars = 'fold: ,diff:~' -- ,eob:.'
 if os.getenv 'TERM' == 'linux' then
   vim.opt.fillchars:append 'eob:.'  -- dots end of buffer for tty
 else
-  if os.getenv 'ASCIINEMA_REC' == '1' then
+  if os.getenv 'DVTM' or os.getenv 'ASCIINEMA_REC' == '1' then
     vim.opt.fillchars:append 'eob:♥'  -- cute end of buffer >^_^<
   else
     vim.opt.fillchars:append 'eob:'  -- cute end of buffer >^_^<

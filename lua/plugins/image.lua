@@ -17,7 +17,7 @@ return {
     config = function()
       require 'utils.rocks'.ensureRocks(rocksDeps, function()
         require 'image'.setup {
-          backend = 'kitty',
+          backend = 'ueberzug',
           processor = 'magick_rock',
           markdown = {
             enabled = true,

@@ -1,15 +1,6 @@
 local cmd = vim.api.nvim_create_user_command
 local opts
 
-local docsdir
-do
-  local fh = io.popen 'xdg-user-dir DOCUMENTS'
-  if fh then
-    docsdir = fh:read()
-    fh:close()
-  end
-end
-
 -- egs :WhatDayIsIt 10days ago :WhatDayIsIt in 5y20w10d
 cmd('WhatDayIsIt', function(o)
   local time, err = require 'utils.date'.relDateToTime(o.args:lower())
@@ -17,20 +8,6 @@ cmd('WhatDayIsIt', function(o)
     print "That's not a real time!"
   end
   print('The date ' .. ((o.args == '' or err) and 'today' or o.args) .. ' is ' .. os.date('%A, %d %B, %Y', time))
-end, {
-  nargs = '?',
-})
-
-cmd('Journal', function(o)
-  local time, err = require 'utils.date'.relDateToTime(o.args:lower())
-  if err then
-    print "That's not a real time!"
-  end
-  vim.print(o.smods)
-  vim.cmd.split {
-    docsdir .. os.date('/journal/%Y-%m-%d.md', time), 
-    mods = o.smods
-  }
 end, {
   nargs = '?',
 })
@@ -113,7 +90,7 @@ local function filelistGrep(search, list, vimgrep) -->
   vim.fn.setqflist({})
   local c = vimgrep and 'vimgrepadd' or 'grepadd'
   local s = vim.fn.escape(search, '"')
-  print('Searching in ' .. (#list) .. ' files')
+  -- print('Searching in ' .. (#list) .. ' files')
   for _, bufnr in ipairs(list) do
     local buf = vim.fn.fnameescape(vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ':p'))
     vim.cmd[c] { args = { '"' .. s .. '"', buf }, bang = true, mods = { silent = true } }
@@ -178,10 +155,10 @@ cmd('Fput', function(a) -->
 end, opts) --<
 
 vim.api.nvim_create_user_command('Rename', function(o)
-  local curfile = vim.api.nvim_buf_get_name(0) -- current file path
-  local cwd = assert(vim.uv.cwd()) -- cwd
+  local curfile = vim.api.nvim_buf_get_name(0)                  -- current file path
+  local cwd = assert(vim.uv.cwd())                              -- cwd
   local relfile = curfile:gsub('^' .. vim.pesc(cwd) .. '/', '') -- `curfile` relative to cwd
-  local reldir = vim.fs.dirname(relfile) .. '/' -- dirname of `curfile`
+  local reldir = vim.fs.dirname(relfile) .. '/'                 -- dirname of `curfile`
   local newfile = vim.fn.input('rename ' .. relfile .. ' to: ', reldir)
   if newfile:sub(1, 1) ~= '/' then
     newfile = vim.fs.normalize(cwd .. '/' .. newfile)

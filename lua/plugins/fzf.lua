@@ -16,10 +16,14 @@ return {
       cmd 'FzfLua',
     },
     config = function()
+      local backdrop
+      if vim.o.termguicolors == false then
+        backdrop = 100
+      end
       require 'fzf-lua'.setup {
         { 'max-perf', 'border-fused' },
         winopts = {
-          backdrop = os.getenv 'ASCIINEMA_REC' == '1' and 100 or nil,
+          backdrop = backdrop,
           preview = {
             default = 'builtin',
             scrollbar = false,
@@ -68,7 +72,10 @@ return {
             false,
             ['<M-Esc>'] = 'hide',
             ['<M-CR>'] = 'toggle-fullscreen',
-            ['<F7>'] = 'toggle-preview-ts-ctx',
+            ['<M-t>'] = 'toggle-preview-ts-ctx',
+            ['<M-j>'] = 'preview-page-down',
+            ['<M-k>'] = 'preview-page-up',
+            ['<M-h>'] = 'preview-reset',
           },
           fzf = {
             true,
@@ -92,6 +99,7 @@ return {
           }
         },
       }
+      vim.keymap.set('n', '<LocalLeader>b', function() require 'fzf-lua'.buffers() end, { desc = 'browse open buffers in fzf' })
       vim.keymap.set('n', '<LocalLeader>f', function() require 'fzf-lua'.files() end, { desc = 'browse files in fzf' })
       vim.keymap.set('n', '<M-Esc>', function() require 'fzf-lua'.resume() end, { desc = 'resume fzf session' })
       vim.keymap.set('n', '<LocalLeader>c', function() require 'fzf-lua'.files { cwd = vim.fn.stdpath 'config' } end,

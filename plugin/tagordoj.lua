@@ -27,6 +27,10 @@ end, {
 
 
 vim.api.nvim_create_user_command('Tagordo', function(opts)
+  if vim.b[evt.buf].pckrPluginGuard then
+    return
+  end
+  vim.b[evt.buf].tagordoGuard = true
   local f = vim.fs.joinpath(tagordujo, os.date '%Y-%m-%d-%a.md')
   vim.cmd.split { args = { f }, mods = opts.smods }
 end, {

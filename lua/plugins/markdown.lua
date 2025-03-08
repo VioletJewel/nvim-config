@@ -4,35 +4,49 @@ local event = require 'pckr.loader.event'
 
 return {
 
-  {
-    'dhruvasagar/vim-table-mode',
-    cond = event('FileType', 'markdown'),
-  },
+  -- {
+  --   'OXY2DEV/markview.nvim',
+  --   config = function()
+  --     require 'markview'.setup {
+  --       -- RenderMarkdownH1Bg xxx guibg=#2c314a
+  --       -- RenderMarkdownH2Bg xxx guibg=#38343d
+  --       -- RenderMarkdownH3Bg xxx guibg=#32383f
+  --       -- RenderMarkdownH4Bg xxx guibg=#273644
+  --       -- RenderMarkdownH5Bg xxx guibg=#32304a
+  --       -- RenderMarkdownH6Bg xxx guibg=#383148
+  --     }
+  --   end
+  -- },
 
-  {
-    'iamcco/markdown-preview.nvim',
-    run = 'cd app && yarn install',
-    cond = event('FileType', 'markdown'),
-    config_pre = function()
-      vim.g.mkdp_auto_close = 0
-    end,
-  },
+  -- {
+  --   'dhruvasagar/vim-table-mode',
+  --   cond = event('FileType', 'markdown'),
+  -- },
 
-  {
-    'toppair/peek.nvim',
-    run = 'deno task --quiet build:fast',
-    cond = {
-      cmd 'PeekOpen',
-      cmd 'PeekClose',
-    },
-    config = function()
-      require 'peek'.setup {
-        -- app = 'firefox'
-      }
-      vim.api.nvim_create_user_command('PeekOpen', require('peek').open, {})
-      vim.api.nvim_create_user_command('PeekClose', require('peek').close, {})
-    end,
-  },
+  -- {
+  --   'iamcco/markdown-preview.nvim',
+  --   run = 'cd app && yarn install',
+  --   cond = event('FileType', 'markdown'),
+  --   config_pre = function()
+  --     vim.g.mkdp_auto_close = 0
+  --   end,
+  -- },
+
+  -- {
+  --   'toppair/peek.nvim',
+  --   run = 'deno task --quiet build:fast',
+  --   cond = {
+  --     cmd 'PeekOpen',
+  --     cmd 'PeekClose',
+  --   },
+  --   config = function()
+  --     require 'peek'.setup {
+  --       -- app = 'firefox'
+  --     }
+  --     vim.api.nvim_create_user_command('PeekOpen', require('peek').open, {})
+  --     vim.api.nvim_create_user_command('PeekClose', require('peek').close, {})
+  --   end,
+  -- },
 
   {
     'MeanderingProgrammer/render-markdown.nvim',
