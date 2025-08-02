@@ -1,13 +1,19 @@
 local cmd = vim.api.nvim_create_user_command
 
 local docsdir
-do
+if vim.fn.executable 'xdg-user-dir' then
   local fh = io.popen 'xdg-user-dir DOCUMENTS'
   if fh then
     docsdir = fh:read()
     fh:close()
   end
+else
+  docsdir = vim.fs.joinpath(os.getenv 'HOME', 'Documents')
 end
+
+local notesDir = vim.fs.joinpath(docsdir, '/notujo')
+local journalDir = vim.fs.joinpath(docsdir, '/jxournalujo')
+
 
 local au = require 'utils.augroup' 'ViJournal'
 
@@ -18,7 +24,7 @@ cmd('Journal', function(o)
   end
   -- vim.print(o.smods)
   vim.cmd[o.bang and 'edit' or require 'utils.win'.shouldSplit() and 'split' or 'edit'] {
-    docsdir .. os.date('/journal/%Y-%m-%d.md', time),
+    vim.fs.joinpath(journalDir, os.date('/%Y-%m-%d.md', time)),
     mods = o.bang ~= true and o.smods or nil
   }
 end, {
@@ -28,7 +34,7 @@ end, {
 
 au { 'BufNewFile',
   ---@diagnostic disable-next-line: param-type-mismatch
-  pattern = vim.fs.joinpath(vim.fn.fnameescape(docsdir), 'journal', '*.lua'),
+  pattern = vim.fs.joinpath(vim.fn.fnameescape(journalDir), '*.md'),
   callback = function(evt)
     if vim.b[evt.buf].journalSkeletonGuard then
       return

@@ -48,13 +48,16 @@ return {
             ['core.dirman'] = {
               config = {
                 workspaces = { notes = notesDir },
-                default_workspace = 'notes'
+                default_workspace = 'notes',
+                index = 'index.norg',
               },
             },
             ['core.journal'] = {
-              journal_folder = 'areas/journal',
-              strategy = 'flat',
-              workspace = 'notes',
+              config = {
+                journal_folder = 'journal',
+                strategy = 'flat',
+                workspace = 'notes',
+              }
             },
             ['core.integrations.treesitter'] = {},
             ['core.concealer'] = {},

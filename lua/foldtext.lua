@@ -25,7 +25,7 @@ function Foldtext()
     l1 = l1:gsub(cms .. '%s*' .. f1 .. '%d*', ''):gsub('%s*' .. f1 .. '%d*', '')
     if l1:len() > llen then l1 = l1:sub(1, llen) .. '...' end
   end
-  return string.format(fmt, l1:gsub('^ ?', '▷'), vim.v.foldend - vim.v.foldstart)
+  return string.format(fmt, l1:gsub('^ ?', '▷ '), vim.v.foldend - vim.v.foldstart)
 end
 
 vim.opt.foldtext = 'v:lua.Foldtext()'

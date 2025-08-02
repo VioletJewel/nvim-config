@@ -48,11 +48,11 @@ vim.o.showcmd = false   -- do now show count/etc during op pending mode, etc
 
 -->1 shortmess
 --  a: l + m + r + w                  |  o: overwrite read w write msgs
---   l: "99L" not "99 lines           |  O: overwrite any msg w read msg
---   m: "[+]" not "[Modified]"        |  c: no ins-cmpl msgs
---   r: "[RO]" not "[readonly]"       |  C: no "scanning tags" for ins-cmpl
---   w: "[w]" not "written"           |  F: no :file on :edit
---      "[a]" not "appended"          |  A: no ATTENTION for existing swap
+--  l: "99L" not "99 lines            |  O: overwrite any msg w read msg
+--  m: "[+]" not "[Modified]"         |  c: no ins-cmpl msgs
+--  r: "[RO]" not "[readonly]"        |  C: no "scanning tags" for ins-cmpl
+--  w: "[w]" not "written"            |  F: no :file on :edit
+--     "[a]" not "appended"           |  A: no ATTENTION for existing swap
 --  t: truncate long msgs at start    |  W: no [w] on :write
 --  T: truncate other msgs in middle  |  I: no :intro on VimEnter
 vim.opt.shortmess:append 'atToOcCFAWI'

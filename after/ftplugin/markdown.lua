@@ -30,7 +30,7 @@ ft.addMap('n', '<Tab>', function() -->
 end, {
   silent = true,
   desc = 'Cycle through markdown things!'
-})                                   --<
+}) --<
 
 ft.addMap('n', '<S-Tab>', function() -->
   local line = vim.api.nvim_get_current_line()
@@ -90,17 +90,19 @@ local function getLink()
   return link and vim.treesitter.get_node_text(link, 0), linkType
 end
 
+-- Create link under cursor or jump if already exists (like gd)
 ft.addMap('n', '<CR>', function()
-  local params = vim.lsp.util.make_position_params(0)
+  local params = vim.lsp.util.make_position_params(0, 'utf-8')
   local def = vim.lsp.buf_request_sync(0, 'textDocument/definition', params, 2000)
-  print('dev', vim.inspect(def))
+  -- print('dev', vim.inspect(def))
   if def and def[1] and def[1].result then
     -- if there is a valid definition under the cursor, go to it
     vim.lsp.buf.definition()
     return
   end
   -- there is no definition under the cursor
-  local link, linkType = assert(getLink())
+  local title, linkType = assert(getLink())
+  local link = title:gsub('%s+', '_')
   local stat = vim.uv.fs_stat(link)
   local bufname = vim.api.nvim_buf_get_name(0)
   if not stat or stat.type == 'directory' or link:sub(-1, -1) == '/' then
@@ -120,7 +122,7 @@ ft.addMap('n', '<CR>', function()
     vim.cmd.edit(path)
     if linkType == 'shortcut_link' and vim.api.nvim_buf_line_count(0) then
       path = path:gsub('%.md$', ''):gsub('/index', '')
-      vim.api.nvim_buf_set_lines(0, 0, 1, true, { '# ' .. path, '', '' })
+      vim.api.nvim_buf_set_lines(0, 0, 1, true, { '', '# ' .. title, '', '' })
       vim.api.nvim_win_set_cursor(0, { 3, 0 })
     end
   end

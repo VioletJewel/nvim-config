@@ -9,9 +9,11 @@ return {
     --   'nvim-tree/nvim-web-devicons' -- ./devicons.lua (opt)
     -- },
     cond = {
-      keys('n', '<Bslash>f'),
-      keys('n', '<Bslash>c'),
-      keys('n', '<Bslash>C'),
+      keys('n', '<Bslash>fb'),
+      keys('n', '<Bslash>ff'),
+      keys('n', '<Bslash>fF'),
+      keys('n', '<Bslash>fc'),
+      keys('n', '<Bslash>fp'),
       cmd 'FZF',
       cmd 'FzfLua',
     },
@@ -99,12 +101,19 @@ return {
           }
         },
       }
-      vim.keymap.set('n', '<LocalLeader>b', function() require 'fzf-lua'.buffers() end, { desc = 'browse open buffers in fzf' })
-      vim.keymap.set('n', '<LocalLeader>f', function() require 'fzf-lua'.files() end, { desc = 'browse files in fzf' })
+      -- [f]zfind [b]uffers
+      vim.keymap.set('n', '<LocalLeader>fb', function() require 'fzf-lua'.buffers() end, { desc = 'browse open buffers in fzf' })
+      -- [f]zfind [f]iles
+      vim.keymap.set('n', '<LocalLeader>ff', function() require 'fzf-lua'.files() end, { desc = 'browse files in fzf' })
+      -- [f]zfind [f]iles (locally)
+      vim.keymap.set('n', '<LocalLeader>fF', function() require 'fzf-lua'.files { cwd = vim.fn.expand '%:p:h' } end, { desc = 'browse files in fzf' })
+      -- toggle fzf
       vim.keymap.set('n', '<M-Esc>', function() require 'fzf-lua'.resume() end, { desc = 'resume fzf session' })
-      vim.keymap.set('n', '<LocalLeader>c', function() require 'fzf-lua'.files { cwd = vim.fn.stdpath 'config' } end,
+      -- [f]zfind [c]onfig
+      vim.keymap.set('n', '<LocalLeader>fc', function() require 'fzf-lua'.files { cwd = vim.fn.stdpath 'config' } end,
         { desc = 'browse nvim config files in fzf' })
-      vim.keymap.set('n', '<LocalLeader>C',
+      -- [f]zfind [p]lugins
+      vim.keymap.set('n', '<LocalLeader>fp',
         --- @diagnostic disable-next-line: param-type-mismatch
         function() require 'fzf-lua'.files { cwd = vim.fs.joinpath(vim.fn.stdpath 'config', 'lua', 'plugins') } end,
         { desc = 'browse nvim config files in fzf' })

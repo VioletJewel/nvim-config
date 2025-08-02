@@ -371,14 +371,15 @@ vim.api.nvim_set_keymap('n', '<LocalLeader>g#', 'g#', {
   noremap = true,
   desc = 'original backwards no-bounds search backup'
 })
-vim.api.nvim_set_keymap('n', '<LocalLeader>n', 'n', {
-  noremap = true,
-  desc = 'original forwards search'
-})
-vim.api.nvim_set_keymap('n', '<LocalLeader>N', 'N', {
-  noremap = true,
-  desc = 'original backwards search'
-})
+
+-- vim.api.nvim_set_keymap('n', '<LocalLeader>n', 'n', {
+--   noremap = true,
+--   desc = 'original forwards search'
+-- })
+-- vim.api.nvim_set_keymap('n', '<LocalLeader>N', 'N', {
+--   noremap = true,
+--   desc = 'original backwards search'
+-- })
 
 -->1 faster *N{operator}gn{replacementText} w */#/g*/g# as pending operators
 

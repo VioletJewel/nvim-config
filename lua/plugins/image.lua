@@ -6,6 +6,8 @@ local rocksDeps = {
   { 'magick', withArgs = '--dev' },
 }
 
+if os.getenv 'TERM' == 'linux' then return {} end
+
 return {
 
   {
@@ -17,7 +19,7 @@ return {
     config = function()
       require 'utils.rocks'.ensureRocks(rocksDeps, function()
         require 'image'.setup {
-          backend = 'ueberzug',
+          backend = 'kitty', -- 'ueberzug',
           processor = 'magick_rock',
           markdown = {
             enabled = true,
