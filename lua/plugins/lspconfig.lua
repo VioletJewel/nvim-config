@@ -1,7 +1,3 @@
--- local cmd = require 'pckr.loader.cmd'
--- local keys = require 'pckr.loader.keys'
-local event = require 'pckr.loader.event'
-
 local lsps = { -->1
   clangd = {},
   zls = {},
@@ -18,11 +14,18 @@ local lsps = { -->1
         runtime = { version = 'LuaJIT' },
         workspace = {
           checkThirdParty = false,
-          library = { vim.env.VIMRUNTIME, "${3rd}/luv/library" --[["${3rd}/busted/library"]] }
-        }
+          library = {
+            vim.env.VIMRUNTIME,
+            "${3rd}/luv/library",
+            --[["${3rd}/busted/library",]]
+          }
+        },
+        diagnostics = { globals = { 'Cmd', 'Keys', 'Event' } },
       })
     end,
-    settings = { Lua = {} }
+    settings = {
+      Lua = {},
+    }
   },
   rust_analyzer = { -->2
     -- settings = {
@@ -90,7 +93,7 @@ return {
 
   {
     'neovim/nvim-lspconfig',
-    cond = event { 'BufReadPost', 'BufNewFile' },
+    cond = Event { 'BufReadPost', 'BufNewFile' },
     config = function()
       vim.diagnostic.config { signs = false, virtual_text = true, underline = false }
 

@@ -1,20 +1,16 @@
--- local cmd = require 'pckr.loader.cmd'
-local keys = require 'pckr.loader.keys'
--- local event = require 'pckr.loader.event'
-
 return {
   {
     'kylechui/nvim-surround',
     cond = {
-      keys('n', 'ys'),
-      keys('n', 'ds'),
-      keys('n', 'cs'),
-      keys('n', 'yS'),
-      keys('n', 'cS'),
-      keys('i', '<C-g>s'),
-      keys('i', '<C-g>S'),
-      keys({ 'n', 'x' }, 'S'),
-      keys('x', 'gS'),
+      Keys('n', 'ys'),
+      Keys('n', 'ds'),
+      Keys('n', 'cs'),
+      Keys('n', 'yS'),
+      Keys('n', 'cS'),
+      Keys('i', '<C-g>s'),
+      Keys('i', '<C-g>S'),
+      Keys({ 'n', 'x' }, 'S'),
+      Keys('x', 'gS'),
     },
     config = function() require 'nvim-surround'.setup() end,
   },

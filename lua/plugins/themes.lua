@@ -1,7 +1,3 @@
--- local cmd = require 'pckr.loader.cmd'
--- local keys = require 'pckr.loader.keys'
--- local event = require 'pckr.loader.event'
-
 local au = require 'utils.augroup' 'ViPluginThemes'
 
 local theme
@@ -35,7 +31,16 @@ au {
 
 return {
 
-  'folke/tokyonight.nvim',
+  {
+    'folke/tokyonight.nvim',
+    config = function()
+      require 'tokyonight'.setup {
+        styles = {
+          comments = { italic = false }
+        }
+      }
+    end
+  },
 
   'rebelot/kanagawa.nvim',
 

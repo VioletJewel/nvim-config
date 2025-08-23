@@ -1,7 +1,3 @@
-local cmd = require 'pckr.loader.cmd'
-local keys = require 'pckr.loader.keys'
-local event = require 'pckr.loader.event'
-
 local fh = assert(io.popen 'xdg-user-dir DOCUMENTS')
 local notesDir = vim.fs.joinpath(fh:read(), 'notes')
 fh:close()
@@ -28,11 +24,11 @@ return {
     },
     tag = '*', -- Pin Neorg to the latest stable release
     cond = {
-      cmd 'Neorg',
-      event('FileType', 'norg'),
-      keys('n', '<Space>nj'),
-      keys('n', '<Space>ni'),
-      keys('n', '<Space>nc'),
+      Cmd 'Neorg',
+      Event('FileType', 'norg'),
+      Keys('n', '<Space>nj'),
+      Keys('n', '<Space>ni'),
+      Keys('n', '<Space>nc'),
     },
     run = function()
       require 'utils.rocks'.ensureRocks(rocksDeps)

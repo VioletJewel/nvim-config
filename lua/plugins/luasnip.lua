@@ -1,20 +1,16 @@
--- local cmd = require 'pckr.loader.cmd'
--- local keys = require 'pckr.loader.keys'
--- local event = require 'pckr.loader.event'
-
 return {
   {
     'L3MON4D3/LuaSnip',
     tag = "v2.*",
     run = 'make install_jsregexp',
     -- cond = {
-    --   keys({ 'n', 'i', 's' }, '<M-Space>'),
-    --   keys({ 'n', 'i', 's' }, '<M-h>'),
-    --   keys({ 'n', 'i', 's' }, '<M-l>'),
-    --   keys({ 'n', 'i', 's' }, '<M-j>'),
-    --   keys({ 'n', 'i', 's' }, '<M-k>'),
-    --   cmd 'LuaSnipListAvailable',
-    --   cmd 'LuaSnipUnlinkCurrent',
+    --   Keys({ 'n', 'i', 's' }, '<M-Space>'),
+    --   Keys({ 'n', 'i', 's' }, '<M-h>'),
+    --   Keys({ 'n', 'i', 's' }, '<M-l>'),
+    --   Keys({ 'n', 'i', 's' }, '<M-j>'),
+    --   Keys({ 'n', 'i', 's' }, '<M-k>'),
+    --   Cmd 'LuaSnipListAvailable',
+    --   Cmd 'LuaSnipUnlinkCurrent',
     -- },
     config = function()
       local ls = require 'luasnip'

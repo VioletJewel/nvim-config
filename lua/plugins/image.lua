@@ -1,7 +1,3 @@
-local cmd = require 'pckr.loader.cmd'
--- local keys = require 'pckr.loader.keys'
--- local event = require 'pckr.loader.event'
-
 local rocksDeps = {
   { 'magick', withArgs = '--dev' },
 }
@@ -12,7 +8,7 @@ return {
 
   {
     '3rd/image.nvim',
-    cond = cmd 'ImageReport',
+    cond = Cmd 'ImageReport',
     run = function()
       require 'utils.rocks'.ensureRocks()
     end,

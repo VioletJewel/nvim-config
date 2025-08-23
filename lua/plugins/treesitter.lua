@@ -1,12 +1,9 @@
--- local cmd = require 'pckr.loader.cmd'
--- local keys = require 'pckr.loader.keys'
-local event = require 'pckr.loader.event'
-
 return {
 
   {-->
     'nvim-treesitter/nvim-treesitter',
-    cond = event 'UIEnter',
+    requires = { 'OXY2DEV/markview.nvim' },
+    cond = Event 'UIEnter',
     run = function() require 'nvim-treesitter.install'.update { with_sync = true } () end,
     config = function()
       -- &ft to 0 or more tree-sitter grammars
@@ -59,7 +56,7 @@ return {
   {-->
     'nvim-treesitter/nvim-treesitter-textobjects',
     requires = { 'nvim-treesitter/nvim-treesitter', },
-    cond = event { 'BufReadPost', 'BufNewFile' },
+    cond = Event { 'BufReadPost', 'BufNewFile' },
     config = function()
       require 'nvim-treesitter.configs'.setup {
         textobjects = {
@@ -118,7 +115,7 @@ return {
 
   {-->
     'nvim-treesitter/nvim-treesitter-context',
-    cond = event { 'BufReadPost', 'BufNewFile' },
+    cond = Event { 'BufReadPost', 'BufNewFile' },
     config = function()
       require 'treesitter-context'.setup {
         trim_scope = 'inner',
@@ -131,7 +128,7 @@ return {
 
   -- {-->
   --   'theHamsta/nvim-treesitter-pairs',
-  --   cond = event { 'BufReadPost', 'BufNewFile' },
+  --   cond = Event { 'BufReadPost', 'BufNewFile' },
   --   config = function()
   --     require'nvim-treesitter.configs'.setup {
   --       pairs = {

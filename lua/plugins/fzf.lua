@@ -1,7 +1,3 @@
-local cmd = require 'pckr.loader.cmd'
-local keys = require 'pckr.loader.keys'
--- local event = require 'pckr.loader.event'
-
 return {
   {-->
     'ibhagwan/fzf-lua',
@@ -9,13 +5,13 @@ return {
     --   'nvim-tree/nvim-web-devicons' -- ./devicons.lua (opt)
     -- },
     cond = {
-      keys('n', '<Bslash>fb'),
-      keys('n', '<Bslash>ff'),
-      keys('n', '<Bslash>fF'),
-      keys('n', '<Bslash>fc'),
-      keys('n', '<Bslash>fp'),
-      cmd 'FZF',
-      cmd 'FzfLua',
+      Keys('n', '<Bslash>fb'),
+      Keys('n', '<Bslash>ff'),
+      Keys('n', '<Bslash>fF'),
+      Keys('n', '<Bslash>fc'),
+      Keys('n', '<Bslash>fp'),
+      Cmd 'FZF',
+      Cmd 'FzfLua',
     },
     config = function()
       local backdrop

@@ -1,16 +1,11 @@
--- -- local cmd = require 'pckr.loader.cmd'
--- local keys = require 'pckr.loader.keys'
--- local event = require 'pckr.loader.event'
-
-
 -- return {
 --   {
 --     'kevinhwang91/nvim-ufo',
 --     requires = 'kevinhwang91/promise-async',
 --     cond = {
---       keys('n', 'zR'),
---       keys('n', 'zM'),
---       event 'UiEnter',
+--       Keys('n', 'zR'),
+--       Keys('n', 'zM'),
+--       Event 'UiEnter',
 --     },
 --     config = function()
 --       require 'ufo'.setup({

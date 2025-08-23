@@ -1,20 +1,16 @@
-local cmd = require 'pckr.loader.cmd'
-local keys = require 'pckr.loader.keys'
--- local event = require 'pckr.loader.event'
-
 return {
 
   {
     'nanotee/zoxide.vim',
     requires = { 'ibhagwan/fzf-lua' },
     cond = {
-      cmd 'Z',
-      cmd 'Lz',
-      cmd 'Tz',
-      cmd 'Zi',
-      cmd 'Lzi',
-      cmd 'Tzi',
-      keys('n', '<Bslash>z', ':<C-u>Zi<CR>', { desc = '[F]ZF [Z]oxide CD' }),
+      Cmd 'Z',
+      Cmd 'Lz',
+      Cmd 'Tz',
+      Cmd 'Zi',
+      Cmd 'Lzi',
+      Cmd 'Tzi',
+      Keys('n', '<Bslash>z', ':<C-u>Zi<CR>', { desc = '[F]ZF [Z]oxide CD' }),
     },
     config_pre = function()
       vim.g.zoxide_use_select = 1

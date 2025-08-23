@@ -1,11 +1,7 @@
-local cmd = require 'pckr.loader.cmd'
--- local keys = require 'pckr.loader.keys'
--- local event = require 'pckr.loader.event'
-
 return {
   {
     'NStefan002/screenkey.nvim',
-    cond = cmd 'Screenkey',
+    cond = Cmd 'Screenkey',
     config_pre = function()
       vim.g.screenkey_statusline_component = true
     end,

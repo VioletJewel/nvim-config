@@ -31,6 +31,10 @@ do
   vim.uv.fs_closedir(dir)
 end
 
+local cmd = require 'pckr.loader.cmd'
+local keys = require 'pckr.loader.keys'
+local event = require 'pckr.loader.event'
+
 require 'pckr'.add(vim.iter(files)
   :flatten(1):filter(function(p)
     return p.type == 'file' and p.name ~= 'init.lua' and not p.name:find '/init%.lua$' and p.name:find '%.lua'
@@ -38,6 +42,10 @@ require 'pckr'.add(vim.iter(files)
   :map(function(p)
     local lf, err = loadfile(plugd .. p.name)
     if lf then
+      local env = getfenv(lf)
+      env.Cmd = cmd
+      env.Keys = keys
+      env.Event = event
       local ok, mod = pcall(lf)
       if ok then return mod end
       err = mod

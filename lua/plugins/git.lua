@@ -1,29 +1,25 @@
-local cmd = require 'pckr.loader.cmd'
-local keys = require 'pckr.loader.keys'
--- local event = require 'pckr.loader.event'
-
 return {
 
   {
     'tpope/vim-fugitive',
     cond = {
-      keys('n', '<Space>gg'),
-      cmd 'G',
-      cmd 'Git',
-      cmd 'Ggrep',
-      cmd 'Glgrep',
-      -- cmd 'Gclog',
-      cmd 'Gcd',
-      -- cmd 'Glcd',
-      cmd 'Gedit',
-      cmd 'Gdiffsplit',
+      Keys('n', '<Space>gg'),
+      Cmd 'G',
+      Cmd 'Git',
+      Cmd 'Ggrep',
+      Cmd 'Glgrep',
+      -- Cmd 'Gclog',
+      Cmd 'Gcd',
+      -- Cmd 'Glcd',
+      Cmd 'Gedit',
+      Cmd 'Gdiffsplit',
     },
     config_pre = function()
       vim.keymap.set('n', '<Space>gg', function()
         local buf = vim.api.nvim_get_current_buf()
-        vim.cmd.Git { mods = { vertical = true, split = "topleft" } }
+        vim.Cmd.Git { mods = { vertical = true, split = "topleft" } }
         if #vim.api.nvim_tabpage_list_wins(0) == 2 and vim.bo[buf].buftype == '' and #vim.fn.undotree(buf).entries == 0 then
-          vim.cmd.wincmd 'o'
+          vim.Cmd.wincmd 'o'
         end
         vim.api.nvim_win_set_cursor(0, { 1, 0 })
       end, {
@@ -46,8 +42,8 @@ return {
   {
     'SuperBo/fugit2.nvim',
     cond = {
-      keys('n', '<Space>gf'),
-      cmd 'Fugit2', cmd 'Fugit2Diff', cmd 'Fugit2Graph'
+      Keys('n', '<Space>gf'),
+      Cmd 'Fugit2', Cmd 'Fugit2Diff', Cmd 'Fugit2Graph'
     },
     requires = {
       'MunifTanjim/nui.nvim',
@@ -68,25 +64,25 @@ return {
   {
     'lewis6991/gitsigns.nvim',
     cond = {
-      keys('n', ']c'),
-      keys('n', '[c'),
-      -- keys('n', '<Bslash>gss'),
-      -- keys('n', '<Bslash>gsn'),
-      -- keys('n', '<Bslash>gsl'),
-      -- keys('n', '<Bslash>gsw'),
-      -- keys('n', '<Bslash>gsb'),
-      -- keys('n', '<LocalLeader>hS'),
-      -- keys('n', '<LocalLeader>hu'),
-      -- keys('n', '<LocalLeader>hR'),
-      -- keys('n', '<LocalLeader>hp'),
-      -- keys('n', '<LocalLeader>hb'),
-      -- keys('n', '<LocalLeader>tb'),
-      -- keys('n', '<LocalLeader>hd'),
-      -- keys('n', '<LocalLeader>hD'),
-      -- keys('n', '<LocalLeader>td'),
-      -- keys('n', '<LocalLeader>gb'),
-      -- keys('n', '<LocalLeader>gB'),
-      keys({ 'o', 'x' }, 'ih', function()
+      Keys('n', ']c'),
+      Keys('n', '[c'),
+      -- Keys('n', '<Bslash>gss'),
+      -- Keys('n', '<Bslash>gsn'),
+      -- Keys('n', '<Bslash>gsl'),
+      -- Keys('n', '<Bslash>gsw'),
+      -- Keys('n', '<Bslash>gsb'),
+      -- Keys('n', '<LocalLeader>hS'),
+      -- Keys('n', '<LocalLeader>hu'),
+      -- Keys('n', '<LocalLeader>hR'),
+      -- Keys('n', '<LocalLeader>hp'),
+      -- Keys('n', '<LocalLeader>hb'),
+      -- Keys('n', '<LocalLeader>tb'),
+      -- Keys('n', '<LocalLeader>hd'),
+      -- Keys('n', '<LocalLeader>hD'),
+      -- Keys('n', '<LocalLeader>td'),
+      -- Keys('n', '<LocalLeader>gb'),
+      -- Keys('n', '<LocalLeader>gB'),
+      Keys({ 'o', 'x' }, 'ih', function()
         require 'gitsigns'.select_hunk()
       end) -- ':<C-U>Gitsigns select_hunk<CR>'),
     },

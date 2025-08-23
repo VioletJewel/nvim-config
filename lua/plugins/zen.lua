@@ -1,13 +1,9 @@
-local cmd = require 'pckr.loader.cmd'
-local keys = require 'pckr.loader.keys'
--- local event = require 'pckr.loader.event'
-
 return {
   {
     'folke/zen-mode.nvim',
     cond = {
-      keys('n', '<M-CR>'),
-      cmd 'ZenMode',
+      Keys('n', '<M-CR>'),
+      Cmd 'ZenMode',
     },
     config = function()
       require 'zen-mode'.setup {

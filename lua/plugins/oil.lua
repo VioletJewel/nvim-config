@@ -1,7 +1,3 @@
--- local cmd = require 'pckr.loader.cmd'
--- local keys = require 'pckr.loader.keys'
-local event = require 'pckr.loader.event'
-
 return {
   {
     'stevearc/oil.nvim',
@@ -9,7 +5,7 @@ return {
       -- { 'echasnovski/mini.icons', opts = {} },
       { 'nvim-tree/nvim-web-devicons' },
     },
-    cond = event 'UIEnter',
+    cond = Event 'UIEnter',
     config = function()
       require 'oil'.setup {
         default_file_explorer = true,
